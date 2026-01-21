@@ -1,0 +1,9 @@
+/Documentazione/*
+
+# File di configurazione ambiente
+.env
+.env.local
+.env.*.local
+
+# File di esempio NON ignorati (devono essere committati)
+# .env.example
