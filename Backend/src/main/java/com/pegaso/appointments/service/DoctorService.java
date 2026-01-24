@@ -132,24 +132,22 @@ public class DoctorService {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", doctorId));
 
-        if (request.getFirstName() != null) {
-            validation.requireNonEmptyWhenPresent(request.getFirstName(), "First name");
+        if (request.getFirstName() != null && !request.getFirstName().isBlank()) {
             doctor.setFirstName(normalization.normalizeName(request.getFirstName()));
         }
-        if (request.getLastName() != null) {
-            validation.requireNonEmptyWhenPresent(request.getLastName(), "Last name");
+        if (request.getLastName() != null && !request.getLastName().isBlank()) {
             doctor.setLastName(normalization.normalizeName(request.getLastName()));
         }
-        if (request.getSpecialization() != null) {
+        if (request.getSpecialization() != null && !request.getSpecialization().isBlank()) {
             doctor.setSpecialization(normalization.normalizeOptionalName(request.getSpecialization()));
         }
-        if (request.getGender() != null) {
+        if (request.getGender() != null && !request.getGender().isBlank()) {
             doctor.setGender(normalization.normalizeGender(request.getGender()));
         }
-        if (request.getPhoneNumber() != null) {
+        if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
             doctor.setPhoneNumber(normalization.normalizeString(request.getPhoneNumber()));
         }
-        if (request.getEmail() != null) {
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
             String emailToStore = normalization.emailToStore(request.getEmail());
             if (emailToStore != null) {
                 doctorRepository.findByEmail(emailToStore)
