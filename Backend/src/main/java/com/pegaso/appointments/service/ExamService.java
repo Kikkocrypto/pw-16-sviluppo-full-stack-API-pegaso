@@ -9,6 +9,7 @@ import com.pegaso.appointments.exception.ResourceNotFoundException;
 import com.pegaso.appointments.repository.AdminRepository;
 import com.pegaso.appointments.repository.ExamRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class ExamService {
     private final ExamRepository examRepository;
     private final AdminRepository adminRepository;
     private final FieldNormalizationService normalization;
+    private final JdbcTemplate jdbcTemplate;
 
 
     // Creazione di un nuovo esame POST api/exams
@@ -94,6 +96,47 @@ public class ExamService {
 
         exam = examRepository.save(exam);
         return mapToResponse(exam);
+    }
+
+
+
+
+    // Eliminazione di un esame DELETE api/exams/{examId}
+    @Transactional
+    public void deleteExam(UUID adminId, UUID examId) {
+        adminRepository.findById(adminId)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin", adminId));
+
+        Exam exam = examRepository.findById(examId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exam", examId));
+        if (hasAppointments(examId)) {
+            throw new ConflictException(
+                    "Impossibile eliminare l'esame: esistono prenotazioni associate. Elimina prima le prenotazioni o annullale.");
+        }
+        if (hasDoctorExams(examId)) {
+            throw new ConflictException(
+                    "Impossibile eliminare l'esame: esistono dottori abilitati a questo esame. Rimuovi prima le abilitazioni.");
+        }
+        examRepository.delete(exam);
+    }
+
+    // Verifica se esistono prenotazioni associate all'esame
+    private boolean hasAppointments(UUID examId) {
+        Boolean exists = jdbcTemplate.queryForObject(
+                "SELECT EXISTS(SELECT 1 FROM appointments WHERE exam_id = ?)",
+                Boolean.class,
+                examId
+        );
+        return Boolean.TRUE.equals(exists);
+    }
+    // Verifica se esistono dottori abilitati all'esame
+    private boolean hasDoctorExams(UUID examId) {
+        Boolean exists = jdbcTemplate.queryForObject(
+                "SELECT EXISTS(SELECT 1 FROM doctor_exams WHERE exam_id = ?)",
+                Boolean.class,
+                examId
+        );
+        return Boolean.TRUE.equals(exists);
     }
 
     private ExamResponse mapToResponse(Exam exam) {

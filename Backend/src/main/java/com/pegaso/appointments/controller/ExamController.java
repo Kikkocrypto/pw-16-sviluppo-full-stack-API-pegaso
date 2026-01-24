@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -199,5 +200,33 @@ public class ExamController {
         }
         ExamResponse response = examService.createExam(adminId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // Eliminazione di un esame DELETE api/exams/{examId}
+    @DeleteMapping(value = "/{examId}")
+    @Operation(
+            summary = "Delete exam",
+            description = "Elimina un esame dal catalogo. Richiede l'header X-Demo-Admin-Id. Consentito solo se non esistono prenotazioni associate né abilitazioni dottori (doctor_exams)."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Esame eliminato con successo"),
+            @ApiResponse(responseCode = "400", description = "Bad request - invalid or missing UUID in X-Demo-Admin-Id"),
+            @ApiResponse(responseCode = "404", description = "Admin or exam not found"),
+            @ApiResponse(responseCode = "409", description = "Conflict - exam has associated appointments or doctor_exams"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<Void> deleteExam(
+            @Parameter(description = "UUID of the admin. Required for DELETE /api/exams/{examId}.", required = true, example = "880e8400-e29b-41d4-a716-446655440001")
+            @RequestHeader(value = "X-Demo-Admin-Id", required = true) String adminIdHeader,
+            @Parameter(description = "UUID of the exam to delete", required = true, example = "770e8400-e29b-41d4-a716-446655440002")
+            @PathVariable UUID examId) {
+        UUID adminId;
+        try {
+            adminId = UUID.fromString(adminIdHeader.trim());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid UUID format");
+        }
+        examService.deleteExam(adminId, examId);
+        return ResponseEntity.noContent().build();
     }
 }
