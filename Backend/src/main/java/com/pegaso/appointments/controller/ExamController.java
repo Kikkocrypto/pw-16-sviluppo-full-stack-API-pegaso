@@ -15,12 +15,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -34,7 +36,49 @@ public class ExamController {
     private final ExamService examService;
 
 
-    // Creazione di un nuovo esame POST api/exams
+    // Recupero di tutti gli esami GET api/exams + swagger documentation
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "Get all exams",
+            description = "Returns a list of all exams. Requires X-Demo-Admin-Id header."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "List of exams retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = ExamResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request - invalid or missing UUID in X-Demo-Admin-Id"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Admin not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error - unexpected persistence error"
+            )
+    })
+    public ResponseEntity<List<ExamResponse>> getAllExams(
+            @Parameter(description = "UUID of the admin. Required for GET /api/exams.", required = true, example = "880e8400-e29b-41d4-a716-446655440001")
+            @RequestHeader(value = "X-Demo-Admin-Id", required = true) String adminIdHeader) {
+        UUID adminId;
+        try {
+            adminId = UUID.fromString(adminIdHeader.trim());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid UUID format");
+        }
+        List<ExamResponse> response = examService.getAllExams(adminId);
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
+
+    // Creazione di un nuovo esame POST api/exams + swagger documentation
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             summary = "Crea un nuovo esame",

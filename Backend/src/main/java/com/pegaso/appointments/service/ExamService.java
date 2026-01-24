@@ -11,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 // Service per la gestione degli esami, per astrarre logica di business e presentazione
 @Service
@@ -46,7 +49,19 @@ public class ExamService {
         return mapToResponse(exam);
     }
 
-    // Mapping dell'esame alla risposta
+
+    // Recupero di tutti gli esami GET api/exams
+    @Transactional(readOnly = true)
+    public List<ExamResponse> getAllExams(UUID adminId) {
+        adminRepository.findById(adminId)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin", adminId));
+
+        return examRepository.findAll().stream()
+                .sorted(Comparator.comparing(Exam::getName))
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     private ExamResponse mapToResponse(Exam exam) {
         return ExamResponse.builder()
                 .id(exam.getId())

@@ -29,6 +29,7 @@ public class CorsConfig {
         config.addAllowedHeader("Accept");
         config.addAllowedHeader("X-Demo-Patient-Id");
         config.addAllowedHeader("X-Demo-Doctor-Id");
+        config.addAllowedHeader("X-Demo-Admin-Id");
         
         // Allow credentials (if needed in the future)
         config.setAllowCredentials(false);
