@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -124,5 +125,33 @@ public class PatientController {
         }
         PatientResponse response = patientService.updatePatientProfile(patientId, request);
         return ResponseEntity.ok(response);
+    }
+
+
+
+
+    // Eliminazione del profilo del paziente DELETE api/patients + swagger documentation
+    @DeleteMapping
+    @Operation(
+            summary = "Delete patient profile",
+            description = "Elimina il profilo del paziente identificato dall'header X-Demo-Patient-Id. Consentito solo se non esistono prenotazioni associate."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Profilo cancellato con successo"),
+            @ApiResponse(responseCode = "400", description = "Bad request - invalid or missing UUID, or patient has associated appointments"),
+            @ApiResponse(responseCode = "404", description = "Patient not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<Void> deletePatientProfile(
+            @Parameter(description = "UUID del paziente da eliminare. Obbligatorio.", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
+            @RequestHeader(value = "X-Demo-Patient-Id", required = true) String patientIdHeader) {
+        UUID patientId;
+        try {
+            patientId = UUID.fromString(patientIdHeader.trim());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid UUID format");
+        }
+        patientService.deletePatient(patientId);
+        return ResponseEntity.noContent().build();
     }
 }

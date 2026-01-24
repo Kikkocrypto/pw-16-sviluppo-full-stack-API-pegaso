@@ -8,6 +8,7 @@ import com.pegaso.appointments.exception.ConflictException;
 import com.pegaso.appointments.exception.ResourceNotFoundException;
 import com.pegaso.appointments.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,12 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
     private final FieldNormalizationService normalization;
+    private final JdbcTemplate jdbcTemplate;
 
+
+
+
+    // Creazione di un nuovo paziente POST api/patients
     @Transactional
     public PatientResponse createPatient(CreatePatientRequest request) {
         String emailToStore = normalization.emailToStore(request.getEmail());
@@ -53,7 +59,7 @@ public class PatientService {
 
 
 
-    // Aggiornamento del profilo del paziente
+    // Aggiornamento del profilo del paziente PATCH api/patients
     @Transactional
     public PatientResponse updatePatientProfile(UUID patientId, UpdatePatientRequest request) {
         Patient patient = patientRepository.findById(patientId)
@@ -89,6 +95,27 @@ public class PatientService {
         }
         patient = patientRepository.save(patient);
         return mapToResponse(patient);
+    }
+
+
+    // Eliminazione del profilo del paziente DELETE api/patients
+    @Transactional
+    public void deletePatient(UUID patientId) {
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient", patientId));
+        if (hasAppointments(patientId)) {
+            throw new IllegalArgumentException("Cannot delete patient: patient has associated appointments");
+        }
+        patientRepository.delete(patient);
+    }
+
+    private boolean hasAppointments(UUID patientId) {
+        Boolean exists = jdbcTemplate.queryForObject(
+                "SELECT EXISTS(SELECT 1 FROM appointments WHERE patient_id = ?)",
+                Boolean.class,
+                patientId
+        );
+        return Boolean.TRUE.equals(exists);
     }
 
     private PatientResponse mapToResponse(Patient patient) {
