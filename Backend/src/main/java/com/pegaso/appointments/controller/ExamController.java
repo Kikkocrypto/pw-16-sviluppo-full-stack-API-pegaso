@@ -2,6 +2,7 @@ package com.pegaso.appointments.controller;
 
 import com.pegaso.appointments.dto.exam.CreateExamRequest;
 import com.pegaso.appointments.dto.exam.ExamResponse;
+import com.pegaso.appointments.dto.exam.UpdateExamRequest;
 import com.pegaso.appointments.service.ExamService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -111,6 +113,49 @@ public class ExamController {
     }
 
 
+
+
+    // Aggiornamento di un esame PATCH api/exams/{exam_id} + swagger documentation
+    @PatchMapping(value = "/{examId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "Update exam",
+            description = "Aggiorna un esame. Solo i campi presenti nel body verranno aggiornati (aggiornamento parziale). Il nome non può essere modificato. Richiede l'header X-Demo-Admin-Id."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Exam updated successfully",
+                    content = @Content(schema = @Schema(implementation = ExamResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request - invalid or missing UUID in X-Demo-Admin-Id, invalid duration minutes"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Admin or exam not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error - unexpected persistence error"
+            )
+    })
+    // Aggiornamento di un esame PATCH api/exams/{exam_id} (solo admin autorizzato + modifica su descrizione, durata e stato)
+    public ResponseEntity<ExamResponse> updateExam(
+            @Parameter(description = "UUID of the admin. Required for PATCH /api/exams/{examId}.", required = true, example = "880e8400-e29b-41d4-a716-446655440001")
+            @RequestHeader(value = "X-Demo-Admin-Id", required = true) String adminIdHeader,
+            @Parameter(description = "UUID of the exam to update", required = true, example = "770e8400-e29b-41d4-a716-446655440001")
+            @PathVariable UUID examId,
+            @Valid @RequestBody UpdateExamRequest request) {
+        UUID adminId;
+        try {
+            adminId = UUID.fromString(adminIdHeader.trim());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid UUID format");
+        }
+        ExamResponse response = examService.updateExam(adminId, examId, request);
+        return ResponseEntity.ok(response);
+    }
 
     // Creazione di un nuovo esame POST api/exams + swagger documentation
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

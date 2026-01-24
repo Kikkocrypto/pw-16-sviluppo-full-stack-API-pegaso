@@ -2,6 +2,7 @@ package com.pegaso.appointments.service;
 
 import com.pegaso.appointments.dto.exam.CreateExamRequest;
 import com.pegaso.appointments.dto.exam.ExamResponse;
+import com.pegaso.appointments.dto.exam.UpdateExamRequest;
 import com.pegaso.appointments.entity.Exam;
 import com.pegaso.appointments.exception.ConflictException;
 import com.pegaso.appointments.exception.ResourceNotFoundException;
@@ -67,6 +68,31 @@ public class ExamService {
     public ExamResponse getExamById(UUID examId) {
         Exam exam = examRepository.findById(examId)
                 .orElseThrow(() -> new ResourceNotFoundException("Exam", examId));
+        return mapToResponse(exam);
+    }
+
+    
+    
+    // Aggiornamento di un esame PATCH api/exams
+    @Transactional
+    public ExamResponse updateExam(UUID adminId, UUID examId, UpdateExamRequest request) {
+        adminRepository.findById(adminId)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin", adminId));
+
+        Exam exam = examRepository.findById(examId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exam", examId));
+
+        if (request.getDescription() != null) {
+            exam.setDescription(normalization.normalizeOptionalName(request.getDescription()));
+        }
+        if (request.getDurationMinutes() != null) {
+            exam.setDurationMinutes(request.getDurationMinutes());
+        }
+        if (request.getIsActive() != null) {
+            exam.setIsActive(request.getIsActive());
+        }
+
+        exam = examRepository.save(exam);
         return mapToResponse(exam);
     }
 
