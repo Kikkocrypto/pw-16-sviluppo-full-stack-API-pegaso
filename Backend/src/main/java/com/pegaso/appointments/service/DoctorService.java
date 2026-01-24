@@ -1,7 +1,10 @@
 package com.pegaso.appointments.service;
 
-import com.pegaso.appointments.dto.CreateDoctorRequest;
-import com.pegaso.appointments.dto.DoctorResponse;
+import com.pegaso.appointments.dto.doctor.CreateDoctorRequest;
+import com.pegaso.appointments.dto.doctor.DoctorProfileResponse;
+import com.pegaso.appointments.dto.doctor.DoctorResponse;
+import com.pegaso.appointments.dto.doctor.ExamInfoDto;
+import com.pegaso.appointments.dto.doctor.UpdateDoctorRequest;
 import com.pegaso.appointments.entity.Doctor;
 import com.pegaso.appointments.entity.DoctorExam;
 import com.pegaso.appointments.entity.DoctorExamId;
@@ -12,6 +15,7 @@ import com.pegaso.appointments.repository.DoctorExamRepository;
 import com.pegaso.appointments.repository.DoctorRepository;
 import com.pegaso.appointments.repository.ExamRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +32,7 @@ public class DoctorService {
     private final DoctorRepository doctorRepository;
     private final ExamRepository examRepository;
     private final DoctorExamRepository doctorExamRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Transactional
     // Creazione di un nuovo dottore
@@ -94,6 +99,116 @@ public class DoctorService {
             }
         }
         return mapToResponse(doctor, examIds);
+    }
+
+    @Transactional(readOnly = true)
+    // Recupero il profilo del dottore e gli esami associati
+    public DoctorProfileResponse getDoctorProfile(UUID doctorId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", doctorId));
+        List<DoctorExam> doctorExams = doctorExamRepository.findById_DoctorId(doctor.getId());
+        List<ExamInfoDto> exams = doctorExams.stream()
+                .map(de -> ExamInfoDto.builder()
+                        .examId(de.getExam().getId())
+                        .examName(de.getExam().getName())
+                        .description(de.getExam().getDescription())
+                        .build())
+                .collect(Collectors.toList());
+        return DoctorProfileResponse.builder()
+                .id(doctor.getId())
+                .firstName(doctor.getFirstName())
+                .lastName(doctor.getLastName())
+                .specialization(doctor.getSpecialization())
+                .gender(doctor.getGender())
+                .email(doctor.getEmail())
+                .phoneNumber(doctor.getPhoneNumber())
+                .exams(exams)
+                .build();
+    }
+
+    // Aggiornamento del profilo del dottore
+    @Transactional
+    public DoctorProfileResponse updateDoctorProfile(UUID doctorId, UpdateDoctorRequest request) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", doctorId));
+
+        if (request.getFirstName() != null) {
+            if (request.getFirstName().trim().isEmpty()) {
+                throw new IllegalArgumentException("First name cannot be empty");
+            }
+            doctor.setFirstName(normalizeName(request.getFirstName()));
+        }
+        if (request.getLastName() != null) {
+            if (request.getLastName().trim().isEmpty()) {
+                throw new IllegalArgumentException("Last name cannot be empty");
+            }
+            doctor.setLastName(normalizeName(request.getLastName()));
+        }
+        if (request.getSpecialization() != null) {
+            doctor.setSpecialization(normalizeOptionalName(request.getSpecialization()));
+        }
+        if (request.getGender() != null) {
+            doctor.setGender(normalizeGender(request.getGender()));
+        }
+        if (request.getPhoneNumber() != null) {
+            doctor.setPhoneNumber(normalizeString(request.getPhoneNumber()));
+        }
+        if (request.getEmail() != null) {
+            String normalizedEmail = normalizeEmail(request.getEmail());
+            if (normalizedEmail != null && !normalizedEmail.isBlank()) {
+                doctorRepository.findByEmail(normalizedEmail)
+                        .ifPresent(existingDoctor -> {
+                            if (!existingDoctor.getId().equals(doctorId)) {
+                                throw new ConflictException("Email already exists: " + normalizedEmail);
+                            }
+                        });
+                doctor.setEmail(normalizedEmail);
+            } else {
+                doctor.setEmail(null);
+            }
+        }
+
+        doctor = doctorRepository.save(doctor);
+        // Recupero gli esami associati al dottore
+        List<DoctorExam> doctorExams = doctorExamRepository.findById_DoctorId(doctor.getId());
+        List<ExamInfoDto> exams = doctorExams.stream()
+                .map(de -> ExamInfoDto.builder()
+                        .examId(de.getExam().getId())
+                        .examName(de.getExam().getName())
+                        .description(de.getExam().getDescription())
+                        .build())
+                .collect(Collectors.toList());
+
+        return DoctorProfileResponse.builder()
+                .id(doctor.getId())
+                .firstName(doctor.getFirstName())
+                .lastName(doctor.getLastName())
+                .specialization(doctor.getSpecialization())
+                .gender(doctor.getGender())
+                .email(doctor.getEmail())
+                .phoneNumber(doctor.getPhoneNumber())
+                .exams(exams)
+                .build();
+    }
+
+    // Eliminazione del profilo del dottore
+    @Transactional
+    public void deleteDoctor(UUID doctorId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", doctorId));
+        if (hasAppointments(doctorId)) {
+            throw new IllegalArgumentException("Cannot delete doctor: doctor has associated appointments");
+        }
+        doctorRepository.delete(doctor);
+    }
+
+    private boolean hasAppointments(UUID doctorId) {
+        Boolean exists = jdbcTemplate.queryForObject(
+                "SELECT EXISTS(SELECT 1 FROM appointments WHERE doctor_id = ?)",
+                Boolean.class,
+                doctorId
+        );
+        return Boolean.TRUE.equals(exists);
     }
 
     // Mappo il dottore e gli esami associati al DTO

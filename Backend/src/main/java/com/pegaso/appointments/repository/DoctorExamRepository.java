@@ -12,7 +12,7 @@ import java.util.UUID;
 @Repository
 public interface DoctorExamRepository extends JpaRepository<DoctorExam, DoctorExamId> {
 
-    List<DoctorExam> findByDoctorId(UUID doctorId);
+    List<DoctorExam> findById_DoctorId(UUID doctorId);
 
     boolean existsByDoctorIdAndExamId(UUID doctorId, UUID examId);
 }

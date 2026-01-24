@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS doctor_exams (
     CONSTRAINT fk_doctor_exams_doctor
         FOREIGN KEY (doctor_id)
         REFERENCES doctors (id)
-        ON DELETE RESTRICT,
+        ON DELETE CASCADE,
     CONSTRAINT fk_doctor_exams_exam
         FOREIGN KEY (exam_id)
         REFERENCES exams (id)

@@ -1,4 +1,4 @@
-package com.pegaso.appointments.dto;
+package com.pegaso.appointments.dto.doctor;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-// DTO per la risposta di un dottore
+//  DTO per la risposta del dottore
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
