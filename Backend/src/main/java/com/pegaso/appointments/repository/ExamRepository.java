@@ -12,4 +12,6 @@ import java.util.UUID;
 public interface ExamRepository extends JpaRepository<Exam, UUID> {
 
     List<Exam> findAllByIdIn(List<UUID> ids);
+
+    boolean existsByName(String name);
 }
