@@ -4,10 +4,12 @@ import com.pegaso.appointments.dto.patient.CreatePatientRequest;
 import com.pegaso.appointments.dto.patient.PatientResponse;
 import com.pegaso.appointments.entity.Patient;
 import com.pegaso.appointments.exception.ConflictException;
+import com.pegaso.appointments.exception.ResourceNotFoundException;
 import com.pegaso.appointments.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.UUID;
 
 // Service per la gestione dei pazienti, utilizzato per astrarre la logica di business dalla presentazione (chiama i repository e mantiene il controller pulito)
 @Service
@@ -40,6 +42,13 @@ public class PatientService {
     }
 
     // Mapping del paziente alla risposta
+    @Transactional(readOnly = true)
+    public PatientResponse getPatientProfile(UUID patientId) {
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient", patientId));
+        return mapToResponse(patient);
+    }
+
     private PatientResponse mapToResponse(Patient patient) {
         return PatientResponse.builder()
                 .id(patient.getId())
