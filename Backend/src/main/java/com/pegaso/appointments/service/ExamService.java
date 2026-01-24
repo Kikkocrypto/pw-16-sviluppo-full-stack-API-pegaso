@@ -62,6 +62,14 @@ public class ExamService {
                 .collect(Collectors.toList());
     }
 
+    // Recupero di un singolo esame GET api/exams/{exam_id}
+    @Transactional(readOnly = true)
+    public ExamResponse getExamById(UUID examId) {
+        Exam exam = examRepository.findById(examId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exam", examId));
+        return mapToResponse(exam);
+    }
+
     private ExamResponse mapToResponse(Exam exam) {
         return ExamResponse.builder()
                 .id(exam.getId())

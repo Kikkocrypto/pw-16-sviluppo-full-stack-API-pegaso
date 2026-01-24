@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -75,6 +76,39 @@ public class ExamController {
     }
 
 
+
+    // Recupero di un singolo esame GET api/exams/{exam_id} + swagger documentation
+    @GetMapping(value = "/{examId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "Get exam by ID",
+            description = "Returns a single exam by its ID. No authentication required."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Exam retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = ExamResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request - invalid UUID format"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Exam not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error - unexpected persistence error"
+            )
+    })
+    // Recupero di un singolo esame GET api/exams/{exam_id}
+    public ResponseEntity<ExamResponse> getExamById(
+            @Parameter(description = "UUID of the exam to retrieve", required = true, example = "770e8400-e29b-41d4-a716-446655440001")
+            @PathVariable UUID examId) {
+        ExamResponse response = examService.getExamById(examId);
+        return ResponseEntity.ok(response);
+    }
 
 
 
