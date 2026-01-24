@@ -46,7 +46,16 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
-    // Gestione delle eccezioni di conflitto
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationException(ValidationException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Bad request");
+        response.put("message", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<Map<String, Object>> handleConflictException(ConflictException ex) {
         Map<String, Object> response = new HashMap<>();
@@ -76,6 +85,8 @@ public class GlobalExceptionHandler {
         String message = ex.getMessage();
         if (message != null && message.contains("UUID")) {
             response.put("message", "Invalid UUID format");
+        } else if (message != null && (message.contains("LocalDate") || message.contains("java.time"))) {
+            response.put("message", "Invalid date format");
         } else {
             response.put("message", "Invalid JSON format");
         }

@@ -35,6 +35,9 @@ import java.util.UUID;
 public class DoctorController {
 
     private final DoctorService doctorService;
+
+
+    
     // Creazione di un nuovo dottore POST api/doctors
     @PostMapping
     @Operation(
@@ -65,6 +68,9 @@ public class DoctorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+
+
+
     // Recupero il profilo del dottore GET api/doctors (NON ADMIN)
     @GetMapping
     @Operation(
@@ -93,6 +99,9 @@ public class DoctorController {
         DoctorProfileResponse response = doctorService.getDoctorProfile(doctorId);
         return ResponseEntity.ok(response);
     }
+
+
+
 
     // Aggiornamento del profilo del dottore PATCH api/doctors con swagger documentation
     @PatchMapping
@@ -125,6 +134,9 @@ public class DoctorController {
         DoctorProfileResponse response = doctorService.updateDoctorProfile(doctorId, request);
         return ResponseEntity.ok(response);
     }
+
+
+
     // Eliminazione del profilo del dottore DELETE api/doctors
     @DeleteMapping
     @Operation(

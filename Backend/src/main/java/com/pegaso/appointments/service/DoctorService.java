@@ -33,26 +33,26 @@ public class DoctorService {
     private final ExamRepository examRepository;
     private final DoctorExamRepository doctorExamRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final FieldNormalizationService normalization;
+    private final FieldValidationService validation;
 
     @Transactional
     // Creazione di un nuovo dottore
     public DoctorResponse createDoctor(CreateDoctorRequest request) {
-        String normalizedEmail = normalizeEmail(request.getEmail());
-        
-        // Controllo se l'email è già presente
-        if (normalizedEmail != null && !normalizedEmail.isBlank()) {
-            if (doctorRepository.existsByEmail(normalizedEmail)) {
-                throw new ConflictException("Email already exists: " + normalizedEmail);
+        String emailToStore = normalization.emailToStore(request.getEmail());
+        if (emailToStore != null) {
+            if (doctorRepository.existsByEmail(emailToStore)) {
+                throw new ConflictException("Email already exists: " + emailToStore);
             }
         }
 
         Doctor doctor = Doctor.builder()
-                .firstName(normalizeName(request.getFirstName()))
-                .lastName(normalizeName(request.getLastName()))
-                .specialization(normalizeOptionalName(request.getSpecialization()))
-                .gender(normalizeGender(request.getGender()))
-                .email(normalizedEmail)
-                .phoneNumber(normalizeString(request.getPhoneNumber()))
+                .firstName(normalization.normalizeName(request.getFirstName()))
+                .lastName(normalization.normalizeName(request.getLastName()))
+                .specialization(normalization.normalizeOptionalName(request.getSpecialization()))
+                .gender(normalization.normalizeGender(request.getGender()))
+                .email(emailToStore)
+                .phoneNumber(normalization.normalizeString(request.getPhoneNumber()))
                 .build();
 
         doctor = doctorRepository.save(doctor);
@@ -133,36 +133,32 @@ public class DoctorService {
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", doctorId));
 
         if (request.getFirstName() != null) {
-            if (request.getFirstName().trim().isEmpty()) {
-                throw new IllegalArgumentException("First name cannot be empty");
-            }
-            doctor.setFirstName(normalizeName(request.getFirstName()));
+            validation.requireNonEmptyWhenPresent(request.getFirstName(), "First name");
+            doctor.setFirstName(normalization.normalizeName(request.getFirstName()));
         }
         if (request.getLastName() != null) {
-            if (request.getLastName().trim().isEmpty()) {
-                throw new IllegalArgumentException("Last name cannot be empty");
-            }
-            doctor.setLastName(normalizeName(request.getLastName()));
+            validation.requireNonEmptyWhenPresent(request.getLastName(), "Last name");
+            doctor.setLastName(normalization.normalizeName(request.getLastName()));
         }
         if (request.getSpecialization() != null) {
-            doctor.setSpecialization(normalizeOptionalName(request.getSpecialization()));
+            doctor.setSpecialization(normalization.normalizeOptionalName(request.getSpecialization()));
         }
         if (request.getGender() != null) {
-            doctor.setGender(normalizeGender(request.getGender()));
+            doctor.setGender(normalization.normalizeGender(request.getGender()));
         }
         if (request.getPhoneNumber() != null) {
-            doctor.setPhoneNumber(normalizeString(request.getPhoneNumber()));
+            doctor.setPhoneNumber(normalization.normalizeString(request.getPhoneNumber()));
         }
         if (request.getEmail() != null) {
-            String normalizedEmail = normalizeEmail(request.getEmail());
-            if (normalizedEmail != null && !normalizedEmail.isBlank()) {
-                doctorRepository.findByEmail(normalizedEmail)
+            String emailToStore = normalization.emailToStore(request.getEmail());
+            if (emailToStore != null) {
+                doctorRepository.findByEmail(emailToStore)
                         .ifPresent(existingDoctor -> {
                             if (!existingDoctor.getId().equals(doctorId)) {
-                                throw new ConflictException("Email already exists: " + normalizedEmail);
+                                throw new ConflictException("Email already exists: " + emailToStore);
                             }
                         });
-                doctor.setEmail(normalizedEmail);
+                doctor.setEmail(emailToStore);
             } else {
                 doctor.setEmail(null);
             }
@@ -225,57 +221,5 @@ public class DoctorService {
                 .updatedAt(doctor.getUpdatedAt())
                 .examIds(examIds)
                 .build();
-    }
-
-    private String normalizeName(String name) {
-        if (name == null || name.isBlank()) {
-            return name;
-        }
-        String trimmed = name.trim();
-        if (trimmed.isEmpty()) {
-            return trimmed;
-        }
-        return trimmed.substring(0, 1).toUpperCase() + trimmed.substring(1).toLowerCase();
-    }
-
-    private String normalizeString(String value) {
-        if (value == null) {
-            return null;
-        }
-        String trimmed = value.trim();
-        return trimmed.isEmpty() ? null : trimmed;
-    }
-
-    private String normalizeOptionalName(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        String trimmed = value.trim();
-        if (trimmed.isEmpty()) {
-            return null;
-        }
-        return trimmed.substring(0, 1).toUpperCase() + trimmed.substring(1).toLowerCase();
-    }
-
-    private String normalizeEmail(String email) {
-        if (email == null) {
-            return null;
-        }
-        return email.trim().toLowerCase();
-    }
-
-    private String normalizeGender(String gender) {
-        if (gender == null || gender.isBlank()) {
-            return gender;
-        }
-        String trimmed = gender.trim();
-        if (trimmed.equalsIgnoreCase("M")) {
-            return "M";
-        } else if (trimmed.equalsIgnoreCase("F")) {
-            return "F";
-        } else if (trimmed.equalsIgnoreCase("Other")) {
-            return "Other";
-        }
-        return trimmed;
     }
 }

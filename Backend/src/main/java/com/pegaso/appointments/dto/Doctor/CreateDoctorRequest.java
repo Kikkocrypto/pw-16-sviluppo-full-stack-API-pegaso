@@ -1,12 +1,12 @@
 package com.pegaso.appointments.dto.doctor;
 
 import com.pegaso.appointments.validation.ValidEmailDomain;
+import com.pegaso.appointments.validation.ValidGender;
 import com.pegaso.appointments.validation.ValidPhoneNumber;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +35,7 @@ public class CreateDoctorRequest {
     @Schema(description = "Doctor's specialization", example = "Cardiology", maxLength = 150)
     private String specialization;
 
-    @Pattern(regexp = "^(?i)(M|F|Other)$", message = "Gender must be M, F, or Other")
+    @ValidGender
     @Size(max = 10, message = "Gender must not exceed 10 characters")
     @Schema(description = "Doctor's gender", example = "M", allowableValues = {"M", "F", "Other"}, maxLength = 10)
     private String gender;
