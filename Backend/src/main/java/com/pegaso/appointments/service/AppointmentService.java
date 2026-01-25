@@ -79,6 +79,39 @@ public class AppointmentService {
 
 
 
+
+    // Recupero di un singolo appuntamento GET api/appointments/{appointmentId}
+    @Transactional(readOnly = true)
+    public AppointmentResponse getAppointmentById(UUID appointmentId, UUID adminId, UUID doctorId, UUID patientId) {
+        Appointment appointment = appointmentRepository.findByIdWithRelations(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        // Verifica autorizzazione
+        if (adminId != null) {
+            if (!adminRepository.existsById(adminId)) {
+                throw new ForbiddenException("Accesso non autorizzato");
+            }
+        } else if (doctorId != null) {
+            if (!doctorRepository.existsById(doctorId)) {
+                throw new ForbiddenException("Accesso non autorizzato");
+            }
+            if (!appointment.getDoctor().getId().equals(doctorId)) {
+                throw new ForbiddenException("Unauthorized to view this appointment");
+            }
+        } else if (patientId != null) {
+            if (!patientRepository.existsById(patientId)) {
+                throw new ForbiddenException("Accesso non autorizzato");
+            }
+            if (!appointment.getPatient().getId().equals(patientId)) {
+                throw new ForbiddenException("Unauthorized to view this appointment");
+            }
+        }
+
+        return mapToResponse(appointment);
+    }
+
+
+
     // Creazione di un nuovo appuntamento POST api/appointments
     @Transactional
     public AppointmentCreateResponse createAppointment(UUID patientId, AppointmentRequest request) {

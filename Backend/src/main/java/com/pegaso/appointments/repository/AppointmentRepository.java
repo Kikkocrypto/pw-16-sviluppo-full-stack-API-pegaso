@@ -21,6 +21,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
 
     @Query("SELECT a FROM Appointment a JOIN FETCH a.doctor JOIN FETCH a.patient WHERE a.patient.id = :patientId ORDER BY a.scheduledAt ASC")
     List<Appointment> findByPatientIdOrderByScheduledAtAsc(UUID patientId);
+
+    // Recupero di un singolo appuntamento con le relazioni caricate
+    @Query("SELECT a FROM Appointment a JOIN FETCH a.doctor JOIN FETCH a.patient WHERE a.id = :appointmentId")
+    java.util.Optional<Appointment> findByIdWithRelations(UUID appointmentId);
+
     // Verifica se esiste un appuntamento sovrapposto per un dottore
     @Query(value = "SELECT COUNT(*) > 0 FROM appointments a " +
            "WHERE a.doctor_id = :doctorId " +

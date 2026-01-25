@@ -123,6 +123,55 @@ public class AppointmentController {
 
 
 
+
+
+    // Recupero di un singolo appuntamento GET api/appointments/{appointmentId} + swagger docu
+    @GetMapping(value = "/{appointmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "Get appointment by ID",
+            description = "Returns a single appointment by its ID. Requires exactly one of X-Demo-Admin-Id, X-Demo-Doctor-Id, or X-Demo-Patient-Id. Admin can view any appointment. Doctor/Patient can only view their own appointments."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Appointment retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = AppointmentResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Bad request - no header, multiple headers, or invalid header"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - access not authorized or unauthorized to view this appointment"),
+            @ApiResponse(responseCode = "404", description = "Appointment not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error - unexpected persistence error")
+    })
+    public ResponseEntity<AppointmentResponse> getAppointmentById(
+            @Parameter(description = "UUID of the appointment to retrieve", required = true, example = "990e8400-e29b-41d4-a716-446655440001")
+            @PathVariable UUID appointmentId,
+            @Parameter(description = "Admin UUID (optional, mutually exclusive with other headers)")
+            @RequestHeader(value = HEADER_ADMIN, required = false) String adminIdHeader,
+            @Parameter(description = "Doctor UUID (optional, mutually exclusive with other headers)")
+            @RequestHeader(value = HEADER_DOCTOR, required = false) String doctorIdHeader,
+            @Parameter(description = "Patient UUID (optional, mutually exclusive with other headers)")
+            @RequestHeader(value = HEADER_PATIENT, required = false) String patientIdHeader) {
+
+        validateExactlyOneHeader(adminIdHeader, doctorIdHeader, patientIdHeader);
+
+        UUID adminId = null;
+        UUID doctorId = null;
+        UUID patientId = null;
+
+        if (isPresent(adminIdHeader)) {
+            adminId = parseUuid(adminIdHeader, HEADER_ADMIN);
+        } else if (isPresent(doctorIdHeader)) {
+            doctorId = parseUuid(doctorIdHeader, HEADER_DOCTOR);
+        } else {
+            patientId = parseUuid(patientIdHeader, HEADER_PATIENT);
+        }
+        // Recupero dell'appuntamento in base all'ID + verifica che sia presente l'header ADMIN, DOCTOR o PATIENT
+        AppointmentResponse response = appointmentService.getAppointmentById(appointmentId, adminId, doctorId, patientId);
+        return ResponseEntity.ok(response);
+    }
+
+
+
     // Aggiornamento di un appuntamento PATCH api/appointments/{id} + swagger documentation
     @PatchMapping(value = "/{appointmentId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
