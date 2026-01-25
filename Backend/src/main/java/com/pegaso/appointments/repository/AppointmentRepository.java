@@ -45,4 +45,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
                                                    @Param("excludeAppointmentId") UUID excludeAppointmentId,
                                                    @Param("startTime") OffsetDateTime startTime,
                                                    @Param("endTime") OffsetDateTime endTime);
+
+// Recupero degli appuntamenti passati
+    @Query(value = "SELECT * FROM appointments a " +
+           "WHERE a.status != 'cancelled' " +
+           "AND (a.scheduled_at + COALESCE(a.duration_minutes, 30) * INTERVAL '1 minute') < :now",
+           nativeQuery = true)
+    List<Appointment> findPastAppointments(@Param("now") OffsetDateTime now);
 }

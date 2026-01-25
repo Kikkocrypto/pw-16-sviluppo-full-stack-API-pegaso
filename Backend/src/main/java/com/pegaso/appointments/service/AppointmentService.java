@@ -247,6 +247,44 @@ public class AppointmentService {
     }
 
 
+
+    // Cancellazione di un appuntamento DELETE api/appointments/{id}
+    @Transactional
+    public void deleteAppointment(UUID appointmentId, UUID adminId, UUID doctorId, UUID patientId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        if (adminId != null) {
+            if (!adminRepository.existsById(adminId)) {
+                throw new ForbiddenException("Accesso non autorizzato");
+            }
+        } else if (doctorId != null) {
+            if (!doctorRepository.existsById(doctorId)) {
+                throw new ForbiddenException("Accesso non autorizzato");
+            }
+            if (!appointment.getDoctor().getId().equals(doctorId)) {
+                throw new ForbiddenException("Unauthorized to delete this appointment");
+            }
+        } else if (patientId != null) {
+            if (!patientRepository.existsById(patientId)) {
+                throw new ForbiddenException("Accesso non autorizzato");
+            }
+            if (!appointment.getPatient().getId().equals(patientId)) {
+                throw new ForbiddenException("Unauthorized to delete this appointment");
+            }
+        }
+
+        if ("cancelled".equals(appointment.getStatus())) {
+            throw new ConflictException("Appointment is already cancelled");
+        }
+
+        appointment.setStatus("cancelled");
+        appointmentRepository.save(appointment);
+    }
+
+
+
+
     // mapping dell'appuntamento alla risposta di aggiornamento 
     private UpdateAppointmentResponse mapToUpdateResponse(Appointment appointment) {
         LocalDateTime appointmentDate = appointment.getScheduledAt() == null

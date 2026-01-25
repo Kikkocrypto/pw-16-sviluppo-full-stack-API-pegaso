@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -165,6 +166,51 @@ public class AppointmentController {
 
         UpdateAppointmentResponse response = appointmentService.updateAppointment(appointmentId, request, patientId, doctorId);
         return ResponseEntity.ok(response);
+    }
+
+
+
+    // Cancellazione di un appuntamento DELETE api/appointments/{id} + swagger documentation
+
+    @DeleteMapping(value = "/{appointmentId}")
+    @Operation(
+            summary = "Delete appointment",
+            description = "Cancels an appointment (soft delete). Sets appointment status to 'cancelled'. Requires exactly one of X-Demo-Admin-Id, X-Demo-Doctor-Id, or X-Demo-Patient-Id. Patient and Doctor can only cancel their own appointments. Admin can cancel any appointment."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Appointment cancelled successfully (soft delete - status set to 'cancelled')"),
+            @ApiResponse(responseCode = "400", description = "Bad request - missing or multiple headers"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - unauthorized cancellation attempt"),
+            @ApiResponse(responseCode = "404", description = "Appointment not found"),
+            @ApiResponse(responseCode = "409", description = "Conflict - appointment already cancelled"),
+            @ApiResponse(responseCode = "500", description = "Internal server error - unexpected persistence error")
+    })
+    public ResponseEntity<Void> deleteAppointment(
+            @Parameter(description = "UUID of the appointment to delete", required = true, example = "990e8400-e29b-41d4-a716-446655440001")
+            @PathVariable UUID appointmentId,
+            @Parameter(description = "Admin UUID (optional, mutually exclusive with other headers)")
+            @RequestHeader(value = HEADER_ADMIN, required = false) String adminIdHeader,
+            @Parameter(description = "Doctor UUID (optional, mutually exclusive with other headers)")
+            @RequestHeader(value = HEADER_DOCTOR, required = false) String doctorIdHeader,
+            @Parameter(description = "Patient UUID (optional, mutually exclusive with other headers)")
+            @RequestHeader(value = HEADER_PATIENT, required = false) String patientIdHeader) {
+
+        validateExactlyOneHeader(adminIdHeader, doctorIdHeader, patientIdHeader);
+
+        UUID adminId = null;
+        UUID doctorId = null;
+        UUID patientId = null;
+
+        if (isPresent(adminIdHeader)) {
+            adminId = parseUuid(adminIdHeader, HEADER_ADMIN);
+        } else if (isPresent(doctorIdHeader)) {
+            doctorId = parseUuid(doctorIdHeader, HEADER_DOCTOR);
+        } else {
+            patientId = parseUuid(patientIdHeader, HEADER_PATIENT);
+        }
+        // Cancellazione dell'appuntamento
+        appointmentService.deleteAppointment(appointmentId, adminId, doctorId, patientId);
+        return ResponseEntity.noContent().build();
     }
     
     // Validazione che sia presente solo il header del paziente o del dottore
