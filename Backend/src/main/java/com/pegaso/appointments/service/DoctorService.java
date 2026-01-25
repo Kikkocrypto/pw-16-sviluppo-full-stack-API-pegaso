@@ -126,6 +126,36 @@ public class DoctorService {
                 .build();
     }
 
+
+
+    // Recupero di tutti i dottori (Admin)
+    @Transactional(readOnly = true)
+    public List<DoctorProfileResponse> getAllDoctors() {
+        return doctorRepository.findAll().stream()
+                .map(doctor -> {
+                    List<DoctorExam> doctorExams = doctorExamRepository.findById_DoctorId(doctor.getId());
+                    List<ExamInfoDto> exams = doctorExams.stream()
+                            .map(de -> ExamInfoDto.builder()
+                                    .examId(de.getExam().getId())
+                                    .examName(de.getExam().getName())
+                                    .description(de.getExam().getDescription())
+                                    .build())
+                            .collect(Collectors.toList());
+                    // Mappo il dottore e gli esami associati al DTO
+                    return DoctorProfileResponse.builder()
+                            .id(doctor.getId())
+                            .firstName(doctor.getFirstName())
+                            .lastName(doctor.getLastName())
+                            .specialization(doctor.getSpecialization())
+                            .gender(doctor.getGender())
+                            .email(doctor.getEmail())
+                            .phoneNumber(doctor.getPhoneNumber())
+                            .exams(exams)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
     // Aggiornamento del profilo del dottore
     @Transactional
     public DoctorProfileResponse updateDoctorProfile(UUID doctorId, UpdateDoctorRequest request) {

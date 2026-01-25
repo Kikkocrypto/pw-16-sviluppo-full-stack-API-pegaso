@@ -12,7 +12,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 // Service per la gestione dei pazienti, utilizzato per astrarre la logica di business dalla presentazione (chiama i repository e mantiene il controller pulito)
 @Service
@@ -55,6 +57,14 @@ public class PatientService {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient", patientId));
         return mapToResponse(patient);
+    }
+
+    // Recupero di tutti i pazienti (Admin)
+    @Transactional(readOnly = true)
+    public List<PatientResponse> getAllPatients() {
+        return patientRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
 

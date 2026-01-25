@@ -53,12 +53,9 @@ public class ExamService {
     }
 
 
-    // Recupero di tutti gli esami GET api/exams
+    // Recupero di tutti gli esami GET api/exams (pubblico)
     @Transactional(readOnly = true)
-    public List<ExamResponse> getAllExams(UUID adminId) {
-        adminRepository.findById(adminId)
-                .orElseThrow(() -> new ResourceNotFoundException("Admin", adminId));
-
+    public List<ExamResponse> getAllExams() {
         return examRepository.findAll().stream()
                 .sorted(Comparator.comparing(Exam::getName))
                 .map(this::mapToResponse)
