@@ -46,8 +46,8 @@ public class PatientController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Create a new patient",
-            description = "Creates a new patient. Email must be unique if provided. firstName and lastName are required."
+            summary = "Crea un nuovo paziente",
+            description = "Crea un nuovo paziente. Email deve essere unica se fornita. firstName e lastName sono obbligatori."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -76,8 +76,8 @@ public class PatientController {
     // Recupero il profilo del paziente GET api/patients + swagger documentation
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Get patient profile",
-            description = "Returns the profile of the patient identified by X-Demo-Patient-Id."
+            summary = "Recupera il profilo del paziente",
+            description = "Recupera il profilo del paziente identificato dall'header X-Demo-Patient-Id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -106,8 +106,8 @@ public class PatientController {
     // Aggiornamento del profilo del paziente PATCH api/patients + swagger documentation
     @PatchMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Update patient profile",
-            description = "Updates the profile of the patient identified by X-Demo-Patient-Id. Only fields present in the body are updated (partial update)."
+            summary = "Aggiorna il profilo del paziente",
+            description = "Aggiorna il profilo del paziente identificato dall'header X-Demo-Patient-Id. Solo i campi presenti nel body sono aggiornati (aggiornamento parziale)."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -140,7 +140,7 @@ public class PatientController {
     // Eliminazione del profilo del paziente DELETE api/patients + swagger documentation
     @DeleteMapping
     @Operation(
-            summary = "Delete patient profile",
+            summary = "Elimina il profilo del paziente",
             description = "Elimina il profilo del paziente identificato dall'header X-Demo-Patient-Id. Consentito solo se non esistono prenotazioni attive (non cancellate). Gli appuntamenti con status 'cancelled' non bloccano l'eliminazione."
     )
     @ApiResponses(value = {
@@ -167,7 +167,7 @@ public class PatientController {
 // Recupero il profilo del paziente GET api/patients/{patientId} + swagger documentation per ADMIN
     @GetMapping(value = "/{patientId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Get patient by ID (Admin)",
+            summary = "Recupera un paziente by ID (Admin o Patient)",
             description = "Recupera il profilo di un paziente in base all'ID. Richiede l'header X-Demo-Admin-Id. L'admin può vedere il profilo di qualsiasi paziente."
     )
     @ApiResponses(value = {
@@ -204,8 +204,8 @@ public class PatientController {
     // Eliminazione del profilo del paziente in base all'ID per ADMIN
     @DeleteMapping(value = "/{patientId}")
     @Operation(
-            summary = "Delete patient by ID (Admin)",
-            description = "Deletes a specific patient by ID. Requires X-Demo-Admin-Id header. Admin can delete any patient. Allowed only if patient has no active appointments (non-cancelled). Appointments with status 'cancelled' do not block deletion."
+            summary = "Elimina un paziente by ID (Admin o Patient)",
+            description = "Elimina un paziente in base all'ID. Richiede l'header X-Demo-Admin-Id. Admin può eliminare qualsiasi paziente. Consentito solo se il paziente non ha appuntamenti attivi (non cancellati). Gli appuntamenti con status 'cancelled' non bloccano l'eliminazione."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Patient deleted successfully"),

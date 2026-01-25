@@ -212,20 +212,26 @@ public class AppointmentService {
 
     // Aggiornamento di un appuntamento PATCH api/appointments/{id}
     @Transactional
-    public UpdateAppointmentResponse updateAppointment(UUID appointmentId, UpdateAppointmentRequest request, UUID patientId, UUID doctorId) {
+    public UpdateAppointmentResponse updateAppointment(UUID appointmentId, UpdateAppointmentRequest request, UUID adminId, UUID patientId, UUID doctorId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
 
-        if (patientId != null) {
+        if (adminId != null) {
+            if (!adminRepository.existsById(adminId)) {
+                throw new ForbiddenException("Accesso non autorizzato");
+            }
+            // Admin può modificare tutto (data, status, notes, contraindications)
+        } else if (patientId != null) {
             if (!appointment.getPatient().getId().equals(patientId)) {
                 throw new ForbiddenException("Unauthorized to modify this appointment");
             }
             if (request.getStatus() != null) {
                 throw new ConflictException("Patient cannot modify appointment status");
             }
-        }
-
-        if (doctorId != null) {
+            if (request.getAppointmentDate() != null) {
+                throw new ConflictException("Patient cannot modify appointment date. Only admin can modify the appointment date.");
+            }
+        } else if (doctorId != null) {
             if (!appointment.getDoctor().getId().equals(doctorId)) {
                 throw new ForbiddenException("Unauthorized to modify this appointment");
             }
@@ -233,7 +239,9 @@ public class AppointmentService {
                 throw new ConflictException("Doctor can only modify appointment status");
             }
         }
+
         // Se la data dell'appuntamento è cambiata, verifico che non sia sovrapposta ad un altro appuntamento
+        // Solo admin può modificare la data
         if (request.getAppointmentDate() != null) {
             OffsetDateTime scheduledAt = request.getAppointmentDate()
                     .atZone(ZoneOffset.UTC)
@@ -312,6 +320,16 @@ public class AppointmentService {
 
         if ("cancelled".equals(appointment.getStatus())) {
             throw new ConflictException("Appointment is already cancelled");
+        }
+
+        // Verifica che l'appuntamento possa essere annullato (almeno 2 giorni prima)
+        OffsetDateTime now = OffsetDateTime.now();
+        OffsetDateTime appointmentDate = appointment.getScheduledAt();
+        
+        OffsetDateTime cancellationDeadline = appointmentDate.minusDays(2);
+        
+        if (now.isAfter(cancellationDeadline) || now.isEqual(cancellationDeadline)) {
+            throw new ConflictException("Appointment cannot be cancelled. Cancellation must be requested at least 2 days before the appointment date.");
         }
 
         appointment.setStatus("cancelled");

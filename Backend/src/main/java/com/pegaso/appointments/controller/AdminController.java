@@ -54,8 +54,8 @@ public class AdminController {
     // Creazione di un nuovo esame POST /api/admin/exams
     @PostMapping(value = "/exams", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Create a new exam (Admin)",
-            description = "Creates a new exam in the catalog. Requires X-Demo-Admin-Id header."
+            summary = "Crea un nuovo esame (Admin)",
+            description = "Crea un nuovo esame nel catalogo. Richiede l'header X-Demo-Admin-Id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -99,8 +99,8 @@ public class AdminController {
     // Modifica di un esame PATCH /api/admin/exams/{examId}
     @PatchMapping(value = "/exams/{examId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Update an exam (Admin)",
-            description = "Updates an existing exam. Requires X-Demo-Admin-Id header. Only fields present in the body are updated (partial update)."
+            summary = "Aggiorna un esame (Admin)",
+            description = "Aggiorna un esame esistente. Richiede l'header X-Demo-Admin-Id. Solo i campi presenti nel body sono aggiornati (aggiornamento parziale)."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -150,8 +150,8 @@ public class AdminController {
     // Eliminazione di un esame DELETE /api/admin/exams/{examId}
     @DeleteMapping(value = "/exams/{examId}")
     @Operation(
-            summary = "Delete an exam (Admin)",
-            description = "Deletes an exam from the catalog. Requires X-Demo-Admin-Id header."
+            summary = "Elimina un esame (Admin)",
+            description = "Elimina un esame dal catalogo. Richiede l'header X-Demo-Admin-Id."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -202,7 +202,7 @@ public class AdminController {
     // Lista tutti i pazienti GET /api/admin/patients
     @GetMapping(value = "/patients", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Get all patients (Admin)",
+            summary = "Recupera tutti i pazienti (Admin)",
             description = "recupera la lista di tutti i pazienti registrati nel sistema. Richiede l'header X-Demo-Admin-Id."
     )
     @ApiResponses(value = {
@@ -246,8 +246,8 @@ public class AdminController {
     // Lista tutti i dottori GET /api/admin/doctors
     @GetMapping(value = "/doctors", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Get all doctors (Admin)",
-            description = "Returns a list of all doctors registered in the system. Requires X-Demo-Admin-Id header."
+            summary = "Recupera tutti i dottori (Admin)",
+            description = "Recupera la lista di tutti i dottori registrati nel sistema. Richiede l'header X-Demo-Admin-Id."
     )
     @ApiResponses(value = {
             @ApiResponse(

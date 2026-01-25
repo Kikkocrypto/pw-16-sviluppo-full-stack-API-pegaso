@@ -34,8 +34,8 @@ public class ExamController {
     // Recupero di tutti gli esami GET api/exams + swagger (pubblico)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Get all exams",
-            description = "Returns a list of all exams. No authentication required. Public endpoint."
+            summary = "Recupera tutti gli esami",
+            description = "Recupera la lista di tutti gli esami. Non richiede autenticazione. Endpoint pubblico."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -58,8 +58,8 @@ public class ExamController {
     // Recupero di un singolo esame GET api/exams/{exam_id} + swagger documentation
     @GetMapping(value = "/{examId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Get exam by ID",
-            description = "Returns a single exam by its ID. No authentication required."
+            summary = "Recupera un esame by ID",
+            description = "Recupera un esame in base all'ID. Non richiede autenticazione."
     )
     @ApiResponses(value = {
             @ApiResponse(

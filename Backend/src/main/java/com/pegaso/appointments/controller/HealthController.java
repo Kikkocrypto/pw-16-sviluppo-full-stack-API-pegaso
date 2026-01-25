@@ -17,7 +17,7 @@ import java.util.Map;
 public class HealthController {
 
     @GetMapping("/health")
-    @Operation(summary = "Health check", description = "Returns the health status of the API")
+    @Operation(summary = "Health check", description = "Recupera lo stato di salute dell'API")
     public ResponseEntity<Map<String, String>> health() {
         Map<String, String> response = new HashMap<>();
         response.put("status", "UP");

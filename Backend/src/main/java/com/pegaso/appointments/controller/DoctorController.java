@@ -82,7 +82,7 @@ public class DoctorController {
     // Recupero il profilo del dottore GET api/doctors (NON ADMIN)
     @GetMapping
     @Operation(
-            summary = "Get doctor profile",
+            summary = "Recupera il profilo del dottore",
             description = "restituisce il profilo del dottore identificato dall'header X-Demo-Doctor-Id, incluso gli esami abilitati."
     )
     @ApiResponses(value = {
@@ -114,7 +114,7 @@ public class DoctorController {
     // Aggiornamento del profilo del dottore PATCH api/doctors con swagger documentation
     @PatchMapping
     @Operation(
-            summary = "Update doctor profile",
+            summary = "Aggiorna il profilo del dottore",
             description = "Aggiorna il profilo del dottore identificato dall'header X-Demo-Doctor-Id. Solo i campi presenti nel body verranno aggiornati (aggiornamento parziale)."
     )
     @ApiResponses(value = {
@@ -148,7 +148,7 @@ public class DoctorController {
     // Eliminazione del profilo del dottore DELETE api/doctors
     @DeleteMapping
     @Operation(
-            summary = "Delete doctor profile",
+            summary = "Elimina il profilo del dottore",
             description = "Elimina il profilo del dottore identificato dall'header X-Demo-Doctor-Id. Consentito solo se non esistono prenotazioni attive (non cancellate). Gli appuntamenti con status 'cancelled' non bloccano l'eliminazione. Gli esami associati (doctor_exams) vengono rimossi automaticamente."
     )
     @ApiResponses(value = {
@@ -177,7 +177,7 @@ public class DoctorController {
     // Recupero il profilo del dottore GET api/doctors/{doctorId} + swagger documentation per ADMIN
     @GetMapping(value = "/{doctorId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Get doctor by ID (Admin)",
+            summary = "Recupera un dottore by ID (Admin o Doctor)",
             description = "Recupera il profilo di un dottore in base all'ID. Richiede l'header X-Demo-Admin-Id. L'admin può vedere il profilo di qualsiasi dottore."
     )
     @ApiResponses(value = {
@@ -215,8 +215,8 @@ public class DoctorController {
     // Eliminazione del profilo del dottore in base all'ID per ADMIN
     @DeleteMapping(value = "/{doctorId}")
     @Operation(
-            summary = "Delete doctor by ID (Admin)",
-            description = "Deletes a specific doctor by ID. Requires X-Demo-Admin-Id header. Admin can delete any doctor. Allowed only if doctor has no active appointments (non-cancelled). Appointments with status 'cancelled' do not block deletion. Associated exams (doctor_exams) are automatically removed."
+            summary = "Elimina un dottore by ID (Admin o Doctor)",
+            description = "Elimina un dottore in base all'ID. Richiede l'header X-Demo-Admin-Id. Admin può eliminare qualsiasi dottore. Consentito solo se il dottore non ha appuntamenti attivi (non cancellati). Gli appuntamenti con status 'cancelled' non bloccano l'eliminazione. Gli esami associati (doctor_exams) vengono rimossi automaticamente."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Doctor deleted successfully"),

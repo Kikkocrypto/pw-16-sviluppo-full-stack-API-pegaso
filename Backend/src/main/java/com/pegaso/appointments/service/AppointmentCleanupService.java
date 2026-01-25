@@ -25,11 +25,8 @@ public class AppointmentCleanupService {
      * Esegue ogni giorno alle 2:00 AM (cron: second minute hour day month weekday)
      * 
      * Formato cron: "0 0 2 * * ?" = ogni giorno alle 2:00 AM
-     * 
-     * Per testare più frequentemente, usa:
-     * - "0 */5 * * * ?" = ogni 5 minuti
-     * - "0 0 * * * ?" = ogni ora
      */
+    
     @Scheduled(cron = "0 0 2 * * ?")
     @Transactional
     public void deletePastAppointments() {
