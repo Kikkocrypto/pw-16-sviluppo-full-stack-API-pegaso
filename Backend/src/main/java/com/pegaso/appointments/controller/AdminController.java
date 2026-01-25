@@ -1,12 +1,16 @@
 package com.pegaso.appointments.controller;
 
+import com.pegaso.appointments.dto.doctor.DoctorProfileResponse;
 import com.pegaso.appointments.dto.exam.CreateExamRequest;
 import com.pegaso.appointments.dto.exam.ExamResponse;
 import com.pegaso.appointments.dto.exam.UpdateExamRequest;
+import com.pegaso.appointments.dto.patient.PatientResponse;
 import com.pegaso.appointments.exception.BadRequestException;
 import com.pegaso.appointments.exception.ForbiddenException;
 import com.pegaso.appointments.repository.AdminRepository;
+import com.pegaso.appointments.service.DoctorService;
 import com.pegaso.appointments.service.ExamService;
+import com.pegaso.appointments.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,8 +33,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
+// Controller per la gestione degli endpoint esclusivi per l'admin
+//
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
@@ -39,6 +47,8 @@ public class AdminController {
     private static final String HEADER_ADMIN = "X-Demo-Admin-Id";
 
     private final ExamService examService;
+    private final PatientService patientService;
+    private final DoctorService doctorService;
     private final AdminRepository adminRepository;
 
     // Creazione di un nuovo esame POST /api/admin/exams
@@ -184,6 +194,93 @@ public class AdminController {
 
         examService.deleteExam(adminId, examId);
         return ResponseEntity.noContent().build();
+    }
+
+
+
+
+    // Lista tutti i pazienti GET /api/admin/patients
+    @GetMapping(value = "/patients", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "Get all patients (Admin)",
+            description = "recupera la lista di tutti i pazienti registrati nel sistema. Richiede l'header X-Demo-Admin-Id."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "List of patients retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = PatientResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request - invalid UUID format"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - admin not authorized"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error"
+            )
+    })
+    // Recupero della lista di tutti i pazienti + verifica che sia presente l'header ADMIN
+    public ResponseEntity<List<PatientResponse>> getAllPatients(
+            @Parameter(description = "UUID of the admin. Required.", required = true, example = "880e8400-e29b-41d4-a716-446655440001")
+            @RequestHeader(value = HEADER_ADMIN, required = false) String adminIdHeader) {
+
+        validateAdminHeader(adminIdHeader);
+        UUID adminId = parseUuid(adminIdHeader, HEADER_ADMIN);
+
+        if (!adminRepository.existsById(adminId)) {
+            throw new ForbiddenException("Accesso non autorizzato");
+        }
+
+        List<PatientResponse> response = patientService.getAllPatients();
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
+    // Lista tutti i dottori GET /api/admin/doctors
+    @GetMapping(value = "/doctors", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "Get all doctors (Admin)",
+            description = "Returns a list of all doctors registered in the system. Requires X-Demo-Admin-Id header."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "List of doctors retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = DoctorProfileResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request - invalid UUID format"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - admin not authorized"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error"
+            )
+    })
+    public ResponseEntity<List<DoctorProfileResponse>> getAllDoctors(
+            @Parameter(description = "UUID of the admin. Required.", required = true, example = "880e8400-e29b-41d4-a716-446655440001")
+            @RequestHeader(value = HEADER_ADMIN, required = false) String adminIdHeader) {
+
+        validateAdminHeader(adminIdHeader);
+        UUID adminId = parseUuid(adminIdHeader, HEADER_ADMIN);
+
+        if (!adminRepository.existsById(adminId)) {
+            throw new ForbiddenException("Accesso non autorizzato");
+        }
+
+        List<DoctorProfileResponse> response = doctorService.getAllDoctors();
+        return ResponseEntity.ok(response);
     }
 
     // Validazione che sia presente l'header ADMIN
