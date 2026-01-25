@@ -12,13 +12,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Request DTO for updating an exam (partial update)")
+@Schema(description = "Request DTO for updating an exam (partial update). Name cannot be modified.")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class UpdateExamRequest {
-
-    @Size(max = 150, message = "Name must not exceed 150 characters")
-    @Schema(description = "Exam name (unique)", example = "Colonscopia", maxLength = 150)
-    private String name;
 
     @Schema(description = "Exam description", example = "Esame endoscopico del colon")
     @JsonInclude(JsonInclude.Include.ALWAYS)
