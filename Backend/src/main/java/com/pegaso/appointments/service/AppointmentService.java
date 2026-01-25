@@ -42,6 +42,7 @@ public class AppointmentService {
     private final PatientRepository patientRepository;
     private final ExamRepository examRepository;
     private final DoctorExamRepository doctorExamRepository;
+    private final FieldNormalizationService normalization;
 
     // Recupero degli appuntamenti come admin
     @Transactional(readOnly = true)
@@ -226,12 +227,14 @@ public class AppointmentService {
         }
         // Se lo stato dell'appuntamento è cambiato, verifico che sia valido
         if (request.getStatus() != null) {
-            if (!request.getStatus().equals("pending") && 
-                !request.getStatus().equals("confirmed") && 
-                !request.getStatus().equals("cancelled")) {
+            String normalizedStatus = normalization.normalizeStatus(request.getStatus());
+            if (normalizedStatus == null || 
+                (!normalizedStatus.equals("pending") && 
+                 !normalizedStatus.equals("confirmed") && 
+                 !normalizedStatus.equals("cancelled"))) {
                 throw new BadRequestException("Invalid status. Allowed values: pending, confirmed, cancelled");
             }
-            appointment.setStatus(request.getStatus());
+            appointment.setStatus(normalizedStatus);
         }
 
         if (request.getNotes() != null) {

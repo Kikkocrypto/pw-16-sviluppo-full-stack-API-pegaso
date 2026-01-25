@@ -64,4 +64,15 @@ public class FieldNormalizationService {
         String normalized = normalizeEmail(email);
         return (normalized != null && !normalized.isBlank()) ? normalized : null;
     }
+
+    public String normalizeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return null;
+        }
+        String trimmed = status.trim().toLowerCase();
+        if (trimmed.equals("pending") || trimmed.equals("confirmed") || trimmed.equals("cancelled")) {
+            return trimmed;
+        }
+        return trimmed;
+    }
 }
