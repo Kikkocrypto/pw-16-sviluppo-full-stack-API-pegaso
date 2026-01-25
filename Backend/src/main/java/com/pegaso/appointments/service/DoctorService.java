@@ -191,14 +191,24 @@ public class DoctorService {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", doctorId));
         if (hasAppointments(doctorId)) {
-            throw new IllegalArgumentException("Cannot delete doctor: doctor has associated appointments");
+            throw new IllegalArgumentException("Cannot delete doctor: doctor has active appointments (non-cancelled)");
         }
+        // Elimina fisicamente tutti gli appuntamenti cancellati associati al dottore
+        // per evitare violazioni di foreign key constraint
+        deleteCancelledAppointments(doctorId);
         doctorRepository.delete(doctor);
+    }
+
+    private void deleteCancelledAppointments(UUID doctorId) {
+        jdbcTemplate.update(
+                "DELETE FROM appointments WHERE doctor_id = ? AND status = 'cancelled'",
+                doctorId
+        );
     }
 
     private boolean hasAppointments(UUID doctorId) {
         Boolean exists = jdbcTemplate.queryForObject(
-                "SELECT EXISTS(SELECT 1 FROM appointments WHERE doctor_id = ?)",
+                "SELECT EXISTS(SELECT 1 FROM appointments WHERE doctor_id = ? AND status != 'cancelled')",
                 Boolean.class,
                 doctorId
         );

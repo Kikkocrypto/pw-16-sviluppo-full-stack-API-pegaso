@@ -3,6 +3,9 @@ package com.pegaso.appointments.controller;
 import com.pegaso.appointments.dto.patient.CreatePatientRequest;
 import com.pegaso.appointments.dto.patient.PatientResponse;
 import com.pegaso.appointments.dto.patient.UpdatePatientRequest;
+import com.pegaso.appointments.exception.BadRequestException;
+import com.pegaso.appointments.exception.ForbiddenException;
+import com.pegaso.appointments.repository.AdminRepository;
 import com.pegaso.appointments.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -35,7 +39,10 @@ import java.util.UUID;
 @Tag(name = "Patients", description = "API for managing patients")
 public class PatientController {
 
+    private static final String HEADER_ADMIN = "X-Demo-Admin-Id";
+
     private final PatientService patientService;
+    private final AdminRepository adminRepository;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
@@ -134,11 +141,11 @@ public class PatientController {
     @DeleteMapping
     @Operation(
             summary = "Delete patient profile",
-            description = "Elimina il profilo del paziente identificato dall'header X-Demo-Patient-Id. Consentito solo se non esistono prenotazioni associate."
+            description = "Elimina il profilo del paziente identificato dall'header X-Demo-Patient-Id. Consentito solo se non esistono prenotazioni attive (non cancellate). Gli appuntamenti con status 'cancelled' non bloccano l'eliminazione."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Profilo cancellato con successo"),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid or missing UUID, or patient has associated appointments"),
+            @ApiResponse(responseCode = "400", description = "Bad request - invalid or missing UUID, or patient has active appointments (non-cancelled)"),
             @ApiResponse(responseCode = "404", description = "Patient not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -153,5 +160,90 @@ public class PatientController {
         }
         patientService.deletePatient(patientId);
         return ResponseEntity.noContent().build();
+    }
+
+
+
+// Recupero il profilo del paziente GET api/patients/{patientId} + swagger documentation per ADMIN
+    @GetMapping(value = "/{patientId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "Get patient by ID (Admin)",
+            description = "Recupera il profilo di un paziente in base all'ID. Richiede l'header X-Demo-Admin-Id. L'admin può vedere il profilo di qualsiasi paziente."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Patient profile",
+                    content = @Content(schema = @Schema(implementation = PatientResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Bad request - invalid UUID format"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - admin not authorized"),
+            @ApiResponse(responseCode = "404", description = "Patient not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    // Recupero il profilo del paziente in base all'ID per ADMIN
+    public ResponseEntity<PatientResponse> getPatientById(
+            @Parameter(description = "UUID of the patient to retrieve", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable UUID patientId,
+            @Parameter(description = "UUID of the admin. Required for GET /api/patients/{patientId}.", required = true, example = "880e8400-e29b-41d4-a716-446655440001")
+            @RequestHeader(value = HEADER_ADMIN, required = false) String adminIdHeader) {
+
+        validateAdminHeader(adminIdHeader);
+        UUID adminId = parseUuid(adminIdHeader, HEADER_ADMIN);
+
+        if (!adminRepository.existsById(adminId)) {
+            throw new ForbiddenException("Accesso non autorizzato");
+        }
+
+        PatientResponse response = patientService.getPatientProfile(patientId);
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    // Eliminazione del profilo del paziente in base all'ID per ADMIN
+    @DeleteMapping(value = "/{patientId}")
+    @Operation(
+            summary = "Delete patient by ID (Admin)",
+            description = "Deletes a specific patient by ID. Requires X-Demo-Admin-Id header. Admin can delete any patient. Allowed only if patient has no active appointments (non-cancelled). Appointments with status 'cancelled' do not block deletion."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Patient deleted successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request - invalid UUID format, or patient has active appointments (non-cancelled)"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - admin not authorized"),
+            @ApiResponse(responseCode = "404", description = "Patient not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    // Eliminazione del profilo del paziente in base all'ID per ADMIN
+    public ResponseEntity<Void> deletePatientById(
+            @Parameter(description = "UUID of the patient to delete", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable UUID patientId,
+            @Parameter(description = "UUID of the admin. Required for DELETE /api/patients/{patientId}.", required = true, example = "880e8400-e29b-41d4-a716-446655440001")
+            @RequestHeader(value = HEADER_ADMIN, required = false) String adminIdHeader) {
+
+        validateAdminHeader(adminIdHeader);
+        UUID adminId = parseUuid(adminIdHeader, HEADER_ADMIN);
+
+        if (!adminRepository.existsById(adminId)) {
+            throw new ForbiddenException("Accesso non autorizzato");
+        }
+
+        patientService.deletePatient(patientId);
+        return ResponseEntity.noContent().build();
+    }
+
+    private void validateAdminHeader(String adminIdHeader) {
+        if (adminIdHeader == null || adminIdHeader.isBlank()) {
+            throw new BadRequestException("X-Demo-Admin-Id header is required");
+        }
+    }
+
+    // Parsing dell'UUID dall'header
+    private UUID parseUuid(String value, String headerName) {
+        try {
+            return UUID.fromString(value.trim());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid header: " + headerName);
+        }
     }
 }

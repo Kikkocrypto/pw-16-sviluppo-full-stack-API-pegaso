@@ -104,14 +104,24 @@ public class PatientService {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient", patientId));
         if (hasAppointments(patientId)) {
-            throw new IllegalArgumentException("Cannot delete patient: patient has associated appointments");
+            throw new IllegalArgumentException("Cannot delete patient: patient has active appointments (non-cancelled)");
         }
+        // Elimina fisicamente tutti gli appuntamenti cancellati associati al paziente
+        // per evitare violazioni di foreign key constraint
+        deleteCancelledAppointments(patientId);
         patientRepository.delete(patient);
+    }
+
+    private void deleteCancelledAppointments(UUID patientId) {
+        jdbcTemplate.update(
+                "DELETE FROM appointments WHERE patient_id = ? AND status = 'cancelled'",
+                patientId
+        );
     }
 
     private boolean hasAppointments(UUID patientId) {
         Boolean exists = jdbcTemplate.queryForObject(
-                "SELECT EXISTS(SELECT 1 FROM appointments WHERE patient_id = ?)",
+                "SELECT EXISTS(SELECT 1 FROM appointments WHERE patient_id = ? AND status != 'cancelled')",
                 Boolean.class,
                 patientId
         );
