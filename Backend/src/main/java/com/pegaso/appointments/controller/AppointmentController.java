@@ -3,6 +3,8 @@ package com.pegaso.appointments.controller;
 import com.pegaso.appointments.dto.appointment.AppointmentCreateResponse;
 import com.pegaso.appointments.dto.appointment.AppointmentRequest;
 import com.pegaso.appointments.dto.appointment.AppointmentResponse;
+import com.pegaso.appointments.dto.appointment.UpdateAppointmentRequest;
+import com.pegaso.appointments.dto.appointment.UpdateAppointmentResponse;
 import com.pegaso.appointments.exception.BadRequestException;
 import com.pegaso.appointments.exception.ForbiddenException;
 import com.pegaso.appointments.service.AppointmentService;
@@ -19,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -114,6 +118,68 @@ public class AppointmentController {
 
         AppointmentCreateResponse response = appointmentService.createAppointment(patientId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+
+    // Aggiornamento di un appuntamento PATCH api/appointments/{id} + swagger documentation
+    @PatchMapping(value = "/{appointmentId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "Update appointment",
+            description = "Updates an appointment. Requires exactly one of X-Demo-Patient-Id or X-Demo-Doctor-Id. Admin header is not allowed. Patient can modify date, notes and contraindications. Doctor can modify status."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Appointment updated successfully",
+                    content = @Content(schema = @Schema(implementation = UpdateAppointmentResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Bad request - missing or multiple headers, invalid request body, or appointment date not in the future"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - admin header present or unauthorized modification attempt"),
+            @ApiResponse(responseCode = "404", description = "Appointment not found"),
+            @ApiResponse(responseCode = "409", description = "Conflict - business rules violation or time slot not available"),
+            @ApiResponse(responseCode = "500", description = "Internal server error - unexpected persistence error")
+    })
+    // Aggiornamento di un appuntamento 
+    public ResponseEntity<UpdateAppointmentResponse> updateAppointment(
+            @Parameter(description = "UUID of the appointment to update", required = true, example = "990e8400-e29b-41d4-a716-446655440001")
+            @PathVariable UUID appointmentId,
+            @Parameter(description = "Patient UUID (optional, mutually exclusive with X-Demo-Doctor-Id)")
+            @RequestHeader(value = HEADER_PATIENT, required = false) String patientIdHeader,
+            @Parameter(description = "Doctor UUID (optional, mutually exclusive with X-Demo-Patient-Id)")
+            @RequestHeader(value = HEADER_DOCTOR, required = false) String doctorIdHeader,
+            @Parameter(description = "Admin UUID (not allowed)")
+            @RequestHeader(value = HEADER_ADMIN, required = false) String adminIdHeader,
+            @Valid @RequestBody UpdateAppointmentRequest request) {
+
+        validatePatientOrDoctorHeaders(patientIdHeader, doctorIdHeader, adminIdHeader);
+
+        UUID patientId = null;
+        UUID doctorId = null;
+
+        if (isPresent(patientIdHeader)) {
+            patientId = parseUuid(patientIdHeader, HEADER_PATIENT);
+        } else {
+            doctorId = parseUuid(doctorIdHeader, HEADER_DOCTOR);
+        }
+
+        UpdateAppointmentResponse response = appointmentService.updateAppointment(appointmentId, request, patientId, doctorId);
+        return ResponseEntity.ok(response);
+    }
+    
+    // Validazione che sia presente solo il header del paziente o del dottore
+    private void validatePatientOrDoctorHeaders(String patient, String doctor, String admin) {
+        if (isPresent(admin)) {
+            throw new ForbiddenException("Admin header is not allowed for appointment update");
+        }
+
+        int count = (isPresent(patient) ? 1 : 0) + (isPresent(doctor) ? 1 : 0);
+        if (count == 0) {
+            throw new BadRequestException("Exactly one header required: X-Demo-Patient-Id or X-Demo-Doctor-Id");
+        }
+        if (count > 1) {
+            throw new BadRequestException("Only one header allowed: X-Demo-Patient-Id or X-Demo-Doctor-Id");
+        }
     }
 
     // Validazione che sia presente solo il header del paziente

@@ -30,4 +30,7 @@ public class AppointmentRequest {
 
     @Schema(description = "Optional notes for the appointment", example = "Routine check-up")
     private String notes;
+
+    @Schema(description = "Optional contraindications for the appointment", example = "Patient has allergies to contrast agents")
+    private String contraindications;
 }

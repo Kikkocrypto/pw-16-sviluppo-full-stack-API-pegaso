@@ -3,6 +3,8 @@ package com.pegaso.appointments.service;
 import com.pegaso.appointments.dto.appointment.AppointmentCreateResponse;
 import com.pegaso.appointments.dto.appointment.AppointmentRequest;
 import com.pegaso.appointments.dto.appointment.AppointmentResponse;
+import com.pegaso.appointments.dto.appointment.UpdateAppointmentRequest;
+import com.pegaso.appointments.dto.appointment.UpdateAppointmentResponse;
 import com.pegaso.appointments.entity.Appointment;
 import com.pegaso.appointments.entity.Doctor;
 import com.pegaso.appointments.entity.DoctorExam;
@@ -126,6 +128,7 @@ public class AppointmentService {
                 .durationMinutes(durationMinutes)
                 .status("pending")
                 .reason(request.getNotes())
+                .contraindications(request.getContraindications())
                 .build();
 
         Appointment savedAppointment = appointmentRepository.save(appointment);
@@ -168,6 +171,95 @@ public class AppointmentService {
                 .patientFirstName(a.getPatient().getFirstName())
                 .patientLastName(a.getPatient().getLastName())
                 .status(a.getStatus())
+                .build();
+    }
+
+
+
+    // Aggiornamento di un appuntamento PATCH api/appointments/{id}
+    @Transactional
+    public UpdateAppointmentResponse updateAppointment(UUID appointmentId, UpdateAppointmentRequest request, UUID patientId, UUID doctorId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        if (patientId != null) {
+            if (!appointment.getPatient().getId().equals(patientId)) {
+                throw new ForbiddenException("Unauthorized to modify this appointment");
+            }
+            if (request.getStatus() != null) {
+                throw new ConflictException("Patient cannot modify appointment status");
+            }
+        }
+
+        if (doctorId != null) {
+            if (!appointment.getDoctor().getId().equals(doctorId)) {
+                throw new ForbiddenException("Unauthorized to modify this appointment");
+            }
+            if (request.getAppointmentDate() != null || request.getNotes() != null || request.getContraindications() != null) {
+                throw new ConflictException("Doctor can only modify appointment status");
+            }
+        }
+        // Se la data dell'appuntamento è cambiata, verifico che non sia sovrapposta ad un altro appuntamento
+        if (request.getAppointmentDate() != null) {
+            OffsetDateTime scheduledAt = request.getAppointmentDate()
+                    .atZone(ZoneOffset.UTC)
+                    .toOffsetDateTime();
+
+            if (scheduledAt.isBefore(OffsetDateTime.now())) {
+                throw new BadRequestException("Appointment date must be in the future");
+            }
+            // Calcolo la fine dell'appuntamento
+            Integer durationMinutes = appointment.getDurationMinutes() != null 
+                    ? appointment.getDurationMinutes() 
+                    : 30;
+            OffsetDateTime endTime = scheduledAt.plusMinutes(durationMinutes);
+            // Verifico che non sia sovrapposta ad un altro appuntamento
+            if (appointmentRepository.existsOverlappingAppointmentExcluding(
+                    appointment.getDoctor().getId(), 
+                    appointment.getId(), 
+                    scheduledAt, 
+                    endTime)) {
+                throw new ConflictException("Doctor is not available at the requested time slot");
+            }
+
+            appointment.setScheduledAt(scheduledAt);
+        }
+        // Se lo stato dell'appuntamento è cambiato, verifico che sia valido
+        if (request.getStatus() != null) {
+            if (!request.getStatus().equals("pending") && 
+                !request.getStatus().equals("confirmed") && 
+                !request.getStatus().equals("cancelled")) {
+                throw new BadRequestException("Invalid status. Allowed values: pending, confirmed, cancelled");
+            }
+            appointment.setStatus(request.getStatus());
+        }
+
+        if (request.getNotes() != null) {
+            appointment.setReason(request.getNotes());
+        }
+
+        if (request.getContraindications() != null) {
+            appointment.setContraindications(request.getContraindications());
+        }
+
+        Appointment updatedAppointment = appointmentRepository.save(appointment);
+        return mapToUpdateResponse(updatedAppointment);
+    }
+
+
+    // mapping dell'appuntamento alla risposta di aggiornamento 
+    private UpdateAppointmentResponse mapToUpdateResponse(Appointment appointment) {
+        LocalDateTime appointmentDate = appointment.getScheduledAt() == null
+                ? null
+                : appointment.getScheduledAt().atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+
+        return UpdateAppointmentResponse.builder()
+                .id(appointment.getId())
+                .appointmentDate(appointmentDate)
+                .patientId(appointment.getPatient().getId())
+                .status(appointment.getStatus())
+                .notes(appointment.getReason())
+                .contraindications(appointment.getContraindications())
                 .build();
     }
 }
