@@ -1,0 +1,21 @@
+services:
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./Frontend/src:/app/src
+      - ./Frontend/index.html:/app/index.html
+      - ./Frontend/vite.config.js:/app/vite.config.js
+      - ./Frontend/package.json:/app/package.json
+      - /app/node_modules
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080/api
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app_network
