@@ -15,25 +15,15 @@
 
 .header-left {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.back-button {
-  color: white;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-}
-
-.back-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
 }
 
 .logo {
   color: white;
   text-decoration: none;
+  line-height: 1.2;
 }
 
 .logo h1 {
@@ -41,10 +31,25 @@
   font-size: 1.5rem;
 }
 
+.home-link {
+  color: #bdc3c7;
+  text-decoration: none;
+  font-size: 0.8rem;
+  margin-top: -0.1rem;
+  transition: color 0.2s;
+}
+
+.home-link:hover {
+  color: white;
+  text-decoration: underline;
+}
+
 .header-right {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .identity-banner {
@@ -52,6 +57,13 @@
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   font-size: 0.9rem;
+}
+
+.identity-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
 }
 
 .logout-button {

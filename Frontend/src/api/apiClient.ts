@@ -122,8 +122,17 @@ const handleApiError = (error: AxiosError<ApiError>): Promise<never> => {
   // Se il backend restituisce un formato di errore standardizzato
   if (data?.error) {
     const apiError = data.error;
+    
+    // Prevenzione account enumeration: per errori 409 e 401, usa messaggi generici
+    let message = apiError.message || `Errore ${status}`;
+    if (status === 409 || status === 401) {
+      message = status === 409 
+        ? 'Impossibile completare l\'operazione. Verifica i dati inseriti e riprova.'
+        : 'Credenziali non valide.';
+    }
+    
     throw new ApiClientError(
-      apiError.message || `Errore ${status}`,
+      message,
       status,
       apiError.code,
       apiError.details
@@ -131,12 +140,13 @@ const handleApiError = (error: AxiosError<ApiError>): Promise<never> => {
   }
 
   // Errore senza formato standardizzato
+  // Prevenzione account enumeration: messaggi generici per errori sensibili
   const statusMessages: Record<number, string> = {
     400: 'Richiesta non valida. Verifica i dati inseriti.',
-    401: 'Non autorizzato. Effettua il login.',
+    401: 'Credenziali non valide.', // Generico per prevenire account enumeration
     403: 'Accesso negato. Non hai i permessi necessari.',
     404: 'Risorsa non trovata.',
-    409: 'Conflitto. La risorsa potrebbe essere già esistente o in uso.',
+    409: 'Impossibile completare l\'operazione. Verifica i dati inseriti e riprova.', // Generico per prevenire account enumeration
     500: 'Errore interno del server. Riprova più tardi.',
     502: 'Errore del gateway. Il server non è disponibile.',
     503: 'Servizio non disponibile. Riprova più tardi.',
