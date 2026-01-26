@@ -55,6 +55,14 @@ export async function getPatients(limit: number = 10): Promise<Patient[]> {
 }
 
 /**
+ * Recupera il profilo del paziente corrente (basato sull'header X-Demo-Patient-Id)
+ * @returns Profilo del paziente
+ */
+export async function getPatientProfile(): Promise<Patient> {
+  return apiGet<Patient>(API_ROUTES.patients.current);
+}
+
+/**
  * Crea un nuovo paziente
  * @param data - Dati del paziente da creare
  * @returns Paziente creato con ID

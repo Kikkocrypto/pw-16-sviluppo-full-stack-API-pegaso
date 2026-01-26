@@ -56,6 +56,14 @@ export async function getDoctors(limit: number = 10): Promise<Doctor[]> {
 }
 
 /**
+ * Recupera il profilo del dottore corrente (basato sull'header X-Demo-Doctor-Id)
+ * @returns Profilo del dottore
+ */
+export async function getDoctorProfile(): Promise<Doctor> {
+  return apiGet<Doctor>(API_ROUTES.doctors.current);
+}
+
+/**
  * Crea un nuovo dottore
  * @param data - Dati del dottore da creare
  * @returns Dottore creato con ID
