@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
-import { api } from '../api/apiClient'
-import './HomePage.css'
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { api } from '../../api/apiClient';
+import './HomePage.css';
 
 function HomePage() {
   const [healthStatus, setHealthStatus] = useState(null);
@@ -8,18 +9,12 @@ function HomePage() {
   const [apiUrl, setApiUrl] = useState('');
 
   useEffect(() => {
-    // Mostra l'URL dell'API configurato
-    // Nota: Il browser usa localhost:8080 (porta esposta), non backend:8080
     setApiUrl(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api');
-    
-    // Test di connessione al backend
     checkBackendHealth();
   }, []);
 
   const checkBackendHealth = async () => {
     try {
-      // Usa l'API client per chiamare l'endpoint di health check
-      // L'endpoint è /api/health, quindi usiamo /health come endpoint relativo
       const data = await api.get('/health');
       if (data && data.status === 'UP') {
         setHealthStatus('connected');
@@ -49,17 +44,21 @@ function HomePage() {
         </div>
       </div>
 
-      <div className="info-card">
-        <h2>Informazioni</h2>
-        <p>Questa è la pagina principale dell'applicazione React.</p>
-        <p>Il frontend è configurato per comunicare con il backend tramite la variabile d'ambiente <code>VITE_API_BASE_URL</code>.</p>
-        <p>Per utilizzare l'applicazione, implementa le pagine per:</p>
-        <ul>
-          <li>Gestione Pazienti</li>
-          <li>Gestione Dottori</li>
-          <li>Gestione Appuntamenti</li>
-          <li>Area Admin</li>
-        </ul>
+      <div className="home-menu">
+        <Link to="/patient" className="home-card">
+          <h3>Prenota ora</h3>
+          <p>Accedi come paziente o crea un nuovo profilo per prenotare un appuntamento</p>
+        </Link>
+        
+        <Link to="/doctor" className="home-card">
+          <h3>Accedi da dottore</h3>
+          <p>Accedi come dottore o crea un nuovo profilo per gestire le prenotazioni</p>
+        </Link>
+        
+        <Link to="/admin" className="home-card">
+          <h3>Gestione sistema</h3>
+          <p>Accedi all'area amministrativa per gestire pazienti, dottori, prenotazioni ed esami</p>
+        </Link>
       </div>
     </div>
   );
