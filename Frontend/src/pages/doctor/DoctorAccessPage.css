@@ -17,6 +17,26 @@
   padding: 2rem;
   max-width: 600px;
   width: 100%;
+  position: relative;
+}
+
+.back-to-home {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  color: #495057;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.back-to-home:hover {
+  background: #e9ecef;
+  border-color: #ced4da;
 }
 
 .access-container h1 {
@@ -40,7 +60,7 @@
   padding: 1rem 2rem;
   font-size: 1rem;
   background-color: #007bff;
-  color: white;
+  color: white !important;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -49,22 +69,23 @@
 
 .access-button:hover {
   background-color: #0056b3;
+  color: white !important;
 }
 
 .back-button {
   margin-bottom: 1.5rem;
   padding: 0.5rem 1rem;
-  background: transparent;
-  border: 1px solid #ccc;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
   border-radius: 4px;
   cursor: pointer;
-  color: #666;
+  color: #495057 !important;
   transition: all 0.2s;
 }
 
 .back-button:hover {
-  background-color: #f5f5f5;
-  border-color: #999;
+  background-color: #e9ecef;
+  border-color: #ced4da;
 }
 
 .select-form {
@@ -141,7 +162,7 @@
   padding: 1rem 2rem;
   font-size: 1rem;
   background-color: #28a745;
-  color: white;
+  color: white !important;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -151,9 +172,27 @@
 
 .submit-button:hover:not(:disabled) {
   background-color: #218838;
+  color: white !important;
 }
 
 .submit-button:disabled {
   background-color: #6c757d;
+  color: rgba(255, 255, 255, 0.8) !important;
   cursor: not-allowed;
+}
+
+.switch-mode-button {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: transparent;
+  color: #007bff !important;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.switch-mode-button:hover {
+  background-color: rgba(0, 123, 255, 0.1);
 }

@@ -48,9 +48,27 @@ export function setDemoId(type: DemoUserType, id: string | null): void {
   const storageKey = `demo${type.charAt(0).toUpperCase() + type.slice(1)}Id`;
   
   if (id) {
+    // Rimuovi gli altri ruoli quando si imposta un nuovo ruolo
+    // per evitare conflitti (un utente può essere loggato solo con un ruolo alla volta)
+    if (type !== 'patient') {
+      localStorage.removeItem('demoPatientId');
+    }
+    if (type !== 'doctor') {
+      localStorage.removeItem('demoDoctorId');
+    }
+    if (type !== 'admin') {
+      localStorage.removeItem('demoAdminId');
+    }
+    
     localStorage.setItem(storageKey, id);
+    
+    // Dispatches a custom event per notificare i componenti del cambiamento
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('demoRoleChanged', { detail: { type, id } }));
   } else {
     localStorage.removeItem(storageKey);
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('demoRoleChanged', { detail: { type, id: null } }));
   }
 }
 
@@ -71,6 +89,10 @@ export function clearDemoHeaders(): void {
   localStorage.removeItem('demoPatientId');
   localStorage.removeItem('demoDoctorId');
   localStorage.removeItem('demoAdminId');
+  
+  // Dispatches eventi per notificare i componenti del cambiamento
+  window.dispatchEvent(new Event('storage'));
+  window.dispatchEvent(new CustomEvent('demoRoleChanged', { detail: { type: null, id: null } }));
 }
 
 /**

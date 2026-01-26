@@ -6,10 +6,15 @@ import { getDoctors, createDoctor } from '../../api/services/doctor/doctorServic
 import { setDemoId } from '../../api/demoHeaders';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { useToast } from '../../contexts/ToastContext';
+import { validateField as validateFieldUtil, validateDoctorForm } from '../../utils/validation';
+import { normalizePhoneNumber, ensurePhonePrefix } from '../../utils/phoneUtils';
+import { getErrorMessage } from '../../utils/errorUtils';
 import './DoctorAccessPage.css';
 
 function DoctorAccessPage() {
   const navigate = useNavigate();
+  const { showSuccess, showError } = useToast();
   
   // Modalità: 'select' per selezione utente esistente, 'create' per creazione nuovo
   const [mode, setMode] = useState(null);
@@ -51,7 +56,9 @@ function DoctorAccessPage() {
         setErrorDoctors('Nessun dottore trovato. Crea un nuovo dottore per iniziare.');
       }
     } catch (error) {
-      setErrorDoctors(error?.message || 'Errore nel caricamento dei dottori');
+      const errorMsg = getErrorMessage(error, 'Errore nel caricamento dei dottori');
+      setErrorDoctors(errorMsg);
+      showError(errorMsg);
     } finally {
       setLoadingDoctors(false);
     }
@@ -59,36 +66,38 @@ function DoctorAccessPage() {
 // Selezione dottore
   const handleSelectDoctor = () => {
     if (!selectedDoctorId) {
-      setErrorDoctors('Seleziona un dottore dalla lista');
+      const errorMsg = 'Seleziona un dottore dalla lista';
+      setErrorDoctors(errorMsg);
+      showError(errorMsg);
       return;
     }
 
     // Salva l'ID nel localStorage
     setDemoId('doctor', selectedDoctorId);
-
-    navigate('/doctor/dashboard');
+    showSuccess('Accesso effettuato! Reindirizzamento...');
+    
+    setTimeout(() => {
+      navigate('/doctor/dashboard');
+    }, 800);
   };
 
-// Validazione form creazione dottore
+  // Validazione in tempo reale per un singolo campo (usa utility condivisa)
+  const validateField = (name, value) => {
+    const errors = { ...formErrors };
+    const error = validateFieldUtil(name, value, { required: name === 'firstName' || name === 'lastName' });
+    
+    if (error) {
+      errors[name] = error;
+    } else {
+      delete errors[name];
+    }
+    
+    setFormErrors(errors);
+  };
+
+  // Validazione completa del form (per il submit) - usa utility condivisa
   const validateForm = () => {
-    const errors = {};
-
-    // Validazione campi obbligatori
-    if (!formData.firstName.trim()) {
-      errors.firstName = 'Il nome è obbligatorio';
-    }
-    if (!formData.lastName.trim()) {
-      errors.lastName = 'Il cognome è obbligatorio';
-    }
-
-    // Validazione formato emai
-    if (formData.email && formData.email.trim()) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email)) {
-        errors.email = 'Formato email non valido';
-      }
-    }
-
+    const errors = validateDoctorForm(formData);
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -106,13 +115,14 @@ function DoctorAccessPage() {
 
     try {
       // Prepara i dati per l'API (rimuove campi vuoti)
+      // Per il telefono, usa utility condivisa per assicurarsi del prefisso +39
       const doctorData = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         specialization: formData.specialization.trim() || null,
         gender: formData.gender || null,
         email: formData.email.trim() || null,
-        phoneNumber: formData.phoneNumber.trim() || null,
+        phoneNumber: ensurePhonePrefix(formData.phoneNumber),
         examIds: null, // Per ora non gestiamo la selezione esami nella creazione
       };
 
@@ -121,28 +131,36 @@ function DoctorAccessPage() {
       // Salva l'ID nel localStorage
       setDemoId('doctor', newDoctor.id);
 
-      // Reindirizza alla dashboard
-      navigate('/doctor/dashboard');
+      // Mostra toast di successo
+      showSuccess('Dottore creato con successo! Reindirizzamento...');
+
+      // Reindirizza alla dashboard dopo un breve delay per mostrare il toast
+      setTimeout(() => {
+        navigate('/doctor/dashboard');
+      }, 1000);
     } catch (error) {
-      setCreateError(error?.message || 'Errore nella creazione del dottore');
+      const errorMessage = getErrorMessage(error, 'Errore nella creazione del dottore');
+      setCreateError(errorMessage);
+      showError(errorMessage);
     } finally {
       setCreating(false);
     }
   };
 
-// Cambio dei valori dei campi del form
+  // Gestione cambio valori con validazione in tempo reale e prefisso +39
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Rimuove l'errore del campo quando l'utente inizia a digitare
-    if (formErrors[name]) {
-      setFormErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
+    let processedValue = value;
+
+    // Gestione prefisso +39 per il numero di telefono (usa utility condivisa)
+    if (name === 'phoneNumber') {
+      processedValue = normalizePhoneNumber(value);
     }
+
+    setFormData(prev => ({ ...prev, [name]: processedValue }));
+    
+    // Validazione in tempo reale
+    validateField(name, processedValue);
   };
 
   // Schermata iniziale: scelta tra "Accedi" e "Crea nuovo"
@@ -183,7 +201,7 @@ function DoctorAccessPage() {
             className="back-button"
             onClick={() => setMode(null)}
           >
-            ← Indietro
+            ← Cambia modalità
           </button>
 
           {loadingDoctors && <LoadingSpinner message="Caricamento dottori..." />}
@@ -223,6 +241,13 @@ function DoctorAccessPage() {
               >
                 Conferma e Accedi
               </button>
+
+              <button 
+                className="switch-mode-button"
+                onClick={() => setMode('create')}
+              >
+                Non sei in lista? Crea nuovo dottore
+              </button>
             </div>
           )}
         </div>
@@ -252,7 +277,7 @@ function DoctorAccessPage() {
             setCreateError(null);
           }}
         >
-          ← Indietro
+          ← Cambia modalità
         </button>
 
         {createError && (
@@ -260,6 +285,7 @@ function DoctorAccessPage() {
         )}
 
         <form onSubmit={handleCreateDoctor} className="create-form">
+          {/* ... campi del form ... */}
           <div className="form-group">
             <label htmlFor="firstName">
               Nome <span className="required">*</span>
@@ -305,7 +331,12 @@ function DoctorAccessPage() {
               value={formData.specialization}
               onChange={handleInputChange}
               placeholder="Es. Cardiologia, Pediatria..."
+              maxLength={150}
+              className={formErrors.specialization ? 'error' : ''}
             />
+            {formErrors.specialization && (
+              <span className="error-message">{formErrors.specialization}</span>
+            )}
           </div>
 
           <div className="form-group">
@@ -346,7 +377,13 @@ function DoctorAccessPage() {
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleInputChange}
+              placeholder="+39 123 456 7890"
+              maxLength={20}
+              className={formErrors.phoneNumber ? 'error' : ''}
             />
+            {formErrors.phoneNumber && (
+              <span className="error-message">{formErrors.phoneNumber}</span>
+            )}
           </div>
 
           <button
@@ -355,6 +392,14 @@ function DoctorAccessPage() {
             disabled={creating}
           >
             {creating ? 'Creazione in corso...' : 'Crea e Accedi'}
+          </button>
+
+          <button 
+            type="button"
+            className="switch-mode-button"
+            onClick={() => setMode('select')}
+          >
+            Hai già un profilo? Accedi
           </button>
         </form>
       </div>

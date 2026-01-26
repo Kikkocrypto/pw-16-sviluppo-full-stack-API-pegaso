@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../api/apiClient';
+import { setDemoId } from '../../api/demoHeaders';
 import './HomePage.css';
 
 function HomePage() {
+  const navigate = useNavigate();
   const [healthStatus, setHealthStatus] = useState(null);
   const [error, setError] = useState(null);
   const [apiUrl, setApiUrl] = useState('');
@@ -27,6 +29,12 @@ function HomePage() {
       setError('Impossibile connettersi al backend. Verifica che il backend sia avviato.');
       console.error('Health check error:', err);
     }
+  };
+
+  const handleAdminAccess = (e) => {
+    e.preventDefault();
+    setDemoId('admin', '880e8400-e29b-41d4-a716-446655440001');
+    navigate('/admin');
   };
 
   return (
@@ -55,10 +63,10 @@ function HomePage() {
           <p>Accedi come dottore o crea un nuovo profilo per gestire le prenotazioni</p>
         </Link>
         
-        <Link to="/admin" className="home-card">
+        <a href="/admin" onClick={handleAdminAccess} className="home-card">
           <h3>Gestione sistema</h3>
           <p>Accedi all'area amministrativa per gestire pazienti, dottori, prenotazioni ed esami</p>
-        </Link>
+        </a>
       </div>
     </div>
   );
