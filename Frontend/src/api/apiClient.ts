@@ -53,6 +53,11 @@ const createAxiosInstance = (): AxiosInstance => {
   // Interceptor per aggiungere automaticamente gli header demo
   instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
+      // flag skipDemoHeaders per non dover aggiungere gli header demo (errore di sviluppo a backend)
+      if ((config as any).skipDemoHeaders) {
+        return config;
+      }
+
       const demoHeaders = getDemoHeaders();
       
       // Aggiungi gli header demo se presenti

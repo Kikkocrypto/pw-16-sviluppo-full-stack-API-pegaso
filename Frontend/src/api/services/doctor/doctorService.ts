@@ -1,0 +1,65 @@
+/**
+ * Servizio API per la gestione dei dottori
+ * 
+ * Gestisce tutte le chiamate API relative ai dottori:
+ * - Lista dottori (per selettore demo)
+ * - Creazione nuovo dottore
+ */
+
+import { apiGet, apiPost } from '../../apiClient';
+import { API_ROUTES } from '../../routes';
+
+/**
+ * Interfaccia per i dati di un dottore
+ */
+export interface Doctor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  specialization?: string | null;
+  gender?: string | null;
+  email?: string | null;
+  phoneNumber?: string | null;
+}
+
+/**
+ * Interfaccia per la creazione di un dottore
+ */
+export interface CreateDoctorData {
+  firstName: string;
+  lastName: string;
+  specialization?: string | null;
+  gender?: string | null;
+  email?: string | null;
+  phoneNumber?: string | null;
+  examIds?: string[] | null;
+}
+
+/**
+ * Recupera la lista dei dottori (per selettore demo)
+ * 
+ * Nota: questa chiamata viene fatta SENZA header demo per ottenere la lista completa.
+ * Il backend restituisce la lista quando non viene passato l'header X-Demo-Doctor-Id.
+ * Il limite viene applicato lato frontend dopo aver ricevuto tutti i risultati.
+ * 
+ * @param limit - Numero massimo di risultati da restituire (default: 10)
+ * @returns Array di dottori limitato
+ */
+export async function getDoctors(limit: number = 10): Promise<Doctor[]> {
+  // skipDemoHeaders: true per ottenere la lista senza header demo
+  const allDoctors = await apiGet<Doctor[]>(API_ROUTES.doctors.list, {
+    skipDemoHeaders: true,
+  } as any);
+  
+  // Limita i risultati lato frontend
+  return allDoctors.slice(0, limit);
+}
+
+/**
+ * Crea un nuovo dottore
+ * @param data - Dati del dottore da creare
+ * @returns Dottore creato con ID
+ */
+export async function createDoctor(data: CreateDoctorData): Promise<Doctor> {
+  return apiPost<Doctor>(API_ROUTES.doctors.create, data);
+}

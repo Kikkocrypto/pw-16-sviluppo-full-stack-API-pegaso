@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 // parte fondamentale per la gestione delle API, si occupa di gestire le richieste in arrivo e restituire le risposte (POST)
@@ -82,22 +83,30 @@ public class DoctorController {
     // Recupero il profilo del dottore GET api/doctors (NON ADMIN)
     @GetMapping
     @Operation(
-            summary = "Recupera il profilo del dottore",
-            description = "restituisce il profilo del dottore identificato dall'header X-Demo-Doctor-Id, incluso gli esami abilitati."
+            summary = "Recupera il profilo del dottore o lista dottori",
+            description = "Con header X-Demo-Doctor-Id: restituisce il profilo del dottore identificato, incluso gli esami abilitati. Senza header: restituisce la lista di tutti i dottori (per selettore demo)."
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Doctor profile",
+                    description = "Doctor profile or list of doctors",
                     content = @Content(schema = @Schema(implementation = DoctorProfileResponse.class))
             ),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid or missing UUID in X-Demo-Doctor-Id"),
+            @ApiResponse(responseCode = "400", description = "Bad request - invalid UUID in X-Demo-Doctor-Id"),
             @ApiResponse(responseCode = "404", description = "Doctor not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<DoctorProfileResponse> getDoctorProfile(
-            @Parameter(description = "UUID del dottore di cui ottenere il profilo. Obbligatorio per GET /api/doctors.", required = true, example = "660e8400-e29b-41d4-a716-446655440001")
-            @RequestHeader(value = "X-Demo-Doctor-Id", required = true) String doctorIdHeader) {
+    public ResponseEntity<?> getDoctorProfile(
+            @Parameter(description = "UUID del dottore di cui ottenere il profilo. Opzionale - se assente, restituisce la lista di tutti i dottori.", required = false, example = "660e8400-e29b-41d4-a716-446655440001")
+            @RequestHeader(value = "X-Demo-Doctor-Id", required = false) String doctorIdHeader) {
+        
+        // Se l'header non è presente, restituisce la lista di tutti i dottori
+        if (doctorIdHeader == null || doctorIdHeader.isBlank()) {
+            List<DoctorProfileResponse> allDoctors = doctorService.getAllDoctors();
+            return ResponseEntity.ok(allDoctors);
+        }
+        
+        // Se l'header è presente, restituisce il profilo del dottore
         UUID doctorId;
         try {
             doctorId = UUID.fromString(doctorIdHeader.trim());
