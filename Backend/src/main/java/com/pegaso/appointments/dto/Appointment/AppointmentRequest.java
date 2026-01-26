@@ -31,6 +31,9 @@ public class AppointmentRequest {
     @Schema(description = "Optional notes for the appointment", example = "Routine check-up")
     private String notes;
 
+    @Schema(description = "Optional identifier of the doctor", example = "660e8400-e29b-41d4-a716-446655440001")
+    private UUID doctorId;
+
     @Schema(description = "Optional contraindications for the appointment", example = "Patient has allergies to contrast agents")
     private String contraindications;
 }

@@ -120,33 +120,28 @@ const handleApiError = (error: AxiosError<ApiError>): Promise<never> => {
   const { status, data } = error.response;
 
   // Se il backend restituisce un formato di errore standardizzato
-  if (data?.error) {
-    const apiError = data.error;
+  if (data) {
+    // Il backend restituisce { status, error, message, ... }
+    // dove error è una stringa (es. "Conflict") e message è il dettaglio
+    const backendMessage = data.message || (typeof data.error === 'string' ? data.error : data.error?.message);
     
-    // Prevenzione account enumeration: per errori 409 e 401, usa messaggi generici
-    let message = apiError.message || `Errore ${status}`;
-    if (status === 409 || status === 401) {
-      message = status === 409 
-        ? 'Impossibile completare l\'operazione. Verifica i dati inseriti e riprova.'
-        : 'Credenziali non valide.';
+    if (backendMessage) {
+      throw new ApiClientError(
+        backendMessage,
+        status,
+        data.code || (typeof data.error === 'string' ? data.error : data.error?.code),
+        data.details || data.errors // Include anche eventuali errori di validazione
+      );
     }
-    
-    throw new ApiClientError(
-      message,
-      status,
-      apiError.code,
-      apiError.details
-    );
   }
 
   // Errore senza formato standardizzato
-  // Prevenzione account enumeration: messaggi generici per errori sensibili
   const statusMessages: Record<number, string> = {
     400: 'Richiesta non valida. Verifica i dati inseriti.',
-    401: 'Credenziali non valide.', // Generico per prevenire account enumeration
+    401: 'Credenziali non valide.',
     403: 'Accesso negato. Non hai i permessi necessari.',
     404: 'Risorsa non trovata.',
-    409: 'Impossibile completare l\'operazione. Verifica i dati inseriti e riprova.', // Generico per prevenire account enumeration
+    409: 'Conflitto: la risorsa esiste già o l\'operazione non è consentita.',
     500: 'Errore interno del server. Riprova più tardi.',
     502: 'Errore del gateway. Il server non è disponibile.',
     503: 'Servizio non disponibile. Riprova più tardi.',

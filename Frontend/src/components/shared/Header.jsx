@@ -85,7 +85,8 @@ function Header() {
           {identityText && (
             <div className="identity-section">
               <div className="identity-banner">
-                <span>Sei connesso come: <strong>{identityText}</strong></span>
+                <span className="identity-label">Sei connesso come: </span>
+                <strong>{identityText}</strong>
               </div>
             </div>
           )}

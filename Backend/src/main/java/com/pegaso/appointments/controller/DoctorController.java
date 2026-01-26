@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +29,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -98,12 +101,16 @@ public class DoctorController {
     })
     public ResponseEntity<?> getDoctorProfile(
             @Parameter(description = "UUID del dottore di cui ottenere il profilo. Opzionale - se assente, restituisce la lista di tutti i dottori.", required = false, example = "660e8400-e29b-41d4-a716-446655440001")
-            @RequestHeader(value = "X-Demo-Doctor-Id", required = false) String doctorIdHeader) {
+            @RequestHeader(value = "X-Demo-Doctor-Id", required = false) String doctorIdHeader,
+            @Parameter(description = "Filtra per esame (opzionale)")
+            @RequestParam(required = false) UUID examId,
+            @Parameter(description = "Filtra per disponibilità in data/ora (opzionale)")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
         
-        // Se l'header non è presente, restituisce la lista di tutti i dottori
+        // Se l'header non è presente, restituisce la lista di tutti i dottori (eventualmente filtrata)
         if (doctorIdHeader == null || doctorIdHeader.isBlank()) {
-            List<DoctorProfileResponse> allDoctors = doctorService.getAllDoctors();
-            return ResponseEntity.ok(allDoctors);
+            List<DoctorProfileResponse> doctors = doctorService.getDoctors(examId, date);
+            return ResponseEntity.ok(doctors);
         }
         
         // Se l'header è presente, restituisce il profilo del dottore

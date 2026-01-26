@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../api/apiClient';
-import { setDemoId } from '../../api/demoHeaders';
+import { setDemoId, getDemoId } from '../../api/demoHeaders';
 import './HomePage.css';
 
 function HomePage() {
@@ -9,10 +9,22 @@ function HomePage() {
   const [healthStatus, setHealthStatus] = useState(null);
   const [error, setError] = useState(null);
   const [apiUrl, setApiUrl] = useState('');
+  const [patientId, setPatientId] = useState(getDemoId('patient'));
+  const [doctorId, setDoctorId] = useState(getDemoId('doctor'));
+  const [adminId, setAdminId] = useState(getDemoId('admin'));
 
   useEffect(() => {
     setApiUrl(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api');
     checkBackendHealth();
+    
+    // Aggiorna gli ID se cambiano
+    const handleRoleChange = () => {
+      setPatientId(getDemoId('patient'));
+      setDoctorId(getDemoId('doctor'));
+      setAdminId(getDemoId('admin'));
+    };
+    window.addEventListener('demoRoleChanged', handleRoleChange);
+    return () => window.removeEventListener('demoRoleChanged', handleRoleChange);
   }, []);
 
   const checkBackendHealth = async () => {
@@ -53,6 +65,36 @@ function HomePage() {
       </div>
 
       <div className="home-menu">
+        {patientId && (
+          <Link to="/patient/dashboard" className="home-card dashboard-card patient">
+            <div className="card-icon">📅</div>
+            <div className="card-content">
+              <h3>Vai alle tue prenotazioni</h3>
+              <p>Visualizza e gestisci i tuoi appuntamenti come paziente</p>
+            </div>
+          </Link>
+        )}
+
+        {doctorId && (
+          <Link to="/doctor/dashboard" className="home-card dashboard-card doctor">
+            <div className="card-icon">👨‍⚕️</div>
+            <div className="card-content">
+              <h3>Vai alla tua agenda</h3>
+              <p>Gestisci i tuoi appuntamenti e la tua disponibilità</p>
+            </div>
+          </Link>
+        )}
+
+        {adminId && (
+          <Link to="/admin" className="home-card dashboard-card admin">
+            <div className="card-icon">⚙️</div>
+            <div className="card-content">
+              <h3>Vai al pannello admin</h3>
+              <p>Gestisci l'intero sistema, utenti ed esami</p>
+            </div>
+          </Link>
+        )}
+
         <Link to="/patient" className="home-card">
           <h3>Prenota ora</h3>
           <p>Accedi come paziente o crea un nuovo profilo per prenotare un appuntamento</p>

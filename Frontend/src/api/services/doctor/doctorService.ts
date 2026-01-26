@@ -64,6 +64,21 @@ export async function getDoctorProfile(): Promise<Doctor> {
 }
 
 /**
+ * Recupera la lista dei dottori abilitati per un determinato esame
+ * Se viene fornita una data, filtra anche per disponibilità
+ * @param examId - ID dell'esame
+ * @param date - Data e ora dell'appuntamento (opzionale)
+ * @returns Array di dottori
+ */
+export async function getDoctorsByExam(examId: string, date?: string): Promise<Doctor[]> {
+  let url = `${API_ROUTES.doctors.list}?examId=${examId}`;
+  if (date) {
+    url += `&date=${encodeURIComponent(date)}`;
+  }
+  return apiGet<Doctor[]>(url);
+}
+
+/**
  * Crea un nuovo dottore
  * @param data - Dati del dottore da creare
  * @returns Dottore creato con ID

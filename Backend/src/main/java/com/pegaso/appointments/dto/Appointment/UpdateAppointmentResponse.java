@@ -35,4 +35,7 @@ public class UpdateAppointmentResponse {
 
     @Schema(description = "Contraindications for the appointment")
     private String contraindications;
+
+    @Schema(description = "Name of the exam")
+    private String examName;
 }
