@@ -224,11 +224,6 @@ export function validateDoctorForm(formData) {
   const lastNameError = validateName(formData.lastName, true);
   if (lastNameError) errors.lastName = lastNameError;
   
-  if (formData.specialization) {
-    const specializationError = validateSpecialization(formData.specialization, false);
-    if (specializationError) errors.specialization = specializationError;
-  }
-  
   if (formData.email) {
     const emailError = validateEmail(formData.email, false);
     if (emailError) errors.email = emailError;

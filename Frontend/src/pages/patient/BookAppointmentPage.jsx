@@ -269,7 +269,6 @@ function BookAppointmentPage() {
                             onClick={() => setSelectedDoctor(doctor)}
                           >
                             <h3>Dott. {doctor.firstName} {doctor.lastName}</h3>
-                            <p>{doctor.specialization}</p>
                           </div>
                         ))
                       ) : (

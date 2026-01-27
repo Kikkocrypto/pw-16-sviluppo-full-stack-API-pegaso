@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS doctors (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    specialization VARCHAR(150),
     gender VARCHAR(10),
     email VARCHAR(255) UNIQUE,
     phone_number VARCHAR(20),

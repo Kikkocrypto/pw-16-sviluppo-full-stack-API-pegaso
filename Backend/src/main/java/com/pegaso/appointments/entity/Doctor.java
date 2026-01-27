@@ -28,9 +28,6 @@ public class Doctor {
     @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
 
-    @Column(name = "specialization", length = 150)
-    private String specialization;
-
     @Column(name = "gender", length = 10)
     private String gender;
 

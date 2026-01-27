@@ -372,7 +372,6 @@ function AdminExamsPage() {
                   <div key={doctor.id} className={`doctor-selection-item ${isAssigned ? 'assigned' : ''}`}>
                     <div className="doctor-info">
                       <span className="doctor-name">Dr. {doctor.firstName} {doctor.lastName}</span>
-                      <span className="doctor-spec">{doctor.specialization}</span>
                     </div>
                     <button 
                       className={`btn-assign ${isAssigned ? 'remove' : 'add'}`}

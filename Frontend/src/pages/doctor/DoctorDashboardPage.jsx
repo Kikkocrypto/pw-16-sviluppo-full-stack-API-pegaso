@@ -90,9 +90,6 @@ function DoctorDashboardPage() {
         <div className="header-left">
           <h1>Bentornato, Dott. {doctor?.lastName}</h1>
           <div className="header-meta">
-            {doctor?.specialization && (
-              <span className="specialization-tag">{doctor.specialization}</span>
-            )}
             <p className="welcome-text">Ecco il riepilogo della tua attività per oggi.</p>
           </div>
         </div>

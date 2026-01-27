@@ -54,7 +54,6 @@ public class DoctorService {
         Doctor doctor = Doctor.builder()
                 .firstName(normalization.normalizeName(request.getFirstName()))
                 .lastName(normalization.normalizeName(request.getLastName()))
-                .specialization(normalization.normalizeOptionalName(request.getSpecialization()))
                 .gender(normalization.normalizeGender(request.getGender()))
                 .email(emailToStore)
                 .phoneNumber(normalization.normalizeString(request.getPhoneNumber()))
@@ -123,7 +122,6 @@ public class DoctorService {
                 .id(doctor.getId())
                 .firstName(doctor.getFirstName())
                 .lastName(doctor.getLastName())
-                .specialization(doctor.getSpecialization())
                 .gender(doctor.getGender())
                 .email(doctor.getEmail())
                 .phoneNumber(doctor.getPhoneNumber())
@@ -178,7 +176,6 @@ public class DoctorService {
                             .id(doctor.getId())
                             .firstName(doctor.getFirstName())
                             .lastName(doctor.getLastName())
-                            .specialization(doctor.getSpecialization())
                             .gender(doctor.getGender())
                             .email(doctor.getEmail())
                             .phoneNumber(doctor.getPhoneNumber())
@@ -205,9 +202,6 @@ public class DoctorService {
         }
         if (request.getLastName() != null && !request.getLastName().isBlank()) {
             doctor.setLastName(normalization.normalizeName(request.getLastName()));
-        }
-        if (request.getSpecialization() != null && !request.getSpecialization().isBlank()) {
-            doctor.setSpecialization(normalization.normalizeOptionalName(request.getSpecialization()));
         }
         if (request.getGender() != null && !request.getGender().isBlank()) {
             doctor.setGender(normalization.normalizeGender(request.getGender()));
@@ -245,7 +239,6 @@ public class DoctorService {
                 .id(doctor.getId())
                 .firstName(doctor.getFirstName())
                 .lastName(doctor.getLastName())
-                .specialization(doctor.getSpecialization())
                 .gender(doctor.getGender())
                 .email(doctor.getEmail())
                 .phoneNumber(doctor.getPhoneNumber())
@@ -289,7 +282,6 @@ public class DoctorService {
                 .id(doctor.getId())
                 .firstName(doctor.getFirstName())
                 .lastName(doctor.getLastName())
-                .specialization(doctor.getSpecialization())
                 .gender(doctor.getGender())
                 .email(doctor.getEmail())
                 .phoneNumber(doctor.getPhoneNumber())

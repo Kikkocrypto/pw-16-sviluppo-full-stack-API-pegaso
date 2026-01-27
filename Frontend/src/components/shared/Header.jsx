@@ -78,7 +78,15 @@ function Header() {
     return null;
   };
 
+  const getProfileLink = () => {
+    if (adminId) return '/admin';
+    if (doctorId) return '/doctor/profile';
+    if (patientId) return '/patient/profile';
+    return null;
+  };
+
   const identityText = getIdentityText();
+  const profileLink = getProfileLink();
   const showBackButton = location.pathname !== '/' && location.pathname !== '/home';
 
   return (
@@ -117,6 +125,13 @@ function Header() {
                 <Link to="/" className="mobile-home-link mobile-only">
                   🏠 Torna alla Home
                 </Link>
+
+                {profileLink && (
+                  <Link to={profileLink} className="profile-link">
+                    <span className="profile-icon">👤</span>
+                    <span className="profile-text">Il mio Profilo</span>
+                  </Link>
+                )}
 
                 {(patientId || doctorId || adminId) && (
                   <button onClick={handleLogout} className="logout-button">

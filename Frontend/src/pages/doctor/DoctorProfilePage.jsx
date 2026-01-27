@@ -24,7 +24,6 @@ function DoctorProfilePage() {
     lastName: '',
     email: '',
     phoneNumber: '',
-    specialization: '',
     gender: ''
   });
   const [formErrors, setFormErrors] = useState({});
@@ -42,7 +41,6 @@ function DoctorProfilePage() {
         lastName: profile.lastName || '',
         email: profile.email || '',
         phoneNumber: profile.phoneNumber || '',
-        specialization: profile.specialization || '',
         gender: profile.gender || ''
       };
       setFormData(data);
@@ -172,18 +170,6 @@ function DoctorProfilePage() {
                   required
                 />
                 {formErrors.lastName && <span className="error-message">{formErrors.lastName}</span>}
-              </div>
-              <div className="form-group">
-                <label htmlFor="specialization">Specializzazione</label>
-                <input
-                  type="text"
-                  id="specialization"
-                  name="specialization"
-                  value={formData.specialization}
-                  onChange={handleChange}
-                  className={formErrors.specialization ? 'error' : ''}
-                />
-                {formErrors.specialization && <span className="error-message">{formErrors.specialization}</span>}
               </div>
               <div className="form-group">
                 <label htmlFor="gender">Genere</label>

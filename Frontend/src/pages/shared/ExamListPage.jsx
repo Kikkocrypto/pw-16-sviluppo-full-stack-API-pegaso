@@ -80,7 +80,6 @@ function ExamListPage() {
                         {associatedDoctors.map(doc => (
                           <li key={doc.id}>
                             Dr. {doc.firstName} {doc.lastName}
-                            {doc.specialization && <span className="specialization"> ({doc.specialization})</span>}
                           </li>
                         ))}
                       </ul>
