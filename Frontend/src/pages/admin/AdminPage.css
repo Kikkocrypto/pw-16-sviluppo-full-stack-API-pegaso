@@ -55,6 +55,28 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-xl);
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.admin-header h2 {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .admin-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-page, .admin-exams-page {
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
 }
 
 .admin-table-container {
@@ -62,12 +84,82 @@
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
-  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
 }
 
 .admin-table {
   width: 100%;
   border-collapse: collapse;
+}
+
+@media (max-width: 768px) {
+  .admin-table-container {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .admin-table, 
+  .admin-table thead, 
+  .admin-table tbody, 
+  .admin-table th, 
+  .admin-table td, 
+  .admin-table tr {
+    display: block;
+  }
+
+  .admin-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .admin-table tr {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .admin-table td {
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    padding-left: 40%;
+    text-align: left;
+    min-height: 45px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+  }
+
+  .admin-table td:last-child {
+    border-bottom: none;
+  }
+
+  .admin-table td::before {
+    content: attr(data-label);
+    position: static;
+    display: block;
+    width: 100%;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 800;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+  }
+
+  .admin-table td.actions {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding-top: var(--spacing-md);
+  }
 }
 
 .admin-table th {
@@ -142,6 +234,70 @@
   justify-content: center;
   align-items: center;
   z-index: 1500;
+}
+
+/* Admin Quick Navigation */
+.admin-quick-nav {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  background: var(--bg-card);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: var(--transition-base);
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background: var(--bg-main);
+  color: var(--primary-color);
+}
+
+.nav-item.active {
+  background: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.nav-item svg {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .admin-quick-nav {
+    gap: 4px;
+    padding: 4px;
+  }
+  
+  .nav-item {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+    flex: 1;
+    justify-content: center;
+    min-width: calc(50% - 4px);
+  }
+
+  .nav-item span {
+    display: none; /* Nasconde il testo su mobile molto piccolo se necessario, o lo teniamo corto */
+  }
+  
+  /* Se vogliamo mantenere il testo ma rimpicciolirlo */
+  .nav-item span {
+    display: inline;
+  }
 }
 
 .modal-content {

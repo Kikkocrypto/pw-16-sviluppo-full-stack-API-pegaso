@@ -101,6 +101,12 @@ function DoctorAppointmentsPage() {
           Confermati
         </button>
         <button 
+          className={`filter-btn ${filter === 'completed' ? 'active' : ''}`}
+          onClick={() => setFilter('completed')}
+        >
+          Completati
+        </button>
+        <button 
           className={`filter-btn ${filter === 'cancelled' ? 'active' : ''}`}
           onClick={() => setFilter('cancelled')}
         >

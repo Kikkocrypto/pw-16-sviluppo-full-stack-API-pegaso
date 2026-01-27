@@ -5,6 +5,7 @@ import {
   getPatientAppointments 
 } from '../../api/services/patient/patientService';
 import { LoadingSpinner, ErrorMessage, ConfirmDialog } from '../../components/common';
+import AdminQuickNav from '../../components/common/AdminQuickNav';
 import { IconX, IconList, IconTrash } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
@@ -93,6 +94,7 @@ function AdminPatientsPage() {
 
   return (
     <div className="admin-patients-container">
+      <AdminQuickNav />
       <div className="admin-patients-header">
         <h2>Gestione Pazienti</h2>
         <div className="search-bar">
@@ -120,25 +122,25 @@ function AdminPatientsPage() {
             {filteredPatients.length > 0 ? (
               filteredPatients.map(patient => (
                 <tr key={patient.id}>
-                  <td>{patient.firstName}</td>
-                  <td>{patient.lastName}</td>
-                  <td>{patient.email || '-'}</td>
-                  <td>{patient.phoneNumber || '-'}</td>
-                  <td>
+                  <td data-label="Nome">{patient.firstName}</td>
+                  <td data-label="Cognome">{patient.lastName}</td>
+                  <td data-label="Email">{patient.email || '-'}</td>
+                  <td data-label="Telefono">{patient.phoneNumber || '-'}</td>
+                  <td data-label="Azioni">
                     <div className="actions-cell">
                       <button 
-                        className="btn-view"
+                        className="btn-icon view"
                         onClick={() => handleViewDetails(patient)}
                         title="Dettagli"
                       >
-                        <IconList size={16} /> Dettagli
+                        <IconList size={16} />
                       </button>
                       <button 
-                        className="btn-delete"
+                        className="btn-icon delete"
                         onClick={() => handleDeleteClick(patient)}
                         title="Elimina"
                       >
-                        <IconTrash size={16} /> Elimina
+                        <IconTrash size={16} />
                       </button>
                     </div>
                   </td>

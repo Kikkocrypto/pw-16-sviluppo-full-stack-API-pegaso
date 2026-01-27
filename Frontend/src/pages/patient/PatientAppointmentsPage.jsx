@@ -7,6 +7,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { getErrorMessage } from '../../utils/errorUtils';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { IconCalendar, IconClock, IconDoctor, IconList, IconTrash, IconPlus } from '../../components/common/Icons';
+import { getDoctorTitle } from '../../utils/formatters';
 import './PatientAppointmentsPage.css';
 
 function PatientAppointmentsPage() {

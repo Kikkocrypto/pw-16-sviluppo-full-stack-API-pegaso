@@ -5,6 +5,7 @@ import {
   getDoctorAppointments 
 } from '../../api/services/doctor/doctorService';
 import { LoadingSpinner, ErrorMessage, ConfirmDialog } from '../../components/common';
+import AdminQuickNav from '../../components/common/AdminQuickNav';
 import { IconX, IconList, IconTrash } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
@@ -93,6 +94,7 @@ function AdminDoctorsPage() {
 
   return (
     <div className="admin-doctors-container">
+      <AdminQuickNav />
       <div className="admin-doctors-header">
         <h2>Gestione Dottori</h2>
         <div className="search-bar">
@@ -120,9 +122,9 @@ function AdminDoctorsPage() {
             {filteredDoctors.length > 0 ? (
               filteredDoctors.map(doctor => (
                 <tr key={doctor.id}>
-                  <td>{doctor.firstName}</td>
-                  <td>{doctor.lastName}</td>
-                  <td>
+                  <td data-label="Nome">{doctor.firstName}</td>
+                  <td data-label="Cognome">{doctor.lastName}</td>
+                  <td data-label="Esami">
                     <div className="exams-list-cell">
                       {doctor.exams && doctor.exams.length > 0 ? (
                         doctor.exams.slice(0, 2).map(exam => (
@@ -136,22 +138,22 @@ function AdminDoctorsPage() {
                       )}
                     </div>
                   </td>
-                  <td>{doctor.email || '-'}</td>
-                  <td>
+                  <td data-label="Email">{doctor.email || '-'}</td>
+                  <td data-label="Azioni">
                     <div className="actions-cell">
                       <button 
-                        className="btn-view"
+                        className="btn-icon view"
                         onClick={() => handleViewDetails(doctor)}
                         title="Dettagli"
                       >
-                        <IconList size={16} /> Dettagli
+                        <IconList size={16} />
                       </button>
                       <button 
-                        className="btn-delete"
+                        className="btn-icon delete"
                         onClick={() => handleDeleteClick(doctor)}
                         title="Elimina"
                       >
-                        <IconTrash size={16} /> Elimina
+                        <IconTrash size={16} />
                       </button>
                     </div>
                   </td>

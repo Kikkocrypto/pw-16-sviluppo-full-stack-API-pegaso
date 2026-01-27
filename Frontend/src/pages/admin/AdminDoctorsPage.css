@@ -17,7 +17,7 @@
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
-  overflow-x: auto;
+  margin-bottom: var(--spacing-lg);
 }
 
 .doctors-table {
@@ -67,6 +67,12 @@
   align-self: center;
 }
 
+.actions-cell {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
 /* Modal Details */
 .doctor-detail-overlay {
   position: fixed;
@@ -95,5 +101,76 @@
 }
 
 @media (max-width: 768px) {
-  .admin-doctors-header { flex-direction: column; align-items: stretch; }
+  .admin-doctors-header { 
+    flex-direction: column; 
+    align-items: stretch; 
+    gap: var(--spacing-md);
+  }
+
+  .doctors-table-container {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .doctors-table, 
+  .doctors-table thead, 
+  .doctors-table tbody, 
+  .doctors-table th, 
+  .doctors-table td, 
+  .doctors-table tr {
+    display: block;
+  }
+
+  .doctors-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .doctors-table tr {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .doctors-table td {
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    padding-left: 0;
+    text-align: left;
+    min-height: 45px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+  }
+
+  .doctors-table td:last-child {
+    border-bottom: none;
+  }
+
+  .doctors-table td::before {
+    content: attr(data-label);
+    display: block;
+    width: 100%;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 800;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+  }
+
+  .actions-cell {
+    width: 100%;
+    justify-content: flex-start;
+    padding-top: var(--spacing-sm);
+  }
 }

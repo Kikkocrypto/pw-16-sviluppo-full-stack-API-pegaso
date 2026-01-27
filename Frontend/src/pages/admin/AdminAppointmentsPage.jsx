@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAppointments, cancelAppointment } from '../../api/services/appointments/appointmentService';
 import { LoadingSpinner, ErrorMessage, ConfirmDialog } from '../../components/common';
+import AdminQuickNav from '../../components/common/AdminQuickNav';
 import { IconList, IconTrash, IconCalendar, IconClock, IconUser, IconDoctor } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { Link } from 'react-router-dom';
@@ -86,6 +87,7 @@ function AdminAppointmentsPage() {
 
   return (
     <div className="admin-appointments-container">
+      <AdminQuickNav />
       <div className="admin-appointments-header">
         <h2>Gestione Prenotazioni</h2>
         <div className="filters-bar">
@@ -121,52 +123,46 @@ function AdminAppointmentsPage() {
             {filteredAppointments.length > 0 ? (
               filteredAppointments.map(app => (
                 <tr key={app.id}>
-                  <td>
+                  <td data-label="Data e Ora">
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <span style={{ fontWeight: 600 }}><IconCalendar size={14} /> {formatDate(app.appointmentDate)}</span>
                       <span style={{ color: 'var(--text-muted)' }}><IconClock size={14} /> {formatTime(app.appointmentDate)}</span>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Paziente">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <IconUser size={16} color="var(--text-muted)" />
                       {app.patientFirstName} {app.patientLastName}
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Medico">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <IconDoctor size={16} color="var(--text-muted)" />
                       {app.doctorFirstName} {app.doctorLastName}
                     </div>
                   </td>
-                  <td>{app.examName}</td>
-                  <td>
+                  <td data-label="Esame">{app.examName}</td>
+                  <td data-label="Stato">
                     <span className={`status-badge status-${app.status}`}>
                       {app.status === 'pending' ? 'In attesa' : 
                        app.status === 'confirmed' ? 'Confermato' : 
                        app.status === 'completed' ? 'Completato' : 'Annullato'}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="Azioni">
                     <div className="actions-cell">
                       <Link 
                         to={`/appointments/${app.id}`}
-                        className="btn btn-secondary btn-sm"
+                        className="btn-icon view"
                         title="Dettagli"
-                        style={{ padding: '0.4rem 0.8rem' }}
                       >
                         <IconList size={16} />
                       </Link>
                       {app.status !== 'cancelled' && (
                         <button 
-                          className="btn btn-secondary btn-sm"
+                          className="btn-icon delete"
                           onClick={() => handleCancelClick(app)}
                           title={app.status === 'completed' ? "Elimina" : "Annulla"}
-                          style={{ 
-                            padding: '0.4rem 0.8rem', 
-                            color: 'var(--error-color)', 
-                            borderColor: 'var(--error-color)' 
-                          }}
                         >
                           <IconTrash size={16} />
                         </button>

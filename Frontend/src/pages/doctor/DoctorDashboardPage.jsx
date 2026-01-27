@@ -5,6 +5,7 @@ import { getAppointments } from '../../api/services/appointments/appointmentServ
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { IconCalendar, IconClock, IconUser, IconList } from '../../components/common/Icons';
+import { getDoctorTitle } from '../../utils/formatters';
 import './DoctorDashboardPage.css';
 
 function DoctorDashboardPage() {

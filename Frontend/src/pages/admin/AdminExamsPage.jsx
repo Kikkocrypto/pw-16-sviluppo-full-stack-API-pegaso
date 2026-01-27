@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getExams, createExam, updateExam, deleteExam, assignDoctorToExam, removeDoctorFromExam } from '../../api/services/exam/examService';
 import { getDoctors } from '../../api/services/doctor/doctorService';
+import { getDoctorTitle } from '../../utils/formatters';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
-import { IconDoctor, IconEdit, IconTrash, IconList, IconUser, IconCalendar, IconSettings } from '../../components/common/Icons';
+import AdminQuickNav from '../../components/common/AdminQuickNav';
+import { IconDoctor, IconEdit, IconTrash, IconList, IconUser, IconCalendar, IconSettings, IconPlus, IconInfo, IconClock, IconX } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { validateField } from '../../utils/validation';
 import './AdminPage.css';
@@ -233,10 +235,11 @@ function AdminExamsPage() {
 
   return (
     <div className="admin-exams-page">
+      <AdminQuickNav />
       <div className="admin-header">
         <h2>Gestione Esami</h2>
-        <button className="btn-primary" onClick={() => handleOpenModal()}>
-          Nuovo Esame
+        <button className="btn btn-primary" onClick={() => handleOpenModal()}>
+          <IconPlus size={18} /> Nuovo Esame
         </button>
       </div>
 
@@ -246,25 +249,25 @@ function AdminExamsPage() {
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Nome</th>
-              <th>Descrizione</th>
-              <th>Durata (min)</th>
-              <th>Stato</th>
+              <th><IconList size={14} /> Nome</th>
+              <th><IconInfo size={14} /> Descrizione</th>
+              <th><IconClock size={14} /> Durata (min)</th>
+              <th><IconSettings size={14} /> Stato</th>
               <th>Azioni</th>
             </tr>
           </thead>
           <tbody>
             {exams.map(exam => (
               <tr key={exam.id}>
-                <td>{exam.name}</td>
-                <td>{exam.description || '-'}</td>
-                <td>{exam.durationMinutes}</td>
-                <td>
+                <td data-label="Nome">{exam.name}</td>
+                <td data-label="Descrizione">{exam.description || '-'}</td>
+                <td data-label="Durata (min)">{exam.durationMinutes}</td>
+                <td data-label="Stato">
                   <span className={`status-badge ${exam.isActive ? 'active' : 'inactive'}`}>
                     {exam.isActive ? 'Attivo' : 'Inattivo'}
                   </span>
                 </td>
-                <td className="actions">
+                <td data-label="Azioni" className="actions">
                   <Link to={`/exams/${exam.id}`} className="btn-icon" title="Vedi Dettagli">
                     <IconList size={18} />
                   </Link>
@@ -295,7 +298,7 @@ function AdminExamsPage() {
             <h3>{currentExam ? 'Modifica Esame' : 'Nuovo Esame'}</h3>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label htmlFor="name">Nome Esame*</label>
+                <label htmlFor="name"><IconList size={14} /> Nome Esame*</label>
                 <input
                   type="text"
                   id="name"
@@ -311,7 +314,7 @@ function AdminExamsPage() {
                 )}
               </div>
               <div className="form-group">
-                <label htmlFor="description">Descrizione</label>
+                <label htmlFor="description"><IconInfo size={14} /> Descrizione</label>
                 <textarea
                   id="description"
                   name="description"
@@ -321,7 +324,7 @@ function AdminExamsPage() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="durationMinutes">Durata (minuti)*</label>
+                <label htmlFor="durationMinutes"><IconClock size={14} /> Durata (minuti)*</label>
                 <input
                   type="number"
                   id="durationMinutes"
@@ -345,19 +348,19 @@ function AdminExamsPage() {
                     checked={formData.isActive}
                     onChange={handleInputChange}
                   />
-                  Attivo
+                  <IconSettings size={14} /> Attivo
                 </label>
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn-secondary" onClick={handleCloseModal}>
+                <button type="button" className="btn btn-outline" onClick={handleCloseModal}>
                   Annulla
                 </button>
                 <button 
                   type="submit" 
-                  className="btn-primary" 
+                  className="btn btn-primary" 
                   disabled={!isFormValid() || (currentExam && !isFormChanged())}
                 >
-                  {currentExam ? 'Aggiorna' : 'Crea'}
+                  {currentExam ? 'Aggiorna Esame' : 'Crea Nuovo Esame'}
                 </button>
               </div>
             </form>
@@ -368,7 +371,7 @@ function AdminExamsPage() {
       {isDoctorModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content doctor-assignment-modal">
-            <h3>Gestisci Dottori per: {currentExam?.name}</h3>
+            <h3><IconDoctor size={24} /> Gestisci Dottori per: {currentExam?.name}</h3>
             <p className="modal-subtitle">Seleziona i medici abilitati a eseguire questo esame.</p>
             
             <div className="doctor-selection-list">
@@ -377,13 +380,13 @@ function AdminExamsPage() {
                 return (
                   <div key={doctor.id} className={`doctor-selection-item ${isAssigned ? 'assigned' : ''}`}>
                     <div className="doctor-info">
-                      <span className="doctor-name">{getDoctorTitle(doctor.gender)} {doctor.firstName} {doctor.lastName}</span>
+                      <span className="doctor-name"><IconUser size={16} /> {getDoctorTitle(doctor.gender)} {doctor.firstName} {doctor.lastName}</span>
                     </div>
                     <button 
                       className={`btn-assign ${isAssigned ? 'remove' : 'add'}`}
                       onClick={() => handleToggleDoctorAssignment(doctor.id, isAssigned)}
                     >
-                      {isAssigned ? 'Rimuovi' : 'Assegna'}
+                      {isAssigned ? <><IconX size={14} /> Rimuovi</> : <><IconPlus size={14} /> Assegna</>}
                     </button>
                   </div>
                 );
