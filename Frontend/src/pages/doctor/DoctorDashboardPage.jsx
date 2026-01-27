@@ -71,28 +71,60 @@ function DoctorDashboardPage() {
     };
   };
 
-  // Filtra appuntamenti odierni o futuri
+  // Statistiche per il dottore
+  const today = new Date().toISOString().split('T')[0];
+  const appointmentsToday = appointments.filter(app => {
+    if (!app.appointmentDate) return false;
+    const appDate = Array.isArray(app.appointmentDate) 
+      ? new Date(Date.UTC(app.appointmentDate[0], app.appointmentDate[1] - 1, app.appointmentDate[2])).toISOString().split('T')[0]
+      : new Date(app.appointmentDate).toISOString().split('T')[0];
+    return appDate === today && app.status !== 'cancelled';
+  }).length;
+
+  const pendingAppointments = appointments.filter(app => app.status === 'pending').length;
   const activeAppointments = appointments.filter(app => app && app.status !== 'cancelled');
 
   return (
     <div className="doctor-dashboard">
       <header className="dashboard-header">
-        <div>
+        <div className="header-left">
           <h1>Bentornato, Dott. {doctor?.lastName}</h1>
-          {doctor?.specialization && (
-            <span className="specialization-badge">{doctor.specialization}</span>
-          )}
-          <p className="welcome-text">Ecco il riepilogo della tua attività.</p>
+          <div className="header-meta">
+            {doctor?.specialization && (
+              <span className="specialization-tag">{doctor.specialization}</span>
+            )}
+            <p className="welcome-text">Ecco il riepilogo della tua attività per oggi.</p>
+          </div>
+        </div>
+        <div className="header-actions">
+          <Link to="/doctor/profile" className="btn-profile-link">
+            Il mio Profilo
+          </Link>
         </div>
       </header>
+
+      <div className="stats-row">
+        <div className="stat-card">
+          <span className="stat-value">{appointmentsToday}</span>
+          <span className="stat-label">Appuntamenti oggi</span>
+        </div>
+        <div className="stat-card warning">
+          <span className="stat-value">{pendingAppointments}</span>
+          <span className="stat-label">Da confermare</span>
+        </div>
+        <div className="stat-card info">
+          <span className="stat-value">{activeAppointments.length}</span>
+          <span className="stat-label">Totale attivi</span>
+        </div>
+      </div>
 
       <div className="dashboard-grid">
         <div className="dashboard-main">
           <section className="dashboard-section">
             <div className="section-header">
-              <h2>Agenda Appuntamenti</h2>
-              <Link to="/doctor/appointments" className="home-link" style={{ color: '#007bff' }}>
-                Vedi agenda completa
+              <h2>Prossimi Appuntamenti</h2>
+              <Link to="/doctor/appointments" className="view-all-link">
+                Vedi tutti
               </Link>
             </div>
 
@@ -114,16 +146,16 @@ function DoctorDashboardPage() {
                         <div className="appointment-details">
                           <h3>{app.examName || 'Esame medico'}</h3>
                           <div className="appointment-meta">
-                            <span>🕒 {date.time}</span>
-                            <span>👤 {patientName}</span>
+                            <span className="meta-item">🕒 {date.time}</span>
+                            <span className="meta-item">👤 {patientName}</span>
                           </div>
                         </div>
                       </div>
                       <div className="appointment-actions">
                         <span className={`status-badge status-${app.status}`}>
-                          {app.status === 'pending' ? 'Da confermare' : 'Confermato'}
+                          {app.status === 'pending' ? 'In attesa' : 'Confermato'}
                         </span>
-                        <Link to={`/doctor/appointments/${app.id}`} className="btn-manage" style={{ marginLeft: '1rem' }}>
+                        <Link to={`/doctor/appointments/${app.id}`} className="btn-manage">
                           Gestisci
                         </Link>
                       </div>
@@ -134,7 +166,7 @@ function DoctorDashboardPage() {
             ) : (
               <div className="empty-state">
                 <span className="empty-state-icon">📅</span>
-                <p>Non ci sono appuntamenti in programma per i prossimi giorni.</p>
+                <p>Nessun appuntamento in programma.</p>
               </div>
             )}
           </section>
@@ -146,25 +178,25 @@ function DoctorDashboardPage() {
               <h2>Azioni Rapide</h2>
             </div>
             <div className="quick-actions">
-              <Link to="/doctor/profile" className="action-card">
-                <div className="action-icon">👨‍⚕️</div>
+              <Link to="/doctor/appointments" className="action-card">
+                <div className="action-icon">📅</div>
                 <div className="action-info">
-                  <h3>Il mio Profilo</h3>
-                  <p>Gestisci specializzazioni</p>
+                  <h3>Agenda Completa</h3>
+                  <p>Gestisci tutto il calendario</p>
                 </div>
               </Link>
-              <Link to="/doctor/exams" className="action-card">
+              <Link to="/exams" className="action-card">
                 <div className="action-icon">📋</div>
                 <div className="action-info">
-                  <h3>I miei Esami</h3>
-                  <p>Configura esami offerti</p>
+                  <h3>Catalogo Esami</h3>
+                  <p>Visualizza esami disponibili</p>
                 </div>
               </Link>
               <Link to="/admin/patients" className="action-card">
                 <div className="action-icon">👥</div>
                 <div className="action-info">
-                  <h3>Anagrafica</h3>
-                  <p>Cerca pazienti</p>
+                  <h3>Ricerca Pazienti</h3>
+                  <p>Anagrafica completa</p>
                 </div>
               </Link>
             </div>

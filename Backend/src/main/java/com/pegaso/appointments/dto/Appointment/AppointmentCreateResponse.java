@@ -29,6 +29,9 @@ public class AppointmentCreateResponse {
     @Schema(description = "Identifier of the patient")
     private UUID patientId;
 
+    @Schema(description = "Patient email")
+    private String patientEmail;
+
     @Schema(description = "Status of the appointment")
     private String status;
 

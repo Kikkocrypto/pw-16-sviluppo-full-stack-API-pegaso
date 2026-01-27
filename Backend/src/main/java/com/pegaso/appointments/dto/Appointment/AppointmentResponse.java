@@ -42,6 +42,9 @@ public class AppointmentResponse {
     @Schema(description = "Patient last name")
     private String patientLastName;
 
+    @Schema(description = "Patient email")
+    private String patientEmail;
+
     @Schema(description = "Status of the appointment (pending, confirmed, cancelled)")
     private String status;
 
