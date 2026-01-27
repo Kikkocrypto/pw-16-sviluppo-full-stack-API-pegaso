@@ -169,7 +169,7 @@ public class DoctorController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Profilo cancellato con successo"),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid or missing UUID, or doctor has active appointments (non-cancelled)"),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida o il dottore ha appuntamenti attivi"),
             @ApiResponse(responseCode = "404", description = "Doctor not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -236,7 +236,7 @@ public class DoctorController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Doctor deleted successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid UUID format, or doctor has active appointments (non-cancelled)"),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida o il dottore ha appuntamenti attivi"),
             @ApiResponse(responseCode = "403", description = "Forbidden - admin not authorized"),
             @ApiResponse(responseCode = "404", description = "Doctor not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")

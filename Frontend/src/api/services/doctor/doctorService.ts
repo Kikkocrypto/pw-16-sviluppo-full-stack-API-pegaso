@@ -6,7 +6,7 @@
  * - Creazione nuovo dottore
  */
 
-import { apiGet, apiPost } from '../../apiClient';
+import { apiGet, apiPost, apiPatch, apiDelete } from '../../apiClient';
 import { API_ROUTES } from '../../routes';
 
 /**
@@ -20,6 +20,11 @@ export interface Doctor {
   gender?: string | null;
   email?: string | null;
   phoneNumber?: string | null;
+  exams?: {
+    examId: string;
+    examName: string;
+    description?: string;
+  }[];
 }
 
 /**
@@ -85,4 +90,20 @@ export async function getDoctorsByExam(examId: string, date?: string): Promise<D
  */
 export async function createDoctor(data: CreateDoctorData): Promise<Doctor> {
   return apiPost<Doctor>(API_ROUTES.doctors.create, data);
+}
+
+/**
+ * Aggiorna il profilo del dottore corrente (basato sull'header X-Demo-Doctor-Id)
+ * @param data - Dati da aggiornare
+ * @returns Profilo aggiornato
+ */
+export async function updateDoctorProfile(data: Partial<CreateDoctorData>): Promise<Doctor> {
+  return apiPatch<Doctor>(API_ROUTES.doctors.update, data);
+}
+
+/**
+ * Elimina il profilo del dottore corrente (basato sull'header X-Demo-Doctor-Id)
+ */
+export async function deleteDoctorProfile(): Promise<void> {
+  return apiDelete<void>(API_ROUTES.doctors.delete);
 }

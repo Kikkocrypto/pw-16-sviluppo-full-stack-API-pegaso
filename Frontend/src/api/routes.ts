@@ -38,9 +38,11 @@ export const API_ROUTES = {
   exams: {
     list: '/exams',
     detail: (id: string) => `/exams/${id}`,
-    create: '/exams', // Con header X-Demo-Admin-Id
-    update: (id: string) => `/exams/${id}`, // Con header X-Demo-Admin-Id
-    delete: (id: string) => `/exams/${id}`, // Con header X-Demo-Admin-Id
+    create: '/admin/exams', // Corretto: AdminController @RequestMapping("/api/admin") + @PostMapping("/exams")
+    update: (id: string) => `/admin/exams/${id}`, // Corretto: AdminController @PatchMapping("/exams/{examId}")
+    delete: (id: string) => `/admin/exams/${id}`, // Corretto: AdminController @DeleteMapping("/exams/{examId}")
+    assignDoctor: (examId: string, doctorId: string) => `/admin/exams/${examId}/doctors/${doctorId}`,
+    removeDoctor: (examId: string, doctorId: string) => `/admin/exams/${examId}/doctors/${doctorId}`,
   },
 
   // Appointments

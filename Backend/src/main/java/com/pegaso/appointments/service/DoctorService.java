@@ -259,7 +259,7 @@ public class DoctorService {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", doctorId));
         if (hasAppointments(doctorId)) {
-            throw new IllegalArgumentException("Cannot delete doctor: doctor has active appointments (non-cancelled)");
+            throw new IllegalArgumentException("Impossibile eliminare il profilo: sono presenti appuntamenti attivi. Cancella o completa gli appuntamenti prima di procedere.");
         }
         // Elimina fisicamente tutti gli appuntamenti cancellati associati al dottore
         // per evitare violazioni di foreign key constraint

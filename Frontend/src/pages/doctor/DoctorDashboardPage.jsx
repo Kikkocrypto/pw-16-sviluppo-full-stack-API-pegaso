@@ -192,13 +192,6 @@ function DoctorDashboardPage() {
                   <p>Visualizza esami disponibili</p>
                 </div>
               </Link>
-              <Link to="/admin/patients" className="action-card">
-                <div className="action-icon">👥</div>
-                <div className="action-info">
-                  <h3>Ricerca Pazienti</h3>
-                  <p>Anagrafica completa</p>
-                </div>
-              </Link>
             </div>
           </section>
         </aside>

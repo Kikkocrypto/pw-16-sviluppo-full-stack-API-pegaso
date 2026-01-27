@@ -130,7 +130,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> response = new HashMap<>();
         response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         response.put("error", "Internal server error");
-        response.put("message", "A persistence error occurred");
+        response.put("message", "Si è verificato un errore durante il salvataggio dei dati. Verifica che non ci siano vincoli di integrità (es. appuntamenti associati).");
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
