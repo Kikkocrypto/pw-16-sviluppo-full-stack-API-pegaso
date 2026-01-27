@@ -5,6 +5,7 @@ import { getDemoId } from '../../api/demoHeaders';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import { IconCalendar, IconDoctor, IconUser, IconEdit, IconTrash, IconX, IconClock, IconAlertTriangle } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { getErrorMessage } from '../../utils/errorUtils';
 import './AppointmentDetailPage.css';
@@ -114,6 +115,7 @@ function AppointmentDetailPage() {
   const isDoctor = doctorId && appointment.doctorId === doctorId;
   const isAdmin = !!adminId;
   const isCancelled = appointment.status === 'cancelled';
+  const isCompleted = appointment.status === 'completed';
   const isPast = new Date(appointment.appointmentDate) < new Date();
 
   return (
@@ -126,7 +128,9 @@ function AppointmentDetailPage() {
           <div className="header-main">
             <h1>Dettaglio Appuntamento</h1>
             <span className={`status-badge-large status-${appointment.status}`}>
-              {appointment.status === 'pending' ? 'In attesa' : appointment.status === 'confirmed' ? 'Confermato' : 'Annullato'}
+              {appointment.status === 'pending' ? 'In attesa' : 
+               appointment.status === 'confirmed' ? 'Confermato' : 
+               appointment.status === 'completed' ? 'Completato' : 'Annullato'}
             </span>
           </div>
         </header>
@@ -142,17 +146,17 @@ function AppointmentDetailPage() {
                 
                 <div className="info-body">
                   <div className="info-item">
-                    <span className="label">📅 Data e Ora</span>
+                    <span className="label"><IconCalendar size={16} /> Data e Ora</span>
                     <span className="value">{formatDate(appointment.appointmentDate)}</span>
                   </div>
                   <div className="info-item">
-                    <span className="label">👨‍⚕️ Medico</span>
+                    <span className="label"><IconDoctor size={16} /> Medico</span>
                     <span className="value">
                       {appointment.doctorGender === 'F' ? 'Dott.ssa' : 'Dott.'} {appointment.doctorFirstName} {appointment.doctorLastName}
                     </span>
                   </div>
                   <div className="info-item">
-                    <span className="label">👤 Paziente</span>
+                    <span className="label"><IconUser size={16} /> Paziente</span>
                     <span className="value">{appointment.patientFirstName} {appointment.patientLastName}</span>
                   </div>
                 </div>
@@ -160,28 +164,38 @@ function AppointmentDetailPage() {
 
               <div className="notes-section">
                 <div className="notes-card">
-                  <h3>📝 Motivo della visita</h3>
+                  <h3><IconEdit size={18} /> Motivo della visita</h3>
                   <p>{appointment.reason || 'Nessun motivo specificato.'}</p>
                 </div>
                 <div className="notes-card contraindications">
-                  <h3>⚠️ Controindicazioni</h3>
+                  <h3><IconAlertTriangle size={18} /> Controindicazioni</h3>
                   <p>{appointment.contraindications || 'Nessuna controindicazione segnalata.'}</p>
                 </div>
               </div>
             </section>
           </div>
 
-          {!isCancelled && !isPast && (isPatient || isAdmin) && (
+          {( (!isCancelled && !isCompleted && !isPast && (isPatient || isAdmin)) || (isCompleted && isAdmin) ) && (
             <aside className="detail-sidebar">
               <div className="actions-card">
                 <h3>Azioni Disponibili</h3>
                 {!isEditing ? (
                   <div className="action-buttons">
-                    <button className="btn-edit" onClick={() => setIsMenuOpen(true)}>
-                      ✏️ Modifica Appuntamento
-                    </button>
-                    <button className="btn-cancel-large" onClick={() => setShowCancelConfirm(true)}>
-                      ❌ Annulla Appuntamento
+                    {!isCompleted && (
+                      <button className="btn btn-secondary btn-edit" onClick={() => setIsMenuOpen(true)} style={{ width: '100%', marginBottom: '0.5rem' }}>
+                        <IconEdit size={18} /> Modifica Appuntamento
+                      </button>
+                    )}
+                    <button 
+                      className="btn btn-secondary btn-cancel-large" 
+                      onClick={() => setShowCancelConfirm(true)} 
+                      style={{ 
+                        width: '100%', 
+                        color: 'var(--error-color)', 
+                        borderColor: 'var(--error-color)' 
+                      }}
+                    >
+                      <IconTrash size={18} /> {isCompleted ? 'Elimina Definitivamente' : 'Annulla Appuntamento'}
                     </button>
                   </div>
                 ) : (
@@ -232,12 +246,17 @@ function AppointmentDetailPage() {
 
       <ConfirmDialog
         isOpen={showCancelConfirm}
-        title="Annulla Appuntamento"
-        message="Sei sicuro di voler annullare questo appuntamento? L'operazione è irreversibile e può essere effettuata solo fino a 48 ore prima della visita."
+        title={isCompleted ? "Elimina Appuntamento" : "Annulla Appuntamento"}
+        message={
+          isCompleted 
+            ? "Sei sicuro di voler eliminare definitivamente questo appuntamento completato? L'operazione rimuoverà il record dal database."
+            : "Sei sicuro di voler annullare questo appuntamento? L'operazione è irreversibile e può essere effettuata solo fino a 48 ore prima della visita."
+        }
         onConfirm={handleCancel}
         onCancel={() => setShowCancelConfirm(false)}
-        confirmLabel="Sì, annulla"
+        confirmLabel={isCompleted ? "Sì, elimina" : "Sì, annulla"}
         cancelLabel="No, mantieni"
+        isDanger={true}
       />
     </div>
   );

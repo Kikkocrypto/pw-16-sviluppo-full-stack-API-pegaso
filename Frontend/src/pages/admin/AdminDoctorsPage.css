@@ -1,76 +1,47 @@
 .admin-doctors-container {
-  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
 }
 
 .admin-doctors-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-}
-
-.search-bar {
-  display: flex;
-  gap: 10px;
-  max-width: 400px;
-  width: 100%;
-}
-
-.search-bar input {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  margin-bottom: var(--spacing-xl);
+  gap: var(--spacing-lg);
 }
 
 .doctors-table-container {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow-x: auto; /* Scroll orizzontale se necessario */
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
 }
 
 .doctors-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
-  min-width: 900px; /* Garantisce spazio sufficiente per tutte le colonne */
-}
-
-.doctors-table th,
-.doctors-table td {
-  padding: 14px 16px;
-  text-align: left;
-  border-bottom: 1px solid #f1f5f9;
-  vertical-align: middle;
-}
-
-/* Definizione larghezze fisse per stabilità */
-.doctors-table th:nth-child(1), .doctors-table td:nth-child(1) { width: 120px; } /* Nome */
-.doctors-table th:nth-child(2), .doctors-table td:nth-child(2) { width: 120px; } /* Cognome */
-.doctors-table th:nth-child(3), .doctors-table td:nth-child(3) { width: auto; }  /* Esami (flessibile) */
-.doctors-table th:nth-child(4), .doctors-table td:nth-child(4) { width: 220px; } /* Email */
-.doctors-table th:nth-child(5), .doctors-table td:nth-child(5) { width: 180px; } /* Azioni */
-
-.doctors-table td:nth-child(1),
-.doctors-table td:nth-child(2),
-.doctors-table td:nth-child(4) {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .doctors-table th {
-  background-color: #f8fafc;
-  font-weight: 600;
-  color: #475569;
-  font-size: 13px;
+  background: var(--bg-main);
+  padding: var(--spacing-md) var(--spacing-lg);
+  text-align: left;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.025em;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border-color);
 }
 
-.doctors-table tr:hover {
-  background-color: #f8fafc;
+.doctors-table td {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  vertical-align: middle;
 }
 
 .exams-list-cell {
@@ -81,198 +52,48 @@
 }
 
 .exam-tag-mini {
-  background-color: #f1f5f9;
-  color: #475569;
+  background-color: var(--primary-light);
+  color: var(--primary-color);
   padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  border: 1px solid #e2e8f0;
-  white-space: nowrap;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid rgba(44, 82, 130, 0.1);
 }
 
 .exam-tag-more {
-  font-size: 11px;
-  color: #94a3b8;
-  margin-left: 2px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  align-self: center;
 }
 
-.actions-cell {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.btn-view, .btn-delete {
-  padding: 6px 12px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.btn-view {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-view:hover {
-  background-color: #0056b3;
-}
-
-.btn-delete {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #c82333;
-}
-
-/* Modal Styles */
+/* Modal Details */
 .doctor-detail-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1500;
 }
 
 .doctor-detail-modal {
-  background: white;
-  padding: 24px;
-  border-radius: 8px;
-  max-width: 600px;
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
   width: 90%;
+  max-width: 700px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
+  box-shadow: var(--shadow-lg);
 }
 
-.close-modal {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  font-size: 24px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  color: #64748b;
-}
-
-.detail-section {
-  margin-bottom: 24px;
-}
-
-.detail-section h3 {
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 8px;
-  margin-bottom: 16px;
-  font-size: 18px;
-  color: #1e293b;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-.info-item label {
-  display: block;
-  font-size: 12px;
-  color: #64748b;
-  margin-bottom: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-}
-
-.info-item span {
-  font-weight: 500;
-  color: #1e293b;
-}
-
-.appointments-list {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.appointment-item {
-  padding: 10px 14px;
-  border: 1px solid #f1f5f9;
-  border-radius: 6px;
-  background-color: #ffffff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.2s;
-}
-
-.appointment-item:hover {
-  border-color: #cbd5e1;
-  background-color: #f8fafc;
-}
-
-.appointment-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.appointment-date {
-  font-weight: 600;
-  color: #1e293b;
-  font-size: 13px;
-}
-
-.appointment-meta {
-  font-size: 12px;
-  color: #64748b;
-}
-
-.status-badge {
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.status-pending { 
-  background-color: #fffbeb; 
-  color: #b45309;
-  border: 1px solid #fef3c7;
-}
-
-.status-confirmed { 
-  background-color: #f0fdf4; 
-  color: #15803d;
-  border: 1px solid #dcfce7;
-}
-
-.status-cancelled { 
-  background-color: #fef2f2; 
-  color: #b91c1c;
-  border: 1px solid #fee2e2;
-}
-
-.no-appointments {
-  text-align: center;
-  color: #94a3b8;
-  font-style: italic;
-  padding: 20px;
-  background: #f8fafc;
-  border-radius: 6px;
-  font-size: 14px;
+@media (max-width: 768px) {
+  .admin-doctors-header { flex-direction: column; align-items: stretch; }
 }

@@ -319,8 +319,9 @@ public class AppointmentService {
             if (normalizedStatus == null || 
                 (!normalizedStatus.equals("pending") && 
                  !normalizedStatus.equals("confirmed") && 
-                 !normalizedStatus.equals("cancelled"))) {
-                throw new BadRequestException("Stato non valido. I valori consentiti sono: pending, confirmed, cancelled");
+                 !normalizedStatus.equals("cancelled") &&
+                 !normalizedStatus.equals("completed"))) {
+                throw new BadRequestException("Stato non valido. I valori consentiti sono: pending, confirmed, cancelled, completed");
             }
             appointment.setStatus(normalizedStatus);
         }
@@ -367,6 +368,12 @@ public class AppointmentService {
 
         if ("cancelled".equals(appointment.getStatus())) {
             throw new ConflictException("L'appuntamento è già cancellato");
+        }
+
+        // Se l'appuntamento è completato, lo eliminiamo fisicamente dal DB
+        if ("completed".equals(appointment.getStatus())) {
+            appointmentRepository.delete(appointment);
+            return;
         }
 
         // Verifica che l'appuntamento possa essere annullato (almeno 2 giorni prima)

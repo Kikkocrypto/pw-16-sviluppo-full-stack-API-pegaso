@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getExams, createExam, updateExam, deleteExam, assignDoctorToExam, removeDoctorFromExam } from '../../api/services/exam/examService';
 import { getDoctors } from '../../api/services/doctor/doctorService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import { IconDoctor, IconEdit, IconTrash, IconList, IconUser, IconCalendar, IconSettings } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { validateField } from '../../utils/validation';
 import './AdminPage.css';
+import './AdminExamsPage.css';
 
 function AdminExamsPage() {
   const [exams, setExams] = useState([]);
@@ -262,14 +265,17 @@ function AdminExamsPage() {
                   </span>
                 </td>
                 <td className="actions">
+                  <Link to={`/exams/${exam.id}`} className="btn-icon" title="Vedi Dettagli">
+                    <IconList size={18} />
+                  </Link>
                   <button className="btn-icon" onClick={() => handleOpenDoctorModal(exam)} title="Gestisci Dottori">
-                    👨‍⚕️
+                    <IconDoctor size={18} />
                   </button>
                   <button className="btn-icon" onClick={() => handleOpenModal(exam)} title="Modifica">
-                    ✏️
+                    <IconEdit size={18} />
                   </button>
                   <button className="btn-icon delete" onClick={() => handleDeleteClick(exam)} title="Elimina">
-                    🗑️
+                    <IconTrash size={18} />
                   </button>
                 </td>
               </tr>
@@ -402,76 +408,10 @@ function AdminExamsPage() {
         message={`Sei sicuro di voler eliminare l'esame "${examToDelete?.name}"? Questa operazione non può essere annullata.`}
         onConfirm={handleConfirmDelete}
         onCancel={() => setIsConfirmOpen(false)}
+        isDanger={true}
       />
 
-      <style jsx>{`
-        .doctor-assignment-modal {
-          max-width: 600px;
-        }
-        .modal-subtitle {
-          color: #666;
-          margin-bottom: 1.5rem;
-          font-size: 0.95rem;
-        }
-        .doctor-selection-list {
-          max-height: 400px;
-          overflow-y: auto;
-          border: 1px solid #eee;
-          border-radius: 8px;
-          margin-bottom: 1.5rem;
-        }
-        .doctor-selection-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 1rem;
-          border-bottom: 1px solid #eee;
-          transition: background 0.2s;
-        }
-        .doctor-selection-item:last-child {
-          border-bottom: none;
-        }
-        .doctor-selection-item.assigned {
-          background: #f0f7ff;
-        }
-        .doctor-info {
-          display: flex;
-          flex-direction: column;
-        }
-        .doctor-name {
-          font-weight: 600;
-          color: #2c3e50;
-        }
-        .doctor-spec {
-          font-size: 0.85rem;
-          color: #7f8c8d;
-        }
-        .btn-assign {
-          padding: 0.4rem 1rem;
-          border-radius: 4px;
-          font-size: 0.85rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-          border: 1px solid transparent;
-        }
-        .btn-assign.add {
-          background: #e6fffa;
-          color: #2c7a7b;
-          border-color: #b2f5ea;
-        }
-        .btn-assign.add:hover {
-          background: #b2f5ea;
-        }
-        .btn-assign.remove {
-          background: #fff5f5;
-          color: #c53030;
-          border-color: #feb2b2;
-        }
-        .btn-assign.remove:hover {
-          background: #feb2b2;
-        }
-      `}</style>
+      {/* Rimosso style jsx per usare file CSS esterno */}
     </div>
   );
 }

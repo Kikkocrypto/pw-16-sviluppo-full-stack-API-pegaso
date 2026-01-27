@@ -1,0 +1,107 @@
+.exam-list-page {
+  padding: var(--spacing-xl) var(--spacing-md);
+}
+
+.page-header {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: var(--font-size-lg);
+}
+
+.exams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+.exam-card {
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-base);
+  border: 1px solid var(--border-color);
+}
+
+.exam-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-color);
+}
+
+.exam-card-header {
+  padding: var(--spacing-lg);
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.exam-card-header h3 {
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: var(--font-size-lg);
+}
+
+.duration-badge {
+  background: var(--primary-light);
+  color: var(--primary-color);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.exam-card-body {
+  padding: var(--spacing-lg);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.exam-description {
+  color: var(--text-main);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.6;
+  font-size: var(--font-size-sm);
+}
+
+.associated-doctors h4 {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-md);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.doctor-mini-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.doctor-mini-list li {
+  padding: var(--spacing-xs) 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: var(--font-size-sm);
+  color: var(--primary-dark);
+  font-weight: 500;
+}
+
+.doctor-mini-list li:last-child {
+  border-bottom: none;
+}
+
+.no-doctors {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}

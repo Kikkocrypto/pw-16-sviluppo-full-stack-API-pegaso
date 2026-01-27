@@ -2,22 +2,20 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../api/apiClient';
 import { setDemoId, getDemoId } from '../../api/demoHeaders';
+import { IconCalendar, IconDoctor, IconSettings } from '../../components/common/Icons';
 import './HomePage.css';
 
 function HomePage() {
   const navigate = useNavigate();
   const [healthStatus, setHealthStatus] = useState(null);
   const [error, setError] = useState(null);
-  const [apiUrl, setApiUrl] = useState('');
   const [patientId, setPatientId] = useState(getDemoId('patient'));
   const [doctorId, setDoctorId] = useState(getDemoId('doctor'));
   const [adminId, setAdminId] = useState(getDemoId('admin'));
 
   useEffect(() => {
-    setApiUrl(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api');
     checkBackendHealth();
     
-    // Aggiorna gli ID se cambiano
     const handleRoleChange = () => {
       setPatientId(getDemoId('patient'));
       setDoctorId(getDemoId('doctor'));
@@ -34,11 +32,11 @@ function HomePage() {
         setHealthStatus('connected');
       } else {
         setHealthStatus('error');
-        setError('Backend non raggiungibile');
+        setError('Servizio temporaneamente non disponibile');
       }
     } catch (err) {
       setHealthStatus('error');
-      setError('Impossibile connettersi al backend. Verifica che il backend sia avviato.');
+      setError('Connessione al server fallita');
       console.error('Health check error:', err);
     }
   };
@@ -51,64 +49,71 @@ function HomePage() {
 
   return (
     <div className="home-page">
-      <div className="status-card">
-        <h2>Stato Connessione</h2>
-        <div className="status-info">
-          <p><strong>Backend URL:</strong> {apiUrl}</p>
-          <div className={`status-indicator ${healthStatus}`}>
-            {healthStatus === 'connected' && '✓ Connesso'}
-            {healthStatus === 'error' && '✗ Errore di connessione'}
-            {!healthStatus && '⏳ Controllo in corso...'}
-          </div>
-          {error && <p className="error-message">{error}</p>}
+      <header className="hero-section">
+        <h1>Benvenuto in Dottori & Dolori</h1>
+        <p>La tua salute, semplificata. Prenota visite ed esami in pochi click.</p>
+      </header>
+
+      <div className="status-bar">
+        <span>Stato del sistema:</span>
+        <div className={`status-indicator ${healthStatus}`}>
+          {healthStatus === 'connected' && 'Operativo'}
+          {healthStatus === 'error' && error}
+          {!healthStatus && 'Verifica in corso...'}
         </div>
       </div>
 
       <div className="home-menu">
         {patientId && (
-          <Link to="/patient/dashboard" className="home-card dashboard-card patient">
-            <div className="card-icon">📅</div>
+          <Link to="/patient/dashboard" className="home-card dashboard-card">
+            <div className="card-icon"><IconCalendar size={32} color="var(--primary-color)" /></div>
             <div className="card-content">
-              <h3>Vai alle tue prenotazioni</h3>
-              <p>Visualizza e gestisci i tuoi appuntamenti come paziente</p>
+              <h3>Area Paziente</h3>
+              <p>Bentornato! Visualizza i tuoi appuntamenti e i referti degli esami.</p>
             </div>
           </Link>
         )}
 
         {doctorId && (
-          <Link to="/doctor/dashboard" className="home-card dashboard-card doctor">
-            <div className="card-icon">👨‍⚕️</div>
+          <Link to="/doctor/dashboard" className="home-card dashboard-card">
+            <div className="card-icon"><IconDoctor size={32} color="var(--secondary-color)" /></div>
             <div className="card-content">
-              <h3>Vai alla tua agenda</h3>
-              <p>Gestisci i tuoi appuntamenti e la tua disponibilità</p>
+              <h3>Area Medico</h3>
+              <p>Gestisci la tua agenda, consulta le prenotazioni e i profili dei pazienti.</p>
             </div>
           </Link>
         )}
 
         {adminId && (
-          <Link to="/admin" className="home-card dashboard-card admin">
-            <div className="card-icon">⚙️</div>
+          <Link to="/admin" className="home-card dashboard-card">
+            <div className="card-icon"><IconSettings size={32} color="var(--text-muted)" /></div>
             <div className="card-content">
-              <h3>Vai al pannello admin</h3>
-              <p>Gestisci l'intero sistema, utenti ed esami</p>
+              <h3>Pannello Amministratore</h3>
+              <p>Gestione completa di pazienti, medici, esami e configurazioni di sistema.</p>
             </div>
           </Link>
         )}
 
-        <Link to="/patient" className="home-card">
-          <h3>Prenota ora</h3>
-          <p>Accedi come paziente o crea un nuovo profilo per prenotare un appuntamento</p>
-        </Link>
+        {!patientId && (
+          <Link to="/patient" className="home-card">
+            <h3>Paziente</h3>
+            <p>Accedi per prenotare una visita o consultare i tuoi appuntamenti.</p>
+          </Link>
+        )}
         
-        <Link to="/doctor" className="home-card">
-          <h3>Accedi da dottore</h3>
-          <p>Accedi come dottore o crea un nuovo profilo per gestire le prenotazioni</p>
-        </Link>
+        {!doctorId && (
+          <Link to="/doctor" className="home-card">
+            <h3>Personale Medico</h3>
+            <p>Area riservata ai medici per la gestione delle attività cliniche.</p>
+          </Link>
+        )}
         
-        <a href="/admin" onClick={handleAdminAccess} className="home-card">
-          <h3>Gestione sistema</h3>
-          <p>Accedi all'area amministrativa per gestire pazienti, dottori, prenotazioni ed esami</p>
-        </a>
+        {!adminId && (
+          <a href="/admin" onClick={handleAdminAccess} className="home-card">
+            <h3>Amministrazione</h3>
+            <p>Accesso riservato alla gestione del portale e delle anagrafiche.</p>
+          </a>
+        )}
       </div>
     </div>
   );

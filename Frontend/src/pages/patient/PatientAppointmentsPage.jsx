@@ -6,6 +6,7 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 import { useToast } from '../../contexts/ToastContext';
 import { getErrorMessage } from '../../utils/errorUtils';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import { IconCalendar, IconClock, IconDoctor, IconList, IconTrash, IconPlus } from '../../components/common/Icons';
 import './PatientAppointmentsPage.css';
 
 function PatientAppointmentsPage() {
@@ -90,11 +91,11 @@ function PatientAppointmentsPage() {
           <p>Visualizza lo storico e gestisci le tue prenotazioni</p>
         </div>
         <div className="header-actions">
-          <Link to="/patient/book" className="submit-button" style={{ textDecoration: 'none', marginTop: 0 }}>
-            Nuova Prenotazione
+          <Link to="/patient/book" className="btn btn-primary">
+            <IconPlus size={18} /> Nuova Prenotazione
           </Link>
-          <button className="back-button" onClick={() => navigate('/patient/dashboard')}>
-            ← Torna alla Dashboard
+          <button className="btn btn-secondary" onClick={() => navigate('/patient/dashboard')}>
+            Indietro
           </button>
         </div>
       </header>
@@ -123,17 +124,19 @@ function PatientAppointmentsPage() {
                       <div className="exam-info">
                         <h3>{app.examName}</h3>
                         <span className={`status-tag status-${app.status}`}>
-                          {app.status === 'pending' ? 'In attesa' : app.status === 'confirmed' ? 'Confermato' : 'Annullato'}
+                          {app.status === 'pending' ? 'In attesa' : 
+                           app.status === 'confirmed' ? 'Confermato' : 
+                           app.status === 'completed' ? 'Completato' : 'Annullato'}
                         </span>
                       </div>
                       
                       <div className="meta-info">
                         <div className="meta-item">
-                          <span className="icon">🕒</span>
+                          <span className="icon"><IconClock size={14} /></span>
                           <span>{date.time}</span>
                         </div>
                         <div className="meta-item">
-                          <span className="icon">👨‍⚕️</span>
+                          <span className="icon"><IconDoctor size={14} /></span>
                           <span>
                             {app.doctorGender === 'F' ? 'Dott.ssa' : 'Dott.'} {app.doctorFirstName} {app.doctorLastName}
                           </span>
@@ -144,14 +147,15 @@ function PatientAppointmentsPage() {
                     <div className="card-right">
                       {!isCancelled && !isPast && (
                         <button 
-                          className="btn-cancel" 
+                          className="btn btn-secondary btn-cancel" 
                           onClick={() => handleCancelClick(app)}
+                          style={{ color: 'var(--error-color)', borderColor: 'var(--error-color)' }}
                         >
-                          Annulla
+                          <IconTrash size={16} /> Annulla
                         </button>
                       )}
-                      <Link to={`/patient/appointments/${app.id}`} className="btn-details">
-                        Dettagli
+                      <Link to={`/patient/appointments/${app.id}`} className="btn btn-primary btn-details">
+                        <IconList size={16} /> Dettagli
                       </Link>
                     </div>
                   </div>
@@ -160,11 +164,11 @@ function PatientAppointmentsPage() {
             </div>
           ) : (
             <div className="empty-state-full">
-              <div className="empty-icon">📅</div>
+              <div className="empty-icon"><IconCalendar size={48} /></div>
               <h2>Nessun appuntamento trovato</h2>
               <p>Non hai ancora effettuato alcuna prenotazione.</p>
-              <Link to="/patient/book" className="submit-button" style={{ textDecoration: 'none', marginTop: '1.5rem' }}>
-                Prenota il tuo primo esame
+              <Link to="/patient/book" className="btn btn-primary" style={{ marginTop: '1.5rem' }}>
+                <IconPlus size={18} /> Prenota il tuo primo esame
               </Link>
             </div>
           )}

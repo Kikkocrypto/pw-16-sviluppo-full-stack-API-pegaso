@@ -4,6 +4,7 @@ import { getPatients, createPatient } from '../../api/services/patient/patientSe
 import { setDemoId } from '../../api/demoHeaders';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { IconUser, IconPlus } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { validateField as validateFieldUtil, validatePatientForm } from '../../utils/validation';
 import { normalizePhoneNumber, ensurePhonePrefix } from '../../utils/phoneUtils';
@@ -167,13 +168,13 @@ function PatientAccessPage() {
           
           <div className="access-options">
             <button 
-              className="access-button"
+              className="btn btn-primary"
               onClick={() => setMode('select')}
             >
               Accedi
             </button>
             <button 
-              className="access-button"
+              className="btn btn-secondary"
               onClick={() => setMode('create')}
             >
               Crea nuovo
@@ -195,7 +196,7 @@ function PatientAccessPage() {
             className="back-button"
             onClick={() => setMode(null)}
           >
-            ← Cambia modalità
+            Indietro
           </button>
 
           {loadingPatients && <LoadingSpinner message="Caricamento pazienti..." />}
@@ -228,9 +229,10 @@ function PatientAccessPage() {
               </select>
               
               <button
-                className="submit-button"
+                className="btn btn-primary"
                 onClick={handleSelectPatient}
                 disabled={!selectedPatientId}
+                style={{ width: '100%', marginTop: 'var(--spacing-md)' }}
               >
                 Conferma e Accedi
               </button>
@@ -239,7 +241,7 @@ function PatientAccessPage() {
                 className="switch-mode-button"
                 onClick={() => setMode('create')}
               >
-                Non sei in lista? Crea nuovo paziente
+                Nuovo profilo? Crea ora
               </button>
             </div>
           )}
@@ -270,7 +272,7 @@ function PatientAccessPage() {
             setCreateError(null);
           }}
         >
-          ← Cambia modalità
+          Indietro
         </button>
 
         {createError && (

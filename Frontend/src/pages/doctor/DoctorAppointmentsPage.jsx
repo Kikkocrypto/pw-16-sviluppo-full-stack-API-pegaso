@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getAppointments } from '../../api/services/appointments/appointmentService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { IconCalendar, IconClock, IconUser, IconList, IconCheck, IconX, IconAlertTriangle } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { getErrorMessage } from '../../utils/errorUtils';
 import './DoctorAppointmentsPage.css';
@@ -13,7 +14,7 @@ function DoctorAppointmentsPage() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('all'); // all, pending, confirmed, cancelled
+  const [filter, setFilter] = useState('all'); // all, pending, confirmed, completed, cancelled
 
   useEffect(() => {
     loadAppointments();
@@ -131,17 +132,19 @@ function DoctorAppointmentsPage() {
                       <div className="exam-info">
                         <h3>{app.examName}</h3>
                         <span className={`status-tag status-${app.status}`}>
-                          {app.status === 'pending' ? 'In attesa' : app.status === 'confirmed' ? 'Confermato' : 'Annullato'}
+                          {app.status === 'pending' ? 'In attesa' : 
+                           app.status === 'confirmed' ? 'Confermato' : 
+                           app.status === 'completed' ? 'Completato' : 'Annullato'}
                         </span>
                       </div>
                       
                       <div className="meta-info">
                         <div className="meta-item">
-                          <span className="icon">🕒</span>
+                          <span className="icon"><IconClock size={16} /></span>
                           <span>{date.time}</span>
                         </div>
                         <div className="meta-item">
-                          <span className="icon">👤</span>
+                          <span className="icon"><IconUser size={16} /></span>
                           <span>{patientName}</span>
                         </div>
                       </div>
@@ -158,7 +161,7 @@ function DoctorAppointmentsPage() {
             </div>
           ) : (
             <div className="empty-state-full">
-              <div className="empty-icon">📅</div>
+              <div className="empty-icon"><IconCalendar size={48} /></div>
               <h2>Nessun appuntamento trovato</h2>
               <p>Non ci sono appuntamenti che corrispondono al filtro selezionato.</p>
             </div>

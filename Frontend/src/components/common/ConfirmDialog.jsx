@@ -1,7 +1,7 @@
 import './ConfirmDialog.css';
 
 // Componente per il dialog di conferma, presente in tutte le pagine
-function ConfirmDialog({ title, message, confirmLabel = 'Conferma', cancelLabel = 'Annulla', onConfirm, onCancel, isOpen }) {
+function ConfirmDialog({ title, message, confirmLabel = 'Conferma', cancelLabel = 'Annulla', onConfirm, onCancel, isOpen, isDanger }) {
   if (!isOpen) return null;
 
   return (
@@ -13,7 +13,7 @@ function ConfirmDialog({ title, message, confirmLabel = 'Conferma', cancelLabel 
           <button onClick={onCancel} className="confirm-dialog-button cancel">
             {cancelLabel}
           </button>
-          <button onClick={onConfirm} className="confirm-dialog-button confirm">
+          <button onClick={onConfirm} className={`confirm-dialog-button confirm ${isDanger ? 'danger' : ''}`}>
             {confirmLabel}
           </button>
         </div>

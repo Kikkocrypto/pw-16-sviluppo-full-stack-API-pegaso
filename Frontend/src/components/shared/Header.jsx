@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { getDemoId, clearDemoHeaders } from '../../api/demoHeaders';
+import { IconUser, IconHome } from '../common/Icons';
 import './Header.css';
 
 function Header() {
@@ -93,14 +94,14 @@ function Header() {
     <header className="header">
       <div className="header-content">
         <div className="header-left">
-          <Link to="/" className="logo">
-            <h1>Dottori & Dolori</h1>
-          </Link>
-          {identityText && (
-            <Link to="/" className="home-link desktop-only">
-              Torna alla Home
+            <Link to="/" className="logo">
+              <h1>Dottori & Dolori</h1>
             </Link>
-          )}
+            {identityText && (
+              <Link to="/" className="home-link desktop-only">
+                Dashboard
+              </Link>
+            )}
         </div>
         
         <div className="header-right">
@@ -123,12 +124,12 @@ function Header() {
                 </div>
                 
                 <Link to="/" className="mobile-home-link mobile-only">
-                  🏠 Torna alla Home
+                  <IconHome size={18} /> Torna alla Home
                 </Link>
 
                 {profileLink && (
                   <Link to={profileLink} className="profile-link">
-                    <span className="profile-icon">👤</span>
+                    <IconUser size={18} />
                     <span className="profile-text">Il mio Profilo</span>
                   </Link>
                 )}
