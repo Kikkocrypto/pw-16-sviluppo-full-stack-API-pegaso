@@ -70,7 +70,7 @@ public class FieldNormalizationService {
             return null;
         }
         String trimmed = status.trim().toLowerCase();
-        if (trimmed.equals("pending") || trimmed.equals("confirmed") || trimmed.equals("cancelled")) {
+        if (trimmed.equals("pending") || trimmed.equals("confirmed") || trimmed.equals("cancelled") || trimmed.equals("completed")) {
             return trimmed;
         }
         return trimmed;

@@ -29,6 +29,18 @@ public class AppointmentCreateResponse {
     @Schema(description = "Identifier of the patient")
     private UUID patientId;
 
+    @Schema(description = "Patient email")
+    private String patientEmail;
+
     @Schema(description = "Status of the appointment")
     private String status;
+
+    @Schema(description = "Reason for the visit")
+    private String reason;
+
+    @Schema(description = "Contraindications for the visit")
+    private String contraindications;
+
+    @Schema(description = "Name of the exam")
+    private String examName;
 }

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 // controller per la gestione dei pazienti
@@ -76,22 +77,30 @@ public class PatientController {
     // Recupero il profilo del paziente GET api/patients + swagger documentation
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Recupera il profilo del paziente",
-            description = "Recupera il profilo del paziente identificato dall'header X-Demo-Patient-Id."
+            summary = "Recupera il profilo del paziente o lista pazienti",
+            description = "Con header X-Demo-Patient-Id: restituisce il profilo del paziente identificato. Senza header: restituisce la lista di tutti i pazienti (per selettore demo)."
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Patient profile",
+                    description = "Patient profile or list of patients",
                     content = @Content(schema = @Schema(implementation = PatientResponse.class))
             ),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid or missing UUID in X-Demo-Patient-Id"),
+            @ApiResponse(responseCode = "400", description = "Bad request - invalid UUID in X-Demo-Patient-Id"),
             @ApiResponse(responseCode = "404", description = "Patient not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<PatientResponse> getPatientProfile(
-            @Parameter(description = "UUID of the patient. Required for GET /api/patients.", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
-            @RequestHeader(value = "X-Demo-Patient-Id", required = true) String patientIdHeader) {
+    public ResponseEntity<?> getPatientProfile(
+            @Parameter(description = "UUID of the patient. Optional - if missing, returns list of all patients.", required = false, example = "550e8400-e29b-41d4-a716-446655440000")
+            @RequestHeader(value = "X-Demo-Patient-Id", required = false) String patientIdHeader) {
+        
+        // Se l'header non è presente, restituisce la lista di tutti i pazienti
+        if (patientIdHeader == null || patientIdHeader.isBlank()) {
+            List<PatientResponse> allPatients = patientService.getAllPatients();
+            return ResponseEntity.ok(allPatients);
+        }
+        
+        // Se l'header è presente, restituisce il profilo del paziente
         UUID patientId;
         try {
             patientId = UUID.fromString(patientIdHeader.trim());
@@ -145,7 +154,7 @@ public class PatientController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Profilo cancellato con successo"),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid or missing UUID, or patient has active appointments (non-cancelled)"),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida o il paziente ha appuntamenti attivi"),
             @ApiResponse(responseCode = "404", description = "Patient not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -209,7 +218,7 @@ public class PatientController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Patient deleted successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid UUID format, or patient has active appointments (non-cancelled)"),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida o il paziente ha appuntamenti attivi"),
             @ApiResponse(responseCode = "403", description = "Forbidden - admin not authorized"),
             @ApiResponse(responseCode = "404", description = "Patient not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")

@@ -26,9 +26,6 @@ public class DoctorProfileResponse {
     @Schema(description = "Last name", example = "Rossi")
     private String lastName;
 
-    @Schema(description = "Specialization", example = "Cardiology")
-    private String specialization;
-
     @Schema(description = "Gender", example = "M")
     private String gender;
 

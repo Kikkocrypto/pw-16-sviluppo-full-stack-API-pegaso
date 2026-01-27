@@ -33,6 +33,9 @@ public class AppointmentResponse {
     @Schema(description = "Doctor last name")
     private String doctorLastName;
 
+    @Schema(description = "Doctor gender")
+    private String doctorGender;
+
     @Schema(description = "Identifier of the patient")
     private UUID patientId;
 
@@ -42,6 +45,21 @@ public class AppointmentResponse {
     @Schema(description = "Patient last name")
     private String patientLastName;
 
+    @Schema(description = "Patient email")
+    private String patientEmail;
+
     @Schema(description = "Status of the appointment (pending, confirmed, cancelled)")
     private String status;
+
+    @Schema(description = "Reason for the visit")
+    private String reason;
+
+    @Schema(description = "Contraindications for the visit")
+    private String contraindications;
+
+    @Schema(description = "Duration of the exam in minutes")
+    private Integer durationMinutes;
+
+    @Schema(description = "Name of the exam")
+    private String examName;
 }

@@ -1,0 +1,62 @@
+.error-message-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  margin: var(--spacing-md) 0;
+  border: 1px solid transparent;
+}
+
+.error-message-container.error {
+  background-color: #fff5f5;
+  border-color: #feb2b2;
+  color: #c53030;
+}
+
+.error-message-container.warning {
+  background-color: #fffaf0;
+  border-color: #fbd38d;
+  color: #9c4221;
+}
+
+.error-message-container.info {
+  background-color: var(--primary-light);
+  border-color: #bee3f8;
+  color: var(--primary-dark);
+}
+
+.error-icon {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.error-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.error-text {
+  margin: 0;
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+}
+
+.retry-button {
+  padding: 0.4rem 0.8rem;
+  background-color: white;
+  color: inherit;
+  border: 1px solid currentColor;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.retry-button:hover {
+  background-color: rgba(0,0,0,0.05);
+}

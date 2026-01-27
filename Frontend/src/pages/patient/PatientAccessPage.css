@@ -1,0 +1,107 @@
+.patient-access-page {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-xl);
+}
+
+.access-container {
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-xl);
+  max-width: 500px;
+  width: 100%;
+  border: 1px solid var(--border-color);
+}
+
+.access-container h1 {
+  margin: 0 0 var(--spacing-xs) 0;
+  color: var(--primary-dark);
+  font-size: var(--font-size-2xl);
+  text-align: center;
+}
+
+.access-subtitle {
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.access-options {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-direction: column;
+}
+
+.access-button {
+  padding: 1rem;
+  font-size: var(--font-size-base);
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.access-button:hover {
+  background-color: var(--primary-dark);
+}
+
+.back-button {
+  margin-bottom: var(--spacing-lg);
+  padding: 0.5rem 1rem;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: var(--transition-base);
+}
+
+.back-button:hover {
+  background-color: var(--border-color);
+}
+
+.select-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.select-form label {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--primary-dark);
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.required {
+  color: var(--error-color);
+}
+
+.switch-mode-button {
+  margin-top: var(--spacing-md);
+  padding: 0.75rem;
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  transition: var(--transition-base);
+}
+
+.switch-mode-button:hover {
+  background-color: var(--primary-light);
+}

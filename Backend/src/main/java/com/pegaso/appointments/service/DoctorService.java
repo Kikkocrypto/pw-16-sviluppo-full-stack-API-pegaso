@@ -11,6 +11,7 @@ import com.pegaso.appointments.entity.DoctorExamId;
 import com.pegaso.appointments.entity.Exam;
 import com.pegaso.appointments.exception.ConflictException;
 import com.pegaso.appointments.exception.ResourceNotFoundException;
+import com.pegaso.appointments.repository.AppointmentRepository;
 import com.pegaso.appointments.repository.DoctorExamRepository;
 import com.pegaso.appointments.repository.DoctorRepository;
 import com.pegaso.appointments.repository.ExamRepository;
@@ -19,6 +20,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +36,7 @@ public class DoctorService {
     private final DoctorRepository doctorRepository;
     private final ExamRepository examRepository;
     private final DoctorExamRepository doctorExamRepository;
+    private final AppointmentRepository appointmentRepository;
     private final JdbcTemplate jdbcTemplate;
     private final FieldNormalizationService normalization;
     private final FieldValidationService validation;
@@ -49,7 +54,6 @@ public class DoctorService {
         Doctor doctor = Doctor.builder()
                 .firstName(normalization.normalizeName(request.getFirstName()))
                 .lastName(normalization.normalizeName(request.getLastName()))
-                .specialization(normalization.normalizeOptionalName(request.getSpecialization()))
                 .gender(normalization.normalizeGender(request.getGender()))
                 .email(emailToStore)
                 .phoneNumber(normalization.normalizeString(request.getPhoneNumber()))
@@ -118,7 +122,6 @@ public class DoctorService {
                 .id(doctor.getId())
                 .firstName(doctor.getFirstName())
                 .lastName(doctor.getLastName())
-                .specialization(doctor.getSpecialization())
                 .gender(doctor.getGender())
                 .email(doctor.getEmail())
                 .phoneNumber(doctor.getPhoneNumber())
@@ -128,10 +131,37 @@ public class DoctorService {
 
 
 
-    // Recupero di tutti i dottori (Admin)
+    // Recupero di tutti i dottori (Admin) con filtri opzionali
     @Transactional(readOnly = true)
-    public List<DoctorProfileResponse> getAllDoctors() {
-        return doctorRepository.findAll().stream()
+    public List<DoctorProfileResponse> getDoctors(UUID examId, LocalDateTime date) {
+        List<Doctor> doctors;
+        if (examId != null) {
+            doctors = doctorExamRepository.findByExamIdWithDoctor(examId).stream()
+                    .map(DoctorExam::getDoctor)
+                    .collect(Collectors.toList());
+        } else {
+            doctors = doctorRepository.findAll();
+        }
+
+        // Se è fornita una data, filtriamo i dottori disponibili
+        if (date != null && !doctors.isEmpty()) {
+            OffsetDateTime startTime = date.atZone(ZoneOffset.UTC).toOffsetDateTime();
+            
+            // Se abbiamo l'examId, usiamo la durata dell'esame, altrimenti default 30 min
+            int duration = 30;
+            if (examId != null) {
+                duration = examRepository.findById(examId)
+                        .map(Exam::getDurationMinutes)
+                        .orElse(30);
+            }
+            OffsetDateTime endTime = startTime.plusMinutes(duration);
+
+            doctors = doctors.stream()
+                    .filter(d -> !appointmentRepository.existsOverlappingAppointment(d.getId(), startTime, endTime))
+                    .collect(Collectors.toList());
+        }
+
+        return doctors.stream()
                 .map(doctor -> {
                     List<DoctorExam> doctorExams = doctorExamRepository.findById_DoctorId(doctor.getId());
                     List<ExamInfoDto> exams = doctorExams.stream()
@@ -146,7 +176,6 @@ public class DoctorService {
                             .id(doctor.getId())
                             .firstName(doctor.getFirstName())
                             .lastName(doctor.getLastName())
-                            .specialization(doctor.getSpecialization())
                             .gender(doctor.getGender())
                             .email(doctor.getEmail())
                             .phoneNumber(doctor.getPhoneNumber())
@@ -154,6 +183,12 @@ public class DoctorService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    // Recupero di tutti i dottori (Admin) - Deprecato, usare getDoctors
+    @Transactional(readOnly = true)
+    public List<DoctorProfileResponse> getAllDoctors() {
+        return getDoctors(null, null);
     }
 
     // Aggiornamento del profilo del dottore
@@ -167,9 +202,6 @@ public class DoctorService {
         }
         if (request.getLastName() != null && !request.getLastName().isBlank()) {
             doctor.setLastName(normalization.normalizeName(request.getLastName()));
-        }
-        if (request.getSpecialization() != null && !request.getSpecialization().isBlank()) {
-            doctor.setSpecialization(normalization.normalizeOptionalName(request.getSpecialization()));
         }
         if (request.getGender() != null && !request.getGender().isBlank()) {
             doctor.setGender(normalization.normalizeGender(request.getGender()));
@@ -207,7 +239,6 @@ public class DoctorService {
                 .id(doctor.getId())
                 .firstName(doctor.getFirstName())
                 .lastName(doctor.getLastName())
-                .specialization(doctor.getSpecialization())
                 .gender(doctor.getGender())
                 .email(doctor.getEmail())
                 .phoneNumber(doctor.getPhoneNumber())
@@ -221,7 +252,7 @@ public class DoctorService {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", doctorId));
         if (hasAppointments(doctorId)) {
-            throw new IllegalArgumentException("Cannot delete doctor: doctor has active appointments (non-cancelled)");
+            throw new IllegalArgumentException("Impossibile eliminare il profilo: sono presenti appuntamenti attivi. Cancella o completa gli appuntamenti prima di procedere.");
         }
         // Elimina fisicamente tutti gli appuntamenti cancellati associati al dottore
         // per evitare violazioni di foreign key constraint
@@ -251,7 +282,6 @@ public class DoctorService {
                 .id(doctor.getId())
                 .firstName(doctor.getFirstName())
                 .lastName(doctor.getLastName())
-                .specialization(doctor.getSpecialization())
                 .gender(doctor.getGender())
                 .email(doctor.getEmail())
                 .phoneNumber(doctor.getPhoneNumber())

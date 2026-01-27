@@ -3,10 +3,13 @@ package com.pegaso.appointments.service;
 import com.pegaso.appointments.dto.exam.CreateExamRequest;
 import com.pegaso.appointments.dto.exam.ExamResponse;
 import com.pegaso.appointments.dto.exam.UpdateExamRequest;
+import com.pegaso.appointments.entity.DoctorExam;
 import com.pegaso.appointments.entity.Exam;
 import com.pegaso.appointments.exception.ConflictException;
 import com.pegaso.appointments.exception.ResourceNotFoundException;
 import com.pegaso.appointments.repository.AdminRepository;
+import com.pegaso.appointments.repository.DoctorExamRepository;
+import com.pegaso.appointments.repository.DoctorRepository;
 import com.pegaso.appointments.repository.ExamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,8 +28,61 @@ public class ExamService {
 
     private final ExamRepository examRepository;
     private final AdminRepository adminRepository;
+    private final DoctorRepository doctorRepository;
+    private final DoctorExamRepository doctorExamRepository;
     private final FieldNormalizationService normalization;
     private final JdbcTemplate jdbcTemplate;
+
+    // Aggiunta/Rimozione dottore da un esame
+    @Transactional
+    public void assignDoctorToExam(UUID adminId, UUID examId, UUID doctorId) {
+        adminRepository.findById(adminId)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin", adminId));
+
+        Exam exam = examRepository.findById(examId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exam", examId));
+
+        com.pegaso.appointments.entity.Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", doctorId));
+
+        if (doctorExamRepository.existsByDoctorIdAndExamId(doctorId, examId)) {
+            throw new ConflictException("Doctor already assigned to this exam");
+        }
+
+        DoctorExam doctorExam = DoctorExam.builder()
+                .id(new com.pegaso.appointments.entity.DoctorExamId(doctorId, examId))
+                .doctor(doctor)
+                .exam(exam)
+                .build();
+
+        doctorExamRepository.save(doctorExam);
+    }
+
+    @Transactional
+    public void removeDoctorFromExam(UUID adminId, UUID examId, UUID doctorId) {
+        adminRepository.findById(adminId)
+                .orElseThrow(() -> new ResourceNotFoundException("Admin", adminId));
+
+        if (!doctorExamRepository.existsByDoctorIdAndExamId(doctorId, examId)) {
+            throw new ResourceNotFoundException("Assignment", doctorId + "-" + examId);
+        }
+
+
+        if (hasActiveAppointmentsForDoctorAndExam(doctorId, examId)) {
+            throw new ConflictException("Impossibile rimuovere il dottore: sono presenti appuntamenti attivi per questo esame. Cancella o sposta gli appuntamenti prima di procedere.");
+        }
+
+        doctorExamRepository.deleteById(new com.pegaso.appointments.entity.DoctorExamId(doctorId, examId));
+    }
+    // Verifica se il dottore ha appuntamenti attivi per questo specifico esame
+    private boolean hasActiveAppointmentsForDoctorAndExam(UUID doctorId, UUID examId) {
+        Boolean exists = jdbcTemplate.queryForObject(
+                "SELECT EXISTS(SELECT 1 FROM appointments WHERE doctor_id = ? AND exam_id = ? AND status != 'cancelled')",
+                Boolean.class,
+                doctorId, examId
+        );
+        return Boolean.TRUE.equals(exists);
+    }
 
 
     // Creazione di un nuovo esame POST api/exams
@@ -55,11 +111,18 @@ public class ExamService {
 
     // Recupero di tutti gli esami GET api/exams (pubblico)
     @Transactional(readOnly = true)
-    public List<ExamResponse> getAllExams() {
+    public List<ExamResponse> getAllExams(Boolean active) {
         return examRepository.findAll().stream()
+                .filter(exam -> active == null || exam.getIsActive().equals(active))
                 .sorted(Comparator.comparing(Exam::getName))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    // Recupero di tutti gli esami (overload per compatibilità)
+    @Transactional(readOnly = true)
+    public List<ExamResponse> getAllExams() {
+        return getAllExams(null);
     }
 
     // Recupero di un singolo esame GET api/exams/{exam_id}

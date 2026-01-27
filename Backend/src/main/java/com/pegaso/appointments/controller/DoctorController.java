@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +29,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 // parte fondamentale per la gestione delle API, si occupa di gestire le richieste in arrivo e restituire le risposte (POST)
@@ -82,22 +86,34 @@ public class DoctorController {
     // Recupero il profilo del dottore GET api/doctors (NON ADMIN)
     @GetMapping
     @Operation(
-            summary = "Recupera il profilo del dottore",
-            description = "restituisce il profilo del dottore identificato dall'header X-Demo-Doctor-Id, incluso gli esami abilitati."
+            summary = "Recupera il profilo del dottore o lista dottori",
+            description = "Con header X-Demo-Doctor-Id: restituisce il profilo del dottore identificato, incluso gli esami abilitati. Senza header: restituisce la lista di tutti i dottori (per selettore demo)."
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Doctor profile",
+                    description = "Doctor profile or list of doctors",
                     content = @Content(schema = @Schema(implementation = DoctorProfileResponse.class))
             ),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid or missing UUID in X-Demo-Doctor-Id"),
+            @ApiResponse(responseCode = "400", description = "Bad request - invalid UUID in X-Demo-Doctor-Id"),
             @ApiResponse(responseCode = "404", description = "Doctor not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<DoctorProfileResponse> getDoctorProfile(
-            @Parameter(description = "UUID del dottore di cui ottenere il profilo. Obbligatorio per GET /api/doctors.", required = true, example = "660e8400-e29b-41d4-a716-446655440001")
-            @RequestHeader(value = "X-Demo-Doctor-Id", required = true) String doctorIdHeader) {
+    public ResponseEntity<?> getDoctorProfile(
+            @Parameter(description = "UUID del dottore di cui ottenere il profilo. Opzionale - se assente, restituisce la lista di tutti i dottori.", required = false, example = "660e8400-e29b-41d4-a716-446655440001")
+            @RequestHeader(value = "X-Demo-Doctor-Id", required = false) String doctorIdHeader,
+            @Parameter(description = "Filtra per esame (opzionale)")
+            @RequestParam(required = false) UUID examId,
+            @Parameter(description = "Filtra per disponibilità in data/ora (opzionale)")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
+        
+        // Se l'header non è presente, restituisce la lista di tutti i dottori (eventualmente filtrata)
+        if (doctorIdHeader == null || doctorIdHeader.isBlank()) {
+            List<DoctorProfileResponse> doctors = doctorService.getDoctors(examId, date);
+            return ResponseEntity.ok(doctors);
+        }
+        
+        // Se l'header è presente, restituisce il profilo del dottore
         UUID doctorId;
         try {
             doctorId = UUID.fromString(doctorIdHeader.trim());
@@ -153,7 +169,7 @@ public class DoctorController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Profilo cancellato con successo"),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid or missing UUID, or doctor has active appointments (non-cancelled)"),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida o il dottore ha appuntamenti attivi"),
             @ApiResponse(responseCode = "404", description = "Doctor not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -220,7 +236,7 @@ public class DoctorController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Doctor deleted successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid UUID format, or doctor has active appointments (non-cancelled)"),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida o il dottore ha appuntamenti attivi"),
             @ApiResponse(responseCode = "403", description = "Forbidden - admin not authorized"),
             @ApiResponse(responseCode = "404", description = "Doctor not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")

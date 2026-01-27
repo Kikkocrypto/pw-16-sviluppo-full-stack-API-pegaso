@@ -28,8 +28,11 @@ public class AppointmentRequest {
     @Schema(description = "Scheduled date and time of the appointment (must be in the future)", example = "2026-02-15T10:00:00", required = true)
     private LocalDateTime appointmentDate;
 
-    @Schema(description = "Optional notes for the appointment", example = "Routine check-up")
-    private String notes;
+    @Schema(description = "Optional reason for the appointment", example = "Routine check-up")
+    private String reason;
+
+    @Schema(description = "Optional identifier of the doctor", example = "660e8400-e29b-41d4-a716-446655440001")
+    private UUID doctorId;
 
     @Schema(description = "Optional contraindications for the appointment", example = "Patient has allergies to contrast agents")
     private String contraindications;
