@@ -7,6 +7,7 @@ import PatientProfilePage from './pages/patient/PatientProfilePage';
 import PatientAppointmentsPage from './pages/patient/PatientAppointmentsPage';
 import DoctorAccessPage from './pages/doctor/DoctorAccessPage';
 import DoctorDashboardPage from './pages/doctor/DoctorDashboardPage';
+import DoctorAppointmentsPage from './pages/doctor/DoctorAppointmentsPage';
 import AppointmentManagePage from './pages/doctor/AppointmentManagePage';
 import AppointmentDetailPage from './pages/shared/AppointmentDetailPage';
 import ExamListPage from './pages/shared/ExamListPage';
@@ -40,6 +41,7 @@ function App() {
               
               <Route path="/doctor" element={<DoctorAccessPage />} />
               <Route path="/doctor/dashboard" element={<DoctorDashboardPage />} />
+              <Route path="/doctor/appointments" element={<DoctorAppointmentsPage />} />
               <Route path="/doctor/appointments/:id" element={<AppointmentManagePage />} />
               
               <Route path="/appointments/:id" element={<AppointmentDetailPage />} />

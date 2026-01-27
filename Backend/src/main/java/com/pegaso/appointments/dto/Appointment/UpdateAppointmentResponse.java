@@ -27,6 +27,9 @@ public class UpdateAppointmentResponse {
     @Schema(description = "Identifier of the patient")
     private UUID patientId;
 
+    @Schema(description = "Patient email")
+    private String patientEmail;
+
     @Schema(description = "Status of the appointment (pending, confirmed, cancelled)")
     private String status;
 
