@@ -67,6 +67,47 @@ export async function getPatients(limit: number = 10): Promise<Patient[]> {
 }
 
 /**
+ * Recupera la lista completa dei pazienti (per admin)
+ * @returns Array di tutti i pazienti
+ */
+export async function getAllPatientsAdmin(): Promise<Patient[]> {
+  return api.get<Patient[]>(API_ROUTES.patients.list, {
+    skipDemoHeaders: true,
+  } as any);
+}
+
+/**
+ * Recupera il dettaglio di un paziente (per admin)
+ * @param patientId - ID del paziente
+ * @returns Profilo del paziente
+ */
+export async function getPatientDetailAdmin(patientId: string): Promise<Patient> {
+  return api.get<Patient>(API_ROUTES.patients.detail(patientId));
+}
+
+/**
+ * Elimina un paziente (per admin)
+ * @param patientId - ID del paziente
+ */
+export async function deletePatientAdmin(patientId: string): Promise<void> {
+  return api.delete(API_ROUTES.patients.deleteById(patientId));
+}
+
+/**
+ * Recupera gli appuntamenti di un paziente specifico (per admin o selettore)
+ * @param patientId - ID del paziente
+ * @returns Lista appuntamenti
+ */
+export async function getPatientAppointments(patientId: string): Promise<any[]> {
+  return api.get<any[]>(API_ROUTES.appointments.list, {
+    headers: {
+      'X-Demo-Patient-Id': patientId
+    },
+    skipDemoHeaders: true
+  } as any);
+}
+
+/**
  * Recupera il profilo del paziente corrente (basato sull'header X-Demo-Patient-Id)
  * @returns Profilo del paziente
  */

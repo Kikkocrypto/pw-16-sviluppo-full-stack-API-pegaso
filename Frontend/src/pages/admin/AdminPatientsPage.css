@@ -1,0 +1,216 @@
+.admin-patients-container {
+  padding: 20px;
+}
+
+.admin-patients-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.patients-table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.patients-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.patients-table th,
+.patients-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.patients-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.patients-table tr:hover {
+  background-color: #f1f3f5;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-view, .btn-delete {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btn-view {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-view:hover {
+  background-color: #0056b3;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+}
+
+/* Modal Styles */
+.patient-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.patient-detail-modal {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.detail-section {
+  margin-bottom: 24px;
+}
+
+.detail-section h3 {
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.info-item label {
+  display: block;
+  font-size: 12px;
+  color: #6c757d;
+  margin-bottom: 4px;
+}
+
+.info-item span {
+  font-weight: 500;
+}
+
+.appointments-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.appointment-item {
+  padding: 8px 12px;
+  border: 1px solid #edf2f7;
+  border-radius: 6px;
+  background-color: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.appointment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.appointment-date {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.appointment-meta {
+  font-size: 12px;
+  color: #718096;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.status-pending { 
+  background-color: #fefcbf; 
+  color: #975a16;
+  border: 1px solid #faf089;
+}
+
+.status-confirmed { 
+  background-color: #c6f6d5; 
+  color: #22543d;
+  border: 1px solid #9ae6b4;
+}
+
+.status-cancelled { 
+  background-color: #fed7d7; 
+  color: #822727;
+  border: 1px solid #feb2b2;
+}
+
+.no-appointments {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 10px;
+}
