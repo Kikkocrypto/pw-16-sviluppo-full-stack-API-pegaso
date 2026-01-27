@@ -132,7 +132,7 @@ function BookAppointmentPage() {
         doctorId: selectedDoctor.id,
         examId: selectedExam.id,
         appointmentDate: utcFormattedDate,
-        notes: reason,
+        reason: reason,
         contraindications: contraindications
       });
       showSuccess('Appuntamento prenotato con successo!');
@@ -201,7 +201,6 @@ function BookAppointmentPage() {
                     >
                       <h3>{exam.name}</h3>
                       <p>{exam.description || 'Nessuna descrizione disponibile'}</p>
-                      <small>{exam.durationMinutes} min</small>
                     </div>
                   ))}
                 </div>

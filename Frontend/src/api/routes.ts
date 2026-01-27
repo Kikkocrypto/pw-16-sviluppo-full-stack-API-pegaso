@@ -49,8 +49,7 @@ export const API_ROUTES = {
     detail: (id: string) => `/appointments/${id}`, // con tutti gli headers
     create: '/appointments', // Con header X-Demo-Patient-Id (paziente) o senza header (admin)
     update: (id: string) => `/appointments/${id}`, // Con header X-Demo-Doctor-Id (dottore) o senza header (admin)
-    delete: (id: string) => `/appointments/${id}`, // Admin
-    cancel: (id: string) => `/appointments/${id}/cancel`, // Con header X-Demo-Patient-Id
+    delete: (id: string) => `/appointments/${id}`, // Admin, Doctor, Patient (per cancellazione)
   },
 } as const;
 
