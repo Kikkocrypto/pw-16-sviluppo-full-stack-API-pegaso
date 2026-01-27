@@ -6,7 +6,8 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { useToast } from '../../contexts/ToastContext';
 import { validateField } from '../../utils/validation';
-import './AdminPage.css';
+import { getDoctorTitle } from '../../utils/formatters';
+import './AdminExamsPage.css';
 
 function AdminExamsPage() {
   const [exams, setExams] = useState([]);
@@ -371,7 +372,7 @@ function AdminExamsPage() {
                 return (
                   <div key={doctor.id} className={`doctor-selection-item ${isAssigned ? 'assigned' : ''}`}>
                     <div className="doctor-info">
-                      <span className="doctor-name">Dr. {doctor.firstName} {doctor.lastName}</span>
+                      <span className="doctor-name">{getDoctorTitle(doctor.gender)} {doctor.firstName} {doctor.lastName}</span>
                     </div>
                     <button 
                       className={`btn-assign ${isAssigned ? 'remove' : 'add'}`}

@@ -7,6 +7,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { useToast } from '../../contexts/ToastContext';
 import { getErrorMessage } from '../../utils/errorUtils';
+import { getDoctorTitle } from '../../utils/formatters';
 import './BookAppointmentPage.css';
 
 function BookAppointmentPage() {
@@ -269,7 +270,7 @@ function BookAppointmentPage() {
                             onClick={() => setSelectedDoctor(doctor)}
                           >
                             <h3>
-                              {doctor.gender === 'F' ? 'Dott.ssa' : 'Dott.'} {doctor.firstName} {doctor.lastName}
+                              {getDoctorTitle(doctor.gender)} {doctor.firstName} {doctor.lastName}
                             </h3>
                           </div>
                         ))
