@@ -1,8 +1,234 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  getAllPatientsAdmin, 
+  deletePatientAdmin, 
+  getPatientAppointments 
+} from '../../api/services/patient/patientService';
+import { LoadingSpinner, ErrorMessage, ConfirmDialog } from '../../components/common';
+import { useToast } from '../../contexts/ToastContext';
+import './AdminPatientsPage.css';
+
 function AdminPatientsPage() {
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // State for detail modal
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
+  
+  // State for delete confirmation
+  const [patientToDelete, setPatientToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const fetchPatients = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllPatientsAdmin();
+      setPatients(data);
+      setError(null);
+    } catch (err) {
+      setError('Impossibile caricare la lista dei pazienti. Riprova più tardi.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewDetails = async (patient) => {
+    setSelectedPatient(patient);
+    setLoadingAppointments(true);
+    try {
+      const appts = await getPatientAppointments(patient.id);
+      setAppointments(appts);
+    } catch (err) {
+      console.error('Errore nel caricamento appuntamenti:', err);
+      showToast('Errore nel caricamento degli appuntamenti', 'error');
+    } finally {
+      setLoadingAppointments(false);
+    }
+  };
+
+  const handleDeleteClick = (patient) => {
+    setPatientToDelete(patient);
+  };
+
+  const confirmDelete = async () => {
+    if (!patientToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await deletePatientAdmin(patientToDelete.id);
+      showToast('Paziente eliminato con successo', 'success');
+      setPatients(patients.filter(p => p.id !== patientToDelete.id));
+      setPatientToDelete(null);
+    } catch (err) {
+      console.error(err);
+      const message = err.message || 'Impossibile eliminare il paziente.';
+      showToast(message, 'error');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const filteredPatients = patients.filter(patient => {
+    const fullName = `${patient.firstName} ${patient.lastName}`.toLowerCase();
+    const email = (patient.email || '').toLowerCase();
+    const search = searchTerm.toLowerCase();
+    return fullName.includes(search) || email.includes(search);
+  });
+
+  if (loading) return <LoadingSpinner label="Caricamento pazienti..." />;
+  if (error) return <ErrorMessage message={error} onRetry={fetchPatients} />;
+
   return (
-    <div className="admin-patients-page">
-      <h2>Gestione Pazienti</h2>
-      <p>Pagina in costruzione</p>
+    <div className="admin-patients-container">
+      <div className="admin-patients-header">
+        <h2>Gestione Pazienti</h2>
+        <div className="search-bar">
+          <input 
+            type="text" 
+            placeholder="Cerca per nome o email..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="patients-table-container">
+        <table className="patients-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Cognome</th>
+              <th>Email</th>
+              <th>Telefono</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredPatients.length > 0 ? (
+              filteredPatients.map(patient => (
+                <tr key={patient.id}>
+                  <td>{patient.firstName}</td>
+                  <td>{patient.lastName}</td>
+                  <td>{patient.email || '-'}</td>
+                  <td>{patient.phoneNumber || '-'}</td>
+                  <td className="actions-cell">
+                    <button 
+                      className="btn-view"
+                      onClick={() => handleViewDetails(patient)}
+                    >
+                      Dettagli
+                    </button>
+                    <button 
+                      className="btn-delete"
+                      onClick={() => handleDeleteClick(patient)}
+                    >
+                      Elimina
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center' }}> Nessun paziente trovato </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Patient Details Modal */}
+      {selectedPatient && (
+        <div className="patient-detail-overlay">
+          <div className="patient-detail-modal">
+            <button className="close-modal" onClick={() => setSelectedPatient(null)}>&times;</button>
+            
+            <div className="detail-section">
+              <h3>Dati Personali</h3>
+              <div className="info-grid">
+                <div className="info-item">
+                  <label>Nome Completo</label>
+                  <span>{selectedPatient.firstName} {selectedPatient.lastName}</span>
+                </div>
+                <div className="info-item">
+                  <label>Email</label>
+                  <span>{selectedPatient.email || '-'}</span>
+                </div>
+                <div className="info-item">
+                  <label>Telefono</label>
+                  <span>{selectedPatient.phoneNumber || '-'}</span>
+                </div>
+                <div className="info-item">
+                  <label>Data di Nascita</label>
+                  <span>{selectedPatient.dateOfBirth ? new Date(selectedPatient.dateOfBirth).toLocaleDateString() : '-'}</span>
+                </div>
+                <div className="info-item">
+                  <label>Genere</label>
+                  <span>{selectedPatient.gender || '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="detail-section">
+              <h3>Appuntamenti Schedulati</h3>
+              {loadingAppointments ? (
+                <LoadingSpinner label="Caricamento appuntamenti..." />
+              ) : appointments.length > 0 ? (
+                <ul className="appointments-list">
+                  {appointments.map(appt => (
+                    <li key={appt.id} className="appointment-item">
+                      <div className="appointment-info">
+                        <span className="appointment-date">
+                          {new Date(appt.appointmentDate).toLocaleString([], { 
+                            day: '2-digit', 
+                            month: '2-digit', 
+                            year: 'numeric', 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </span>
+                        <span className="appointment-meta">
+                          {appt.examName} • Dott. {appt.doctorLastName}
+                        </span>
+                      </div>
+                      <span className={`status-badge status-${appt.status}`}>
+                        {appt.status}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="no-appointments">Nessun appuntamento schedulato</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Delete Dialog */}
+      {patientToDelete && (
+        <ConfirmDialog
+          isOpen={!!patientToDelete}
+          title="Elimina Paziente"
+          message={`Sei sicuro di voler eliminare il paziente ${patientToDelete.firstName} ${patientToDelete.lastName}? Questa operazione non può essere annullata.`}
+          confirmLabel={isDeleting ? "Eliminazione..." : "Elimina"}
+          cancelLabel="Annulla"
+          onConfirm={confirmDelete}
+          onCancel={() => setPatientToDelete(null)}
+          isDanger={true}
+          isLoading={isDeleting}
+        />
+      )}
     </div>
   );
 }
