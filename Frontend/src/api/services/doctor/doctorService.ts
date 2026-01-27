@@ -93,6 +93,47 @@ export async function createDoctor(data: CreateDoctorData): Promise<Doctor> {
 }
 
 /**
+ * Recupera la lista completa dei dottori (per admin)
+ * @returns Array di tutti i dottori
+ */
+export async function getAllDoctorsAdmin(): Promise<Doctor[]> {
+  return apiGet<Doctor[]>(API_ROUTES.doctors.list, {
+    skipDemoHeaders: true,
+  } as any);
+}
+
+/**
+ * Recupera il dettaglio di un dottore (per admin)
+ * @param doctorId - ID del dottore
+ * @returns Profilo del dottore
+ */
+export async function getDoctorDetailAdmin(doctorId: string): Promise<Doctor> {
+  return apiGet<Doctor>(API_ROUTES.doctors.detail(doctorId));
+}
+
+/**
+ * Elimina un dottore (per admin)
+ * @param doctorId - ID del dottore
+ */
+export async function deleteDoctorAdmin(doctorId: string): Promise<void> {
+  return apiDelete<void>(API_ROUTES.doctors.deleteById(doctorId));
+}
+
+/**
+ * Recupera gli appuntamenti di un dottore specifico (per admin o selettore)
+ * @param doctorId - ID del dottore
+ * @returns Lista appuntamenti
+ */
+export async function getDoctorAppointments(doctorId: string): Promise<any[]> {
+  return apiGet<any[]>(API_ROUTES.appointments.list, {
+    headers: {
+      'X-Demo-Doctor-Id': doctorId
+    },
+    skipDemoHeaders: true
+  } as any);
+}
+
+/**
  * Aggiorna il profilo del dottore corrente (basato sull'header X-Demo-Doctor-Id)
  * @param data - Dati da aggiornare
  * @returns Profilo aggiornato

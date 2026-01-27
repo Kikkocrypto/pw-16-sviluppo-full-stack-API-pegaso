@@ -134,7 +134,9 @@ function PatientAppointmentsPage() {
                         </div>
                         <div className="meta-item">
                           <span className="icon">👨‍⚕️</span>
-                          <span>Dott. {app.doctorFirstName} {app.doctorLastName}</span>
+                          <span>
+                            {app.doctorGender === 'F' ? 'Dott.ssa' : 'Dott.'} {app.doctorFirstName} {app.doctorLastName}
+                          </span>
                         </div>
                       </div>
                     </div>

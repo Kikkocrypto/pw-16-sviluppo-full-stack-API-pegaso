@@ -81,7 +81,9 @@ function PatientDashboardPage() {
       <header className="dashboard-header">
         <div>
           <h1>Ciao, {patient?.firstName}!</h1>
-          <p className="welcome-text">Bentornato nel tuo portale salute.</p>
+          <p className="welcome-text">
+            {patient?.gender === 'F' ? 'Bentornata' : 'Bentornato'} nel tuo portale salute.
+          </p>
         </div>
         <Link to="/patient/book" className="submit-button" style={{ textDecoration: 'none', marginTop: 0 }}>
           Prenota Visita
@@ -102,8 +104,13 @@ function PatientDashboardPage() {
               <div className="appointments-list">
                 {upcomingAppointments.map(app => {
                   const date = formatDate(app.appointmentDate);
+                  const getDoctorTitle = (gender) => {
+                    if (gender === 'F') return 'Dott.ssa';
+                    if (gender === 'M') return 'Dott.';
+                    return 'Dott.'; // Fallback
+                  };
                   const doctorName = app.doctorFirstName && app.doctorLastName 
-                    ? `Dott. ${app.doctorFirstName} ${app.doctorLastName}`
+                    ? `${getDoctorTitle(app.doctorGender)} ${app.doctorFirstName} ${app.doctorLastName}`
                     : 'Dottore';
                   
                   return (

@@ -84,11 +84,18 @@ function DoctorDashboardPage() {
   const pendingAppointments = appointments.filter(app => app.status === 'pending').length;
   const activeAppointments = appointments.filter(app => app && app.status !== 'cancelled');
 
+  const getGreeting = () => {
+    if (!doctor) return 'Bentornato';
+    const bentornato = doctor.gender === 'F' ? 'Bentornata' : 'Bentornato';
+    const title = doctor.gender === 'F' ? 'Dott.ssa' : 'Dott.';
+    return `${bentornato}, ${title}`;
+  };
+
   return (
     <div className="doctor-dashboard">
       <header className="dashboard-header">
         <div className="header-left">
-          <h1>Bentornato, Dott. {doctor?.lastName}</h1>
+          <h1>{getGreeting()} {doctor?.lastName}</h1>
           <div className="header-meta">
             <p className="welcome-text">Ecco il riepilogo della tua attività per oggi.</p>
           </div>

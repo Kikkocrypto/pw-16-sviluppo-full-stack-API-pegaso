@@ -226,6 +226,7 @@ public class AppointmentService {
                 .doctorId(a.getDoctor().getId())
                 .doctorFirstName(a.getDoctor().getFirstName())
                 .doctorLastName(a.getDoctor().getLastName())
+                .doctorGender(a.getDoctor().getGender())
                 .patientId(a.getPatient().getId())
                 .patientFirstName(a.getPatient().getFirstName())
                 .patientLastName(a.getPatient().getLastName())

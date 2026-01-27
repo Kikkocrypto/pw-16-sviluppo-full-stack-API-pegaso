@@ -33,6 +33,9 @@ public class AppointmentResponse {
     @Schema(description = "Doctor last name")
     private String doctorLastName;
 
+    @Schema(description = "Doctor gender")
+    private String doctorGender;
+
     @Schema(description = "Identifier of the patient")
     private UUID patientId;
 

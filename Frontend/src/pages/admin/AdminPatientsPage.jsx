@@ -29,6 +29,12 @@ function AdminPatientsPage() {
     fetchPatients();
   }, []);
 
+  const getDoctorTitle = (gender) => {
+    if (gender === 'F') return 'Dott.ssa';
+    if (gender === 'M') return 'Dott.';
+    return '';
+  };
+
   const fetchPatients = async () => {
     try {
       setLoading(true);
@@ -198,7 +204,7 @@ function AdminPatientsPage() {
                           })}
                         </span>
                         <span className="appointment-meta">
-                          {appt.examName} • Dott. {appt.doctorLastName}
+                          {appt.examName} • {getDoctorTitle(appt.doctorGender)} {appt.doctorLastName}
                         </span>
                       </div>
                       <span className={`status-badge status-${appt.status}`}>
