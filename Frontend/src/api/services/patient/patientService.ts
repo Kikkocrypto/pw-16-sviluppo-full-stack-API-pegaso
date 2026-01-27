@@ -6,7 +6,7 @@
  * - Creazione nuovo paziente
  */
 
-import { apiGet, apiPost } from '../../apiClient';
+import { apiGet, apiPost, apiPatch, apiDelete } from '../../apiClient';
 import { API_ROUTES } from '../../routes';
 
 /**
@@ -16,6 +16,18 @@ export interface Patient {
   id: string;
   firstName: string;
   lastName: string;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  email?: string | null;
+  phoneNumber?: string | null;
+}
+
+/**
+ * Interfaccia per l'aggiornamento di un paziente
+ */
+export interface UpdatePatientData {
+  firstName?: string;
+  lastName?: string;
   dateOfBirth?: string | null;
   gender?: string | null;
   email?: string | null;
@@ -69,4 +81,20 @@ export async function getPatientProfile(): Promise<Patient> {
  */
 export async function createPatient(data: CreatePatientData): Promise<Patient> {
   return apiPost<Patient>(API_ROUTES.patients.create, data);
+}
+
+/**
+ * Aggiorna il profilo del paziente corrente
+ * @param data - Dati da aggiornare
+ * @returns Profilo aggiornato
+ */
+export async function updatePatientProfile(data: UpdatePatientData): Promise<Patient> {
+  return apiPatch<Patient>(API_ROUTES.patients.update, data);
+}
+
+/**
+ * Elimina il profilo del paziente corrente
+ */
+export async function deletePatientProfile(): Promise<void> {
+  return apiDelete(API_ROUTES.patients.delete);
 }

@@ -8,6 +8,7 @@ function Header() {
   const [patientId, setPatientId] = useState(getDemoId('patient'));
   const [doctorId, setDoctorId] = useState(getDemoId('doctor'));
   const [adminId, setAdminId] = useState(getDemoId('admin'));
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Funzione per aggiornare i ruoli dal localStorage
   const updateRoles = useCallback(() => {
@@ -19,7 +20,19 @@ function Header() {
   // Aggiorna lo stato quando cambia la route
   useEffect(() => {
     updateRoles();
+    setIsMenuOpen(false); // Chiudi il menu al cambio pagina
   }, [location.pathname, updateRoles]);
+
+  // Chiudi il menu se si clicca fuori
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isMenuOpen && !e.target.closest('.header-right')) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMenuOpen]);
 
   // Ascolta gli eventi di cambiamento del ruolo
   useEffect(() => {
@@ -54,6 +67,7 @@ function Header() {
 
   const handleLogout = () => {
     clearDemoHeaders();
+    setIsMenuOpen(false);
     window.location.href = '/';
   };
 
@@ -72,10 +86,10 @@ function Header() {
       <div className="header-content">
         <div className="header-left">
           <Link to="/" className="logo">
-            <h1>Private Healthcare</h1>
+            <h1>Dottori & Dolori</h1>
           </Link>
           {identityText && (
-            <Link to="/" className="home-link">
+            <Link to="/" className="home-link desktop-only">
               Torna alla Home
             </Link>
           )}
@@ -83,14 +97,37 @@ function Header() {
         
         <div className="header-right">
           {identityText && (
-            <div className="identity-section">
-              <div className="identity-banner">
-                <span className="identity-label">Sei connesso come: </span>
-                <strong>{identityText}</strong>
+            <>
+              <button 
+                className="hamburger-button" 
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Menu"
+              >
+                <span className={`hamburger-icon ${isMenuOpen ? 'open' : ''}`}></span>
+              </button>
+
+              <div className={`nav-menu ${isMenuOpen ? 'open' : ''}`}>
+                <div className="identity-section">
+                  <div className="identity-banner">
+                    <span className="identity-label">Sei connesso come: </span>
+                    <strong>{identityText}</strong>
+                  </div>
+                </div>
+                
+                <Link to="/" className="mobile-home-link mobile-only">
+                  🏠 Torna alla Home
+                </Link>
+
+                {(patientId || doctorId || adminId) && (
+                  <button onClick={handleLogout} className="logout-button">
+                    Logout
+                  </button>
+                )}
               </div>
-            </div>
+            </>
           )}
-          {(patientId || doctorId || adminId) && (
+          
+          {!identityText && (patientId || doctorId || adminId) && (
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
