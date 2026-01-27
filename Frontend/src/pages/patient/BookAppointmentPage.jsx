@@ -268,7 +268,9 @@ function BookAppointmentPage() {
                             className={`selection-card ${selectedDoctor?.id === doctor.id ? 'selected' : ''}`}
                             onClick={() => setSelectedDoctor(doctor)}
                           >
-                            <h3>Dott. {doctor.firstName} {doctor.lastName}</h3>
+                            <h3>
+                              {doctor.gender === 'F' ? 'Dott.ssa' : 'Dott.'} {doctor.firstName} {doctor.lastName}
+                            </h3>
                           </div>
                         ))
                       ) : (

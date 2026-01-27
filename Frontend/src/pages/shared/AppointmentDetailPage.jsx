@@ -147,7 +147,9 @@ function AppointmentDetailPage() {
                   </div>
                   <div className="info-item">
                     <span className="label">👨‍⚕️ Medico</span>
-                    <span className="value">Dott. {appointment.doctorFirstName} {appointment.doctorLastName}</span>
+                    <span className="value">
+                      {appointment.doctorGender === 'F' ? 'Dott.ssa' : 'Dott.'} {appointment.doctorFirstName} {appointment.doctorLastName}
+                    </span>
                   </div>
                   <div className="info-item">
                     <span className="label">👤 Paziente</span>
