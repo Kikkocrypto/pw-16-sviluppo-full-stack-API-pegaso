@@ -154,7 +154,7 @@ public class PatientController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Profilo cancellato con successo"),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid or missing UUID, or patient has active appointments (non-cancelled)"),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida o il paziente ha appuntamenti attivi"),
             @ApiResponse(responseCode = "404", description = "Patient not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -218,7 +218,7 @@ public class PatientController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Patient deleted successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request - invalid UUID format, or patient has active appointments (non-cancelled)"),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida o il paziente ha appuntamenti attivi"),
             @ApiResponse(responseCode = "403", description = "Forbidden - admin not authorized"),
             @ApiResponse(responseCode = "404", description = "Patient not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")

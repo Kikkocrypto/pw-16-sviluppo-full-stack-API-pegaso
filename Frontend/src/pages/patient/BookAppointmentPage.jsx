@@ -59,7 +59,8 @@ function BookAppointmentPage() {
   const loadExams = async () => {
     setLoading(true);
     try {
-      const data = await getExams();
+      // Recupera solo gli esami attivi dal server
+      const data = await getExams(true);
       setExams(data);
     } catch (err) {
       setError('Impossibile caricare la lista degli esami.');
@@ -268,7 +269,6 @@ function BookAppointmentPage() {
                             onClick={() => setSelectedDoctor(doctor)}
                           >
                             <h3>Dott. {doctor.firstName} {doctor.lastName}</h3>
-                            <p>{doctor.specialization}</p>
                           </div>
                         ))
                       ) : (

@@ -90,9 +90,6 @@ function DoctorDashboardPage() {
         <div className="header-left">
           <h1>Bentornato, Dott. {doctor?.lastName}</h1>
           <div className="header-meta">
-            {doctor?.specialization && (
-              <span className="specialization-tag">{doctor.specialization}</span>
-            )}
             <p className="welcome-text">Ecco il riepilogo della tua attività per oggi.</p>
           </div>
         </div>
@@ -190,13 +187,6 @@ function DoctorDashboardPage() {
                 <div className="action-info">
                   <h3>Catalogo Esami</h3>
                   <p>Visualizza esami disponibili</p>
-                </div>
-              </Link>
-              <Link to="/admin/patients" className="action-card">
-                <div className="action-icon">👥</div>
-                <div className="action-info">
-                  <h3>Ricerca Pazienti</h3>
-                  <p>Anagrafica completa</p>
                 </div>
               </Link>
             </div>

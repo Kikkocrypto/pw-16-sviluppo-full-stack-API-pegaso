@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDoctors, createDoctor } from '../../api/services/doctor/doctorService';
+import { getExams } from '../../api/services/exam/examService';
 import { setDemoId } from '../../api/demoHeaders';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
@@ -29,21 +30,40 @@ function DoctorAccessPage() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    specialization: '',
     gender: '',
     email: '',
     phoneNumber: '',
+    examIds: [],
   });
   const [formErrors, setFormErrors] = useState({});
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState(null);
+  
+  // Stato per la lista esami disponibili
+  const [availableExams, setAvailableExams] = useState([]);
+  const [loadingExams, setLoadingExams] = useState(false);
 
 
   useEffect(() => {
     if (mode === 'select') {
       loadDoctors();
+    } else if (mode === 'create') {
+      loadExams();
     }
   }, [mode]);
+
+  // Caricamento lista esami
+  const loadExams = async () => {
+    setLoadingExams(true);
+    try {
+      const data = await getExams(true); // Solo esami attivi
+      setAvailableExams(data);
+    } catch (error) {
+      console.error('Errore nel caricamento degli esami:', error);
+    } finally {
+      setLoadingExams(false);
+    }
+  };
 
 // Caricamento lista dottori
   const loadDoctors = async () => {
@@ -119,11 +139,10 @@ function DoctorAccessPage() {
       const doctorData = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
-        specialization: formData.specialization.trim() || null,
         gender: formData.gender || null,
         email: formData.email.trim() || null,
         phoneNumber: ensurePhonePrefix(formData.phoneNumber),
-        examIds: null, // Per ora non gestiamo la selezione esami nella creazione
+        examIds: formData.examIds.length > 0 ? formData.examIds : null,
       };
 
       const newDoctor = await createDoctor(doctorData);
@@ -149,8 +168,21 @@ function DoctorAccessPage() {
 
   // Gestione cambio valori con validazione in tempo reale e prefisso +39
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     let processedValue = value;
+
+    // Gestione checkbox per esami
+    if (name === 'examIds') {
+      const examId = value;
+      setFormData(prev => {
+        const currentIds = prev.examIds || [];
+        const newIds = checked 
+          ? [...currentIds, examId]
+          : currentIds.filter(id => id !== examId);
+        return { ...prev, examIds: newIds };
+      });
+      return;
+    }
 
     // Gestione prefisso +39 per il numero di telefono (usa utility condivisa)
     if (name === 'phoneNumber') {
@@ -228,7 +260,6 @@ function DoctorAccessPage() {
                 {doctors.map((doctor) => (
                   <option key={doctor.id} value={doctor.id}>
                     {doctor.firstName} {doctor.lastName}
-                    {doctor.specialization ? ` - ${doctor.specialization}` : ''}
                     {doctor.email ? ` (${doctor.email})` : ''}
                   </option>
                 ))}
@@ -268,10 +299,10 @@ function DoctorAccessPage() {
             setFormData({
               firstName: '',
               lastName: '',
-              specialization: '',
               gender: '',
               email: '',
               phoneNumber: '',
+              examIds: [],
             });
             setFormErrors({});
             setCreateError(null);
@@ -323,20 +354,27 @@ function DoctorAccessPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="specialization">Specializzazione</label>
-            <input
-              type="text"
-              id="specialization"
-              name="specialization"
-              value={formData.specialization}
-              onChange={handleInputChange}
-              placeholder="Es. Cardiologia, Pediatria..."
-              maxLength={150}
-              className={formErrors.specialization ? 'error' : ''}
-            />
-            {formErrors.specialization && (
-              <span className="error-message">{formErrors.specialization}</span>
-            )}
+            <label>Abilitazione Esami</label>
+            <div className="exams-selection-grid">
+              {loadingExams ? (
+                <p>Caricamento esami...</p>
+              ) : availableExams.length > 0 ? (
+                availableExams.map(exam => (
+                  <label key={exam.id} className="exam-checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="examIds"
+                      value={exam.id}
+                      checked={formData.examIds.includes(exam.id)}
+                      onChange={handleInputChange}
+                    />
+                    <span className="exam-name">{exam.name}</span>
+                  </label>
+                ))
+              ) : (
+                <p>Nessun esame disponibile</p>
+              )}
+            </div>
           </div>
 
           <div className="form-group">

@@ -114,7 +114,7 @@ public class PatientService {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient", patientId));
         if (hasAppointments(patientId)) {
-            throw new IllegalArgumentException("Cannot delete patient: patient has active appointments (non-cancelled)");
+            throw new IllegalArgumentException("Impossibile eliminare il profilo: sono presenti appuntamenti attivi. Cancella o completa gli appuntamenti prima di procedere.");
         }
         // Elimina fisicamente tutti gli appuntamenti cancellati associati al paziente
         // per evitare violazioni di foreign key constraint

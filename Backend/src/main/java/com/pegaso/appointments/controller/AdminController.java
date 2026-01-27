@@ -196,6 +196,94 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    // Assegnazione/Rimozione dottore da un esame
+    @PostMapping(value = "/exams/{examId}/doctors/{doctorId}")
+    @Operation(
+            summary = "Assegna un dottore a un esame (Admin)",
+            description = "Associa un dottore a un esame specifico. Richiede l'header X-Demo-Admin-Id."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Doctor assigned to exam successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request - invalid UUID format"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - admin not authorized"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found - exam or doctor not found"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Conflict - doctor already assigned to this exam"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error"
+            )
+    })
+    // Assegnazione di un dottore a un esame
+    public ResponseEntity<Void> assignDoctorToExam(
+            @Parameter(description = "UUID of the exam", required = true, example = "770e8400-e29b-41d4-a716-446655440001")
+            @PathVariable UUID examId,
+            @Parameter(description = "UUID of the doctor", required = true, example = "660e8400-e29b-41d4-a716-446655440001")
+            @PathVariable UUID doctorId,
+            @Parameter(description = "UUID of the admin. Required.", required = true, example = "880e8400-e29b-41d4-a716-446655440001")
+            @RequestHeader(value = HEADER_ADMIN, required = false) String adminIdHeader) {
+        validateAdminHeader(adminIdHeader);
+        UUID adminId = parseUuid(adminIdHeader, HEADER_ADMIN);
+        examService.assignDoctorToExam(adminId, examId, doctorId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    // Rimozione di un dottore da un esame
+    @DeleteMapping(value = "/exams/{examId}/doctors/{doctorId}")
+    @Operation(
+            summary = "Rimuove un dottore da un esame (Admin)",
+            description = "Rimuove l'associazione tra un dottore e un esame. Richiede l'header X-Demo-Admin-Id."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Doctor removed from exam successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request - invalid UUID format"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - admin not authorized"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found - assignment not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error"
+            )
+    })
+    // Rimozione di un dottore da un esame
+    public ResponseEntity<Void> removeDoctorFromExam(
+            @Parameter(description = "UUID of the exam", required = true, example = "770e8400-e29b-41d4-a716-446655440001")
+            @PathVariable UUID examId,
+            @Parameter(description = "UUID of the doctor", required = true, example = "660e8400-e29b-41d4-a716-446655440001")
+            @PathVariable UUID doctorId,
+            @Parameter(description = "UUID of the admin. Required.", required = true, example = "880e8400-e29b-41d4-a716-446655440001")
+            @RequestHeader(value = HEADER_ADMIN, required = false) String adminIdHeader) {
+        validateAdminHeader(adminIdHeader);
+        UUID adminId = parseUuid(adminIdHeader, HEADER_ADMIN);
+        examService.removeDoctorFromExam(adminId, examId, doctorId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 

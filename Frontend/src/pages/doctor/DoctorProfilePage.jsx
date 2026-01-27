@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPatientProfile, updatePatientProfile, deletePatientProfile } from '../../api/services/patient/patientService';
+import { getDoctorProfile, updateDoctorProfile, deleteDoctorProfile } from '../../api/services/doctor/doctorService';
 import { clearDemoHeaders } from '../../api/demoHeaders';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useToast } from '../../contexts/ToastContext';
 import { getErrorMessage } from '../../utils/errorUtils';
-import { validateField as validateFieldUtil, validatePatientForm } from '../../utils/validation';
+import { validateField as validateFieldUtil, validateDoctorForm } from '../../utils/validation';
 import { normalizePhoneNumber, ensurePhonePrefix } from '../../utils/phoneUtils';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
-import './PatientProfilePage.css';
+import './DoctorProfilePage.css';
 
-function PatientProfilePage() {
+function DoctorProfilePage() {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
   
@@ -24,7 +24,6 @@ function PatientProfilePage() {
     lastName: '',
     email: '',
     phoneNumber: '',
-    dateOfBirth: '',
     gender: ''
   });
   const [formErrors, setFormErrors] = useState({});
@@ -36,13 +35,12 @@ function PatientProfilePage() {
   const loadProfile = async () => {
     setLoading(true);
     try {
-      const profile = await getPatientProfile();
+      const profile = await getDoctorProfile();
       const data = {
         firstName: profile.firstName || '',
         lastName: profile.lastName || '',
         email: profile.email || '',
         phoneNumber: profile.phoneNumber || '',
-        dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.split('T')[0] : '',
         gender: profile.gender || ''
       };
       setFormData(data);
@@ -96,7 +94,7 @@ function PatientProfilePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const errors = validatePatientForm(formData);
+    const errors = validateDoctorForm(formData);
     setFormErrors(errors);
     
     if (Object.keys(errors).length > 0) {
@@ -110,7 +108,7 @@ function PatientProfilePage() {
         ...formData,
         phoneNumber: ensurePhonePrefix(formData.phoneNumber)
       };
-      await updatePatientProfile(updateData);
+      await updateDoctorProfile(updateData);
       showSuccess('Profilo aggiornato con successo');
     } catch (err) {
       showError(getErrorMessage(err, 'Errore durante l\'aggiornamento'));
@@ -121,7 +119,7 @@ function PatientProfilePage() {
 
   const handleDeleteProfile = async () => {
     try {
-      await deletePatientProfile();
+      await deleteDoctorProfile();
       showSuccess('Account eliminato con successo');
       clearDemoHeaders();
       navigate('/');
@@ -133,19 +131,19 @@ function PatientProfilePage() {
   if (loading) return <LoadingSpinner message="Caricamento profilo..." />;
 
   return (
-    <div className="patient-profile-page">
-      <button className="back-button" onClick={() => navigate('/patient/dashboard')}>
+    <div className="doctor-profile-page">
+      <button className="back-button" onClick={() => navigate('/doctor/dashboard')}>
         ← Torna alla Dashboard
       </button>
       <div className="profile-container">
         <header className="profile-header">
           <h1>Il mio Profilo</h1>
-          <p>Gestisci i tuoi dati personali e le impostazioni dell'account</p>
+          <p>Gestisci i tuoi dati professionali e le impostazioni dell'account</p>
         </header>
 
         <form onSubmit={handleSubmit} className="profile-form">
           <div className="form-section">
-            <h2>Informazioni Personali</h2>
+            <h2>Informazioni Professionali</h2>
             <div className="form-grid">
               <div className="form-group">
                 <label htmlFor="firstName">Nome <span className="required">*</span></label>
@@ -172,20 +170,6 @@ function PatientProfilePage() {
                   required
                 />
                 {formErrors.lastName && <span className="error-message">{formErrors.lastName}</span>}
-              </div>
-              <div className="form-group">
-                <label htmlFor="dateOfBirth">Data di Nascita</label>
-                <input
-                  type="date"
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth}
-                  onChange={handleChange}
-                  min="1900-01-01"
-                  max={new Date().toISOString().split('T')[0]}
-                  className={formErrors.dateOfBirth ? 'error' : ''}
-                />
-                {formErrors.dateOfBirth && <span className="error-message">{formErrors.dateOfBirth}</span>}
               </div>
               <div className="form-group">
                 <label htmlFor="gender">Genere</label>
@@ -250,7 +234,7 @@ function PatientProfilePage() {
 
         <div className="danger-zone">
           <h2>Zona Pericolosa</h2>
-          <p>L'eliminazione dell'account è irreversibile. Tutti i tuoi dati e le tue prenotazioni verranno rimosse.</p>
+          <p>L'eliminazione dell'account è irreversibile. Tutti i tuoi dati e le tue visite verranno rimosse.</p>
           <button 
             type="button" 
             className="delete-account-button"
@@ -274,4 +258,4 @@ function PatientProfilePage() {
   );
 }
 
-export default PatientProfilePage;
+export default DoctorProfilePage;

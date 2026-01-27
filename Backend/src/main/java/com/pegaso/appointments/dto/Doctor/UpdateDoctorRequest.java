@@ -24,10 +24,6 @@ public class UpdateDoctorRequest {
     @Schema(description = "Doctor's last name", example = "Rossi", maxLength = 100)
     private String lastName;
 
-    @Size(max = 150, message = "Specialization must not exceed 150 characters")
-    @Schema(description = "Doctor's specialization", example = "Cardiology", maxLength = 150)
-    private String specialization;
-
     @ValidGender
     @Size(max = 10, message = "Gender must not exceed 10 characters")
     @Schema(description = "Doctor's gender", example = "M", allowableValues = {"M", "F", "Other"}, maxLength = 10)

@@ -13,12 +13,11 @@ VALUES (
 ON CONFLICT (id) DO NOTHING;
 
 -- Inserimento Doctor
-INSERT INTO doctors (id, first_name, last_name, specialization, gender, email, phone_number, created_at, updated_at)
+INSERT INTO doctors (id, first_name, last_name, gender, email, phone_number, created_at, updated_at)
 VALUES (
     '660e8400-e29b-41d4-a716-446655440001',
     'Francesco',
     'Bianchi',
-    'Gastroenterologia',
     'M',
     'francesco.bianchi@example.com',
     '+39 123 456 7891',

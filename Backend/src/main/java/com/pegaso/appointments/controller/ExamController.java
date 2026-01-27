@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class ExamController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             summary = "Recupera tutti gli esami",
-            description = "Recupera la lista di tutti gli esami. Non richiede autenticazione. Endpoint pubblico."
+            description = "Recupera la lista di tutti gli esami. Supporta il filtro per stato attivo. Endpoint pubblico."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -45,11 +46,13 @@ public class ExamController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Internal server error - unexpected persistence error"
+                    description = "Internal server error"
             )
     })
-    public ResponseEntity<List<ExamResponse>> getAllExams() {
-        List<ExamResponse> response = examService.getAllExams();
+    public ResponseEntity<List<ExamResponse>> getAllExams(
+            @Parameter(description = "Filtra per stato attivo (opzionale)")
+            @RequestParam(required = false) Boolean active) {
+        List<ExamResponse> response = examService.getAllExams(active);
         return ResponseEntity.ok(response);
     }
 

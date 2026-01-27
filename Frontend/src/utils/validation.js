@@ -103,6 +103,41 @@ export function validateSpecialization(value, required = false) {
 }
 
 /**
+ * Valida un campo nome esame
+ */
+export function validateExamName(value) {
+  if (!value || !value.trim()) {
+    return 'Il nome dell\'esame è obbligatorio';
+  }
+  
+  const trimmed = value.trim();
+  
+  if (trimmed.length < 3) {
+    return 'Deve contenere almeno 3 caratteri';
+  }
+  
+  if (trimmed.length > 100) {
+    return 'Non può superare i 100 caratteri';
+  }
+  
+  return null;
+}
+
+/**
+ * Valida la durata di un esame
+ */
+export function validateExamDuration(value) {
+  const duration = parseInt(value, 10);
+  if (isNaN(duration) || duration <= 0) {
+    return 'La durata deve essere un numero positivo';
+  }
+  if (duration > 480) {
+    return 'La durata non può superare gli 480 minuti (8 ore)';
+  }
+  return null;
+}
+
+/**
  * Valida un campo in tempo reale
  * 
  * @param {string} fieldName - Nome del campo (firstName, lastName, email, ecc.)
@@ -129,6 +164,12 @@ export function validateField(fieldName, value, options = {}) {
     
     case 'phoneNumber':
       return validatePhoneNumber(value);
+    
+    case 'examName':
+      return validateExamName(value);
+    
+    case 'durationMinutes':
+      return validateExamDuration(value);
     
     default:
       return null;
@@ -182,11 +223,6 @@ export function validateDoctorForm(formData) {
   
   const lastNameError = validateName(formData.lastName, true);
   if (lastNameError) errors.lastName = lastNameError;
-  
-  if (formData.specialization) {
-    const specializationError = validateSpecialization(formData.specialization, false);
-    if (specializationError) errors.specialization = specializationError;
-  }
   
   if (formData.email) {
     const emailError = validateEmail(formData.email, false);

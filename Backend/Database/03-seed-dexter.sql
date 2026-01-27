@@ -2,11 +2,11 @@
 -- Eseguire dopo 01-schema.sql e 02-seed-data.sql
 
 -- ========== MEDICI (Dexter) ==========
-INSERT INTO doctors (id, first_name, last_name, specialization, gender, email, phone_number, created_at, updated_at)
+INSERT INTO doctors (id, first_name, last_name, gender, email, phone_number, created_at, updated_at)
 VALUES
-    ('660e8400-e29b-41d4-a716-446655440002', 'Dexter', 'Morgan', 'Patologia forense', 'M', 'dexter.morgan@example.com', '+1 305 555 0101', NOW(), NOW()),
-    ('660e8400-e29b-41d4-a716-446655440003', 'Deborah', 'Morgan', 'Medicina d''urgenza', 'F', 'deborah.morgan@example.com', '+1 305 555 0102', NOW(), NOW()),
-    ('660e8400-e29b-41d4-a716-446655440004', 'Vince', 'Masuka', 'Medicina legale', 'M', 'vince.masuka@example.com', '+1 305 555 0103', NOW(), NOW())
+    ('660e8400-e29b-41d4-a716-446655440002', 'Dexter', 'Morgan', 'M', 'dexter.morgan@example.com', '+1 305 555 0101', NOW(), NOW()),
+    ('660e8400-e29b-41d4-a716-446655440003', 'Deborah', 'Morgan', 'F', 'deborah.morgan@example.com', '+1 305 555 0102', NOW(), NOW()),
+    ('660e8400-e29b-41d4-a716-446655440004', 'Vince', 'Masuka', 'M', 'vince.masuka@example.com', '+1 305 555 0103', NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- ========== PAZIENTI (Dexter) ==========
