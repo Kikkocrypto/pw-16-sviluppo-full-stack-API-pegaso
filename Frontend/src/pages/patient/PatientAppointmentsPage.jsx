@@ -138,7 +138,7 @@ function PatientAppointmentsPage() {
                         <div className="meta-item">
                           <span className="icon"><IconDoctor size={14} /></span>
                           <span>
-                            {app.doctorGender === 'F' ? 'Dott.ssa' : 'Dott.'} {app.doctorFirstName} {app.doctorLastName}
+                            {getDoctorTitle(app.doctorGender)} {app.doctorFirstName} {app.doctorLastName}
                           </span>
                         </div>
                       </div>

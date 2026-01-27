@@ -8,6 +8,7 @@ import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { IconCalendar, IconDoctor, IconUser, IconEdit, IconTrash, IconX, IconClock, IconAlertTriangle } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { getErrorMessage } from '../../utils/errorUtils';
+import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
 import './AppointmentDetailPage.css';
 
 function AppointmentDetailPage() {
@@ -152,7 +153,7 @@ function AppointmentDetailPage() {
                   <div className="info-item">
                     <span className="label"><IconDoctor size={16} /> Medico</span>
                     <span className="value">
-                      {appointment.doctorGender === 'F' ? 'Dott.ssa' : 'Dott.'} {appointment.doctorFirstName} {appointment.doctorLastName}
+                      {getDoctorTitle(appointment.doctorGender)} {appointment.doctorFirstName} {appointment.doctorLastName}
                     </span>
                   </div>
                   <div className="info-item">

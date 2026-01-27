@@ -12,6 +12,7 @@ export interface Appointment {
   doctorId: string;
   doctorFirstName?: string;
   doctorLastName?: string;
+  doctorGender?: string;
   examId: string;
   examName?: string;
   appointmentDate: string;

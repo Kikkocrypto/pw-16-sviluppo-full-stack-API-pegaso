@@ -7,6 +7,7 @@ import {
 import { LoadingSpinner, ErrorMessage, ConfirmDialog } from '../../components/common';
 import { IconX, IconList, IconTrash } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
+import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
 import './AdminDoctorsPage.css';
 
 function AdminDoctorsPage() {
@@ -78,12 +79,6 @@ function AdminDoctorsPage() {
     } finally {
       setIsDeleting(false);
     }
-  };
-
-  const getDoctorTitle = (gender) => {
-    if (gender === 'F') return 'Dott.ssa';
-    if (gender === 'M') return 'Dott.';
-    return '';
   };
 
   const filteredDoctors = doctors.filter(doctor => {
@@ -211,13 +206,7 @@ function AdminDoctorsPage() {
                     <li key={appt.id} className="appointment-item">
                       <div className="appointment-info">
                         <span className="appointment-date">
-                          {new Date(appt.appointmentDate).toLocaleString([], { 
-                            day: '2-digit', 
-                            month: '2-digit', 
-                            year: 'numeric', 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                          })}
+                          {formatDateTime(appt.appointmentDate)}
                         </span>
                         <span className="appointment-meta">
                           {appt.examName} • Paziente: {appt.patientLastName}

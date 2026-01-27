@@ -105,11 +105,6 @@ function PatientDashboardPage() {
               <div className="appointments-list">
                 {upcomingAppointments.map(app => {
                   const date = formatDate(app.appointmentDate);
-                  const getDoctorTitle = (gender) => {
-                    if (gender === 'F') return 'Dott.ssa';
-                    if (gender === 'M') return 'Dott.';
-                    return 'Dott.'; // Fallback
-                  };
                   const doctorName = app.doctorFirstName && app.doctorLastName 
                     ? `${getDoctorTitle(app.doctorGender)} ${app.doctorFirstName} ${app.doctorLastName}`
                     : 'Dottore';

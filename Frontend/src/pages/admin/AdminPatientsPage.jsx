@@ -7,6 +7,7 @@ import {
 import { LoadingSpinner, ErrorMessage, ConfirmDialog } from '../../components/common';
 import { IconX, IconList, IconTrash } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
+import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
 import './AdminPatientsPage.css';
 
 function AdminPatientsPage() {
@@ -29,12 +30,6 @@ function AdminPatientsPage() {
   useEffect(() => {
     fetchPatients();
   }, []);
-
-  const getDoctorTitle = (gender) => {
-    if (gender === 'F') return 'Dott.ssa';
-    if (gender === 'M') return 'Dott.';
-    return '';
-  };
 
   const fetchPatients = async () => {
     try {
