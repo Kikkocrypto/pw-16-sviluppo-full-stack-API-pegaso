@@ -5,6 +5,7 @@ import {
   getPatientAppointments 
 } from '../../api/services/patient/patientService';
 import { LoadingSpinner, ErrorMessage, ConfirmDialog } from '../../components/common';
+import { IconX, IconList, IconTrash } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
 import './AdminPatientsPage.css';
@@ -123,19 +124,23 @@ function AdminPatientsPage() {
                   <td>{patient.lastName}</td>
                   <td>{patient.email || '-'}</td>
                   <td>{patient.phoneNumber || '-'}</td>
-                  <td className="actions-cell">
-                    <button 
-                      className="btn-view"
-                      onClick={() => handleViewDetails(patient)}
-                    >
-                      Dettagli
-                    </button>
-                    <button 
-                      className="btn-delete"
-                      onClick={() => handleDeleteClick(patient)}
-                    >
-                      Elimina
-                    </button>
+                  <td>
+                    <div className="actions-cell">
+                      <button 
+                        className="btn-view"
+                        onClick={() => handleViewDetails(patient)}
+                        title="Dettagli"
+                      >
+                        <IconList size={16} /> Dettagli
+                      </button>
+                      <button 
+                        className="btn-delete"
+                        onClick={() => handleDeleteClick(patient)}
+                        title="Elimina"
+                      >
+                        <IconTrash size={16} /> Elimina
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -152,7 +157,9 @@ function AdminPatientsPage() {
       {selectedPatient && (
         <div className="patient-detail-overlay">
           <div className="patient-detail-modal">
-            <button className="close-modal" onClick={() => setSelectedPatient(null)}>&times;</button>
+            <button className="close-modal" onClick={() => setSelectedPatient(null)}>
+              <IconX size={24} />
+            </button>
             
             <div className="detail-section">
               <h3>Dati Personali</h3>

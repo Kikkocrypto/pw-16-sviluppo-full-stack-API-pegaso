@@ -7,6 +7,7 @@ import { getExams } from '../../api/services/exam/examService';
 import { setDemoId } from '../../api/demoHeaders';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { IconDoctor, IconPlus } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { validateField as validateFieldUtil, validateDoctorForm } from '../../utils/validation';
 import { normalizePhoneNumber, ensurePhonePrefix } from '../../utils/phoneUtils';
@@ -205,13 +206,13 @@ function DoctorAccessPage() {
           
           <div className="access-options">
             <button 
-              className="access-button"
+              className="btn btn-primary"
               onClick={() => setMode('select')}
             >
               Accedi
             </button>
             <button 
-              className="access-button"
+              className="btn btn-secondary"
               onClick={() => setMode('create')}
             >
               Crea nuovo
@@ -233,7 +234,7 @@ function DoctorAccessPage() {
             className="back-button"
             onClick={() => setMode(null)}
           >
-            ← Cambia modalità
+            Indietro
           </button>
 
           {loadingDoctors && <LoadingSpinner message="Caricamento dottori..." />}
@@ -266,9 +267,10 @@ function DoctorAccessPage() {
               </select>
               
               <button
-                className="submit-button"
+                className="btn btn-primary"
                 onClick={handleSelectDoctor}
                 disabled={!selectedDoctorId}
+                style={{ width: '100%', marginTop: 'var(--spacing-md)' }}
               >
                 Conferma e Accedi
               </button>
@@ -277,7 +279,7 @@ function DoctorAccessPage() {
                 className="switch-mode-button"
                 onClick={() => setMode('create')}
               >
-                Non sei in lista? Crea nuovo dottore
+                Nuovo profilo? Crea ora
               </button>
             </div>
           )}
@@ -308,7 +310,7 @@ function DoctorAccessPage() {
             setCreateError(null);
           }}
         >
-          ← Cambia modalità
+          Indietro
         </button>
 
         {createError && (
@@ -426,8 +428,9 @@ function DoctorAccessPage() {
 
           <button
             type="submit"
-            className="submit-button"
+            className="btn btn-primary"
             disabled={creating}
+            style={{ width: '100%', marginTop: '1rem' }}
           >
             {creating ? 'Creazione in corso...' : 'Crea e Accedi'}
           </button>

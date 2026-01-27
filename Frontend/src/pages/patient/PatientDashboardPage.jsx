@@ -4,7 +4,7 @@ import { getPatientProfile } from '../../api/services/patient/patientService';
 import { getAppointments } from '../../api/services/appointments/appointmentService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
-import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
+import { IconCalendar, IconClock, IconDoctor, IconPlus, IconUser, IconList } from '../../components/common/Icons';
 import './PatientDashboardPage.css';
 
 function PatientDashboardPage() {
@@ -86,7 +86,7 @@ function PatientDashboardPage() {
             {patient?.gender === 'F' ? 'Bentornata' : 'Bentornato'} nel tuo portale salute.
           </p>
         </div>
-        <Link to="/patient/book" className="submit-button" style={{ textDecoration: 'none', marginTop: 0 }}>
+        <Link to="/patient/book" className="btn btn-primary">
           Prenota Visita
         </Link>
       </header>
@@ -119,8 +119,8 @@ function PatientDashboardPage() {
                         <div className="appointment-details">
                           <h3>{app.examName || 'Esame medico'}</h3>
                           <div className="appointment-meta">
-                            <span>🕒 {date.time}</span>
-                            <span>👨‍⚕️ {doctorName}</span>
+                            <span><IconClock size={14} /> {date.time}</span>
+                            <span><IconDoctor size={14} /> {doctorName}</span>
                           </div>
                         </div>
                       </div>
@@ -138,7 +138,7 @@ function PatientDashboardPage() {
               </div>
             ) : (
               <div className="empty-state">
-                <span className="empty-state-icon">📅</span>
+                <span className="empty-state-icon"><IconCalendar size={48} /></span>
                 <p>Non hai appuntamenti in programma.</p>
                 <Link to="/patient/book" className="home-link" style={{ color: '#007bff' }}>
                   Prenota il tuo primo esame
@@ -155,21 +155,21 @@ function PatientDashboardPage() {
             </div>
             <div className="quick-actions">
               <Link to="/patient/book" className="action-card">
-                <div className="action-icon">➕</div>
+                <div className="action-icon"><IconPlus size={20} /></div>
                 <div className="action-info">
                   <h3>Nuova Prenotazione</h3>
                   <p>Prenota un nuovo esame</p>
                 </div>
               </Link>
               <Link to="/patient/profile" className="action-card">
-                <div className="action-icon">👤</div>
+                <div className="action-icon"><IconUser size={20} /></div>
                 <div className="action-info">
                   <h3>Il mio Profilo</h3>
                   <p>Gestisci i tuoi dati</p>
                 </div>
               </Link>
               <Link to="/exams" className="action-card">
-                <div className="action-icon">📋</div>
+                <div className="action-icon"><IconList size={20} /></div>
                 <div className="action-info">
                   <h3>Lista Esami</h3>
                   <p>Sfoglia gli esami disponibili</p>

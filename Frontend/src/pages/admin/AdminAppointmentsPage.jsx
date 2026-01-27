@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  getAppointments, 
-  updateAppointment, 
-  cancelAppointment 
-} from '../../api/services/appointments/appointmentService';
+import { getAppointments, cancelAppointment } from '../../api/services/appointments/appointmentService';
 import { LoadingSpinner, ErrorMessage, ConfirmDialog } from '../../components/common';
+import { IconList, IconTrash, IconCalendar, IconClock, IconUser, IconDoctor } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
-import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
+import { Link } from 'react-router-dom';
 import './AdminAppointmentsPage.css';
 
 function AdminAppointmentsPage() {
@@ -14,13 +11,9 @@ function AdminAppointmentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   
-  // State for detail modal
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [updatingStatus, setUpdatingStatus] = useState(false);
-  
-  // State for delete confirmation
-  const [appointmentToDelete, setAppointmentToCancel] = useState(null);
+  const [appointmentToCancel, setAppointmentToCancel] = useState(null);
   const [isCancelling, setIsCancelling] = useState(false);
 
   const { showToast } = useToast();
@@ -43,52 +36,22 @@ function AdminAppointmentsPage() {
     }
   };
 
-  const handleViewDetails = (appointment) => {
-    setSelectedAppointment(appointment);
-  };
-
-  const handleStatusChange = async (newStatus) => {
-    if (!selectedAppointment || selectedAppointment.status === newStatus) return;
-    
-    setUpdatingStatus(true);
-    try {
-      await updateAppointment(selectedAppointment.id, { status: newStatus });
-      showToast('Stato aggiornato con successo', 'success');
-      
-      // Update local state
-      setAppointments(appointments.map(a => 
-        a.id === selectedAppointment.id ? { ...a, status: newStatus } : a
-      ));
-      setSelectedAppointment({ ...selectedAppointment, status: newStatus });
-    } catch (err) {
-      console.error(err);
-      showToast('Errore durante l\'aggiornamento dello stato', 'error');
-    } finally {
-      setUpdatingStatus(false);
-    }
-  };
-
   const handleCancelClick = (appointment) => {
     setAppointmentToCancel(appointment);
   };
 
   const confirmCancel = async () => {
-    if (!appointmentToDelete) return;
+    if (!appointmentToCancel) return;
     
     setIsCancelling(true);
     try {
-      await cancelAppointment(appointmentToDelete.id);
+      await cancelAppointment(appointmentToCancel.id);
       showToast('Prenotazione annullata con successo', 'success');
-      
-      // Update local state (mark as cancelled)
-      setAppointments(appointments.map(a => 
-        a.id === appointmentToDelete.id ? { ...a, status: 'cancelled' } : a
-      ));
+      fetchAppointments(); // Refresh the list
       setAppointmentToCancel(null);
     } catch (err) {
       console.error(err);
-      const message = err.message || 'Impossibile annullare la prenotazione.';
-      showToast(message, 'error');
+      showToast('Impossibile annullare la prenotazione.', 'error');
     } finally {
       setIsCancelling(false);
     }
@@ -100,10 +63,23 @@ function AdminAppointmentsPage() {
     const examName = (app.examName || '').toLowerCase();
     const search = searchTerm.toLowerCase();
     
-    return patientName.includes(search) || 
-           doctorName.includes(search) || 
-           examName.includes(search);
+    const matchesSearch = patientName.includes(search) || doctorName.includes(search) || examName.includes(search);
+    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
   });
+
+  const formatDate = (dateValue) => {
+    if (!dateValue) return '-';
+    const date = new Date(dateValue.endsWith('Z') ? dateValue : dateValue + 'Z');
+    return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  };
+
+  const formatTime = (dateValue) => {
+    if (!dateValue) return '-';
+    const date = new Date(dateValue.endsWith('Z') ? dateValue : dateValue + 'Z');
+    return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+  };
 
   if (loading) return <LoadingSpinner label="Caricamento prenotazioni..." />;
   if (error) return <ErrorMessage message={error} onRetry={fetchAppointments} />;
@@ -112,13 +88,20 @@ function AdminAppointmentsPage() {
     <div className="admin-appointments-container">
       <div className="admin-appointments-header">
         <h2>Gestione Prenotazioni</h2>
-        <div className="search-bar">
+        <div className="filters-bar">
           <input 
             type="text" 
-            placeholder="Cerca per paziente, dottore o esame..." 
+            placeholder="Cerca paziente, medico o esame..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="all">Tutti gli stati</option>
+            <option value="pending">In attesa</option>
+            <option value="confirmed">Confermati</option>
+            <option value="completed">Completati</option>
+            <option value="cancelled">Annullati</option>
+          </select>
         </div>
       </div>
 
@@ -128,7 +111,7 @@ function AdminAppointmentsPage() {
             <tr>
               <th>Data e Ora</th>
               <th>Paziente</th>
-              <th>Dottore</th>
+              <th>Medico</th>
               <th>Esame</th>
               <th>Stato</th>
               <th>Azioni</th>
@@ -138,136 +121,80 @@ function AdminAppointmentsPage() {
             {filteredAppointments.length > 0 ? (
               filteredAppointments.map(app => (
                 <tr key={app.id}>
-                  <td>{formatDateTime(app.appointmentDate)}</td>
-                  <td>{app.patientFirstName} {app.patientLastName}</td>
-                  <td>{getDoctorTitle(app.doctorGender)} {app.doctorLastName}</td>
+                  <td>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontWeight: 600 }}><IconCalendar size={14} /> {formatDate(app.appointmentDate)}</span>
+                      <span style={{ color: 'var(--text-muted)' }}><IconClock size={14} /> {formatTime(app.appointmentDate)}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <IconUser size={16} color="var(--text-muted)" />
+                      {app.patientFirstName} {app.patientLastName}
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <IconDoctor size={16} color="var(--text-muted)" />
+                      {app.doctorFirstName} {app.doctorLastName}
+                    </div>
+                  </td>
                   <td>{app.examName}</td>
                   <td>
                     <span className={`status-badge status-${app.status}`}>
-                      {app.status === 'pending' ? 'In attesa' : app.status === 'confirmed' ? 'Confermato' : 'Annullato'}
+                      {app.status === 'pending' ? 'In attesa' : 
+                       app.status === 'confirmed' ? 'Confermato' : 
+                       app.status === 'completed' ? 'Completato' : 'Annullato'}
                     </span>
                   </td>
-                  <td className="actions-cell">
-                    <button 
-                      className="btn-view"
-                      onClick={() => handleViewDetails(app)}
-                    >
-                      Dettagli
-                    </button>
-                    {app.status !== 'cancelled' && (
-                      <button 
-                        className="btn-delete"
-                        onClick={() => handleCancelClick(app)}
+                  <td>
+                    <div className="actions-cell">
+                      <Link 
+                        to={`/appointments/${app.id}`}
+                        className="btn btn-secondary btn-sm"
+                        title="Dettagli"
+                        style={{ padding: '0.4rem 0.8rem' }}
                       >
-                        Annulla
-                      </button>
-                    )}
+                        <IconList size={16} />
+                      </Link>
+                      {app.status !== 'cancelled' && (
+                        <button 
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => handleCancelClick(app)}
+                          title={app.status === 'completed' ? "Elimina" : "Annulla"}
+                          style={{ 
+                            padding: '0.4rem 0.8rem', 
+                            color: 'var(--error-color)', 
+                            borderColor: 'var(--error-color)' 
+                          }}
+                        >
+                          <IconTrash size={16} />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
-                  Nessuna prenotazione trovata
-                </td>
+                <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}> Nessuna prenotazione trovata </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* Appointment Details Modal */}
-      {selectedAppointment && (
-        <div className="appointment-detail-overlay">
-          <div className="appointment-detail-modal">
-            <button className="close-modal" onClick={() => setSelectedAppointment(null)}>&times;</button>
-            
-            <div className="detail-section">
-              <h3>Dettagli Prenotazione</h3>
-              <div className="info-grid">
-                <div className="info-item">
-                  <label>Data e Ora</label>
-                  <span>{formatDateTime(selectedAppointment.appointmentDate)}</span>
-                </div>
-                <div className="info-item">
-                  <label>Stato Attuale</label>
-                  <span className={`status-badge status-${selectedAppointment.status}`}>
-                    {selectedAppointment.status === 'pending' ? 'In attesa' : selectedAppointment.status === 'confirmed' ? 'Confermato' : 'Annullato'}
-                  </span>
-                </div>
-                <div className="info-item">
-                  <label>Esame</label>
-                  <span>{selectedAppointment.examName}</span>
-                </div>
-                <div className="info-item">
-                  <label>Durata</label>
-                  <span>{selectedAppointment.durationMinutes} minuti</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="detail-section">
-              <h3>Soggetti Coinvolti</h3>
-              <div className="info-grid">
-                <div className="info-item">
-                  <label>Paziente</label>
-                  <span>{selectedAppointment.patientFirstName} {selectedAppointment.patientLastName}</span>
-                </div>
-                <div className="info-item">
-                  <label>Email Paziente</label>
-                  <span>{selectedAppointment.patientEmail || '-'}</span>
-                </div>
-                <div className="info-item">
-                  <label>Dottore</label>
-                  <span>{getDoctorTitle(selectedAppointment.doctorGender)} {selectedAppointment.doctorFirstName} {selectedAppointment.doctorLastName}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="detail-section">
-              <h3>Note e Motivo</h3>
-              <div className="notes-box">
-                {selectedAppointment.reason || 'Nessun motivo specificato'}
-              </div>
-            </div>
-
-            {selectedAppointment.contraindications && (
-              <div className="detail-section">
-                <h3>Controindicazioni</h3>
-                <div className="notes-box" style={{ color: '#b91c1c', backgroundColor: '#fef2f2' }}>
-                  {selectedAppointment.contraindications}
-                </div>
-              </div>
-            )}
-
-            <div className="detail-section">
-              <h3>Gestione Stato</h3>
-              <div className="status-manager">
-                <select 
-                  className="status-select"
-                  value={selectedAppointment.status}
-                  onChange={(e) => handleStatusChange(e.target.value)}
-                  disabled={updatingStatus}
-                >
-                  <option value="pending">In attesa</option>
-                  <option value="confirmed">Confermato</option>
-                  <option value="cancelled">Annullato</option>
-                </select>
-                {updatingStatus && <span className="updating-text">Aggiornamento...</span>}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Confirm Cancel Dialog */}
-      {appointmentToDelete && (
+      {appointmentToCancel && (
         <ConfirmDialog
-          isOpen={!!appointmentToDelete}
-          title="Annulla Prenotazione"
-          message={`Sei sicuro di voler annullare la prenotazione del ${formatDate(appointmentToDelete.appointmentDate)} per il paziente ${appointmentToDelete.patientFirstName} ${appointmentToDelete.patientLastName}?`}
-          confirmLabel={isCancelling ? "Annullamento..." : "Annulla Prenotazione"}
-          cancelLabel="Mantieni"
+          isOpen={!!appointmentToCancel}
+          title={appointmentToCancel.status === 'completed' ? "Elimina Prenotazione" : "Annulla Prenotazione"}
+          message={
+            appointmentToCancel.status === 'completed' 
+              ? `Sei sicuro di voler eliminare definitivamente la prenotazione completata di ${appointmentToCancel.patientFirstName} ${appointmentToCancel.patientLastName}? Questa operazione rimuoverà il record dal database.`
+              : `Sei sicuro di voler annullare la prenotazione di ${appointmentToCancel.patientFirstName} ${appointmentToCancel.patientLastName} per l'esame ${appointmentToCancel.examName}?`
+          }
+          confirmLabel={isCancelling ? (appointmentToCancel.status === 'completed' ? "Eliminazione..." : "Annullamento...") : (appointmentToCancel.status === 'completed' ? "Sì, elimina" : "Sì, annulla")}
+          cancelLabel="No, mantieni"
           onConfirm={confirmCancel}
           onCancel={() => setAppointmentToCancel(null)}
           isDanger={true}

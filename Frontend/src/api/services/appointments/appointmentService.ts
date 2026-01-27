@@ -17,7 +17,7 @@ export interface Appointment {
   examName?: string;
   appointmentDate: string;
   durationMinutes: number;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   reason?: string;
   contraindications?: string;
 }

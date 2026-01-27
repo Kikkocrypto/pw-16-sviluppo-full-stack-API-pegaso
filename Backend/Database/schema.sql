@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS appointments (
     exam_id UUID NOT NULL,
     scheduled_at TIMESTAMPTZ NOT NULL,
     duration_minutes INTEGER DEFAULT 30 CHECK (duration_minutes > 0),
-    status VARCHAR(20) NOT NULL CHECK (status IN ('pending', 'confirmed', 'cancelled')),
+    status VARCHAR(20) NOT NULL CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed')),
     reason TEXT,
     contraindications TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

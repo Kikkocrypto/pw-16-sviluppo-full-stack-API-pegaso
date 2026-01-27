@@ -5,6 +5,7 @@ import {
   getDoctorAppointments 
 } from '../../api/services/doctor/doctorService';
 import { LoadingSpinner, ErrorMessage, ConfirmDialog } from '../../components/common';
+import { IconX, IconList, IconTrash } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
 import './AdminDoctorsPage.css';
@@ -136,19 +137,23 @@ function AdminDoctorsPage() {
                     </div>
                   </td>
                   <td>{doctor.email || '-'}</td>
-                  <td className="actions-cell">
-                    <button 
-                      className="btn-view"
-                      onClick={() => handleViewDetails(doctor)}
-                    >
-                      Dettagli
-                    </button>
-                    <button 
-                      className="btn-delete"
-                      onClick={() => handleDeleteClick(doctor)}
-                    >
-                      Elimina
-                    </button>
+                  <td>
+                    <div className="actions-cell">
+                      <button 
+                        className="btn-view"
+                        onClick={() => handleViewDetails(doctor)}
+                        title="Dettagli"
+                      >
+                        <IconList size={16} /> Dettagli
+                      </button>
+                      <button 
+                        className="btn-delete"
+                        onClick={() => handleDeleteClick(doctor)}
+                        title="Elimina"
+                      >
+                        <IconTrash size={16} /> Elimina
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -165,7 +170,9 @@ function AdminDoctorsPage() {
       {selectedDoctor && (
         <div className="doctor-detail-overlay">
           <div className="doctor-detail-modal">
-            <button className="close-modal" onClick={() => setSelectedDoctor(null)}>&times;</button>
+            <button className="close-modal" onClick={() => setSelectedDoctor(null)}>
+              <IconX size={24} />
+            </button>
             
             <div className="detail-section">
               <h3>Dati Professionali</h3>

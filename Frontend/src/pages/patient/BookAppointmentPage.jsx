@@ -5,6 +5,7 @@ import { getDoctorsByExam } from '../../api/services/doctor/doctorService';
 import { createAppointment } from '../../api/services/appointments/appointmentService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { IconCalendar, IconCheck } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { getErrorMessage } from '../../utils/errorUtils';
 import { getDoctorTitle } from '../../utils/formatters';
@@ -152,14 +153,14 @@ function BookAppointmentPage() {
     return (
       <div className="book-appointment">
         <div className="booking-container success-container">
-          <span className="success-icon">✅</span>
+          <span className="success-icon"><IconCheck size={64} /></span>
           <h1>Prenotazione Completata!</h1>
           <p>La tua richiesta è stata inviata. Riceverai una conferma a breve.</p>
           <div className="success-actions">
-            <Link to="/patient/dashboard" className="btn-primary">
+            <Link to="/patient/dashboard" className="btn btn-primary">
               Vai alla Dashboard
             </Link>
-            <Link to="/patient/appointments" className="btn-secondary">
+            <Link to="/patient/appointments" className="btn btn-secondary">
               Vedi i miei appuntamenti
             </Link>
           </div>
@@ -172,7 +173,7 @@ function BookAppointmentPage() {
     <div className="book-appointment">
       <header className="book-header">
         <h1>Prenota una Visita</h1>
-        <Link to="/patient/dashboard" className="btn-back">
+        <Link to="/patient/dashboard" className="btn btn-secondary">
           Annulla
         </Link>
       </header>
@@ -187,7 +188,7 @@ function BookAppointmentPage() {
             {step > 1 && step < 4 && selectedExam && (
               <div className="booking-summary-mini">
                 <span>Stai prenotando: <strong>{selectedExam.name}</strong></span>
-                <button className="btn-link" onClick={() => setStep(1)}>Cambia</button>
+                <button className="btn btn-secondary btn-sm" onClick={() => setStep(1)} style={{ padding: '0.25rem 0.75rem', fontSize: '0.8rem' }}>Cambia</button>
               </div>
             )}
 
@@ -214,7 +215,7 @@ function BookAppointmentPage() {
                 <h2>2. Scegli Data e Ora</h2>
                 <form onSubmit={handleDateSubmit} className="date-selection-form">
                   <div className="calendar-card">
-                    <div className="calendar-icon-large">📅</div>
+                    <div className="calendar-icon-large"><IconCalendar size={48} /></div>
                     <div className="form-group">
                       <label htmlFor="appointment-date">Quando vorresti effettuare la visita?</label>
                       <input 
@@ -239,10 +240,10 @@ function BookAppointmentPage() {
                     </div>
                   </div>
                   <div className="booking-actions">
-                    <button type="button" onClick={() => setStep(1)} className="btn-back">Indietro</button>
+                    <button type="button" onClick={() => setStep(1)} className="btn btn-secondary">Indietro</button>
                     <button 
                       type="submit" 
-                      className="submit-button" 
+                      className="btn btn-primary" 
                       disabled={!!dateError || !appointmentDate}
                     >
                       Cerca Medici Disponibili
@@ -256,7 +257,7 @@ function BookAppointmentPage() {
               <div className="booking-step">
                 <h2>3. Seleziona Medico e Dettagli</h2>
                 <div className="date-summary-badge">
-                  📅 {new Date(appointmentDate).toLocaleString('it-IT', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
+                  <IconCalendar size={18} /> {new Date(appointmentDate).toLocaleString('it-IT', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
                 </div>
                 <form onSubmit={handleSubmit}>
                   <div className="form-group">
@@ -301,8 +302,8 @@ function BookAppointmentPage() {
                   </div>
 
                   <div className="booking-actions">
-                    <button type="button" onClick={() => setStep(2)} className="btn-back">Indietro</button>
-                    <button type="submit" className="submit-button" disabled={loading || !selectedDoctor}>
+                    <button type="button" onClick={() => setStep(2)} className="btn btn-secondary">Indietro</button>
+                    <button type="submit" className="btn btn-primary" disabled={loading || !selectedDoctor}>
                       Conferma Prenotazione
                     </button>
                   </div>

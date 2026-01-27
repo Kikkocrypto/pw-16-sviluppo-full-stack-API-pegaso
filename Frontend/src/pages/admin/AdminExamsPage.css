@@ -1,0 +1,77 @@
+.admin-exams-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.doctor-assignment-modal {
+  max-width: 600px;
+}
+
+.modal-subtitle {
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-sm);
+}
+
+.doctor-selection-list {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.doctor-selection-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  transition: var(--transition-base);
+}
+
+.doctor-selection-item:last-child {
+  border-bottom: none;
+}
+
+.doctor-selection-item.assigned {
+  background: var(--primary-light);
+}
+
+.doctor-name {
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.btn-assign {
+  padding: 0.4rem 1rem;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+  border: 1px solid transparent;
+}
+
+.btn-assign.add {
+  background: var(--secondary-light);
+  color: var(--secondary-dark);
+  border-color: rgba(56, 161, 105, 0.2);
+}
+
+.btn-assign.add:hover {
+  background: var(--secondary-color);
+  color: white;
+}
+
+.btn-assign.remove {
+  background: #fff5f5;
+  color: var(--error-color);
+  border-color: rgba(229, 62, 62, 0.2);
+}
+
+.btn-assign.remove:hover {
+  background: var(--error-color);
+  color: white;
+}

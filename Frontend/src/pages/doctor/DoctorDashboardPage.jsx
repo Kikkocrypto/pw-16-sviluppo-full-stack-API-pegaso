@@ -4,7 +4,7 @@ import { getDoctorProfile } from '../../api/services/doctor/doctorService';
 import { getAppointments } from '../../api/services/appointments/appointmentService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
-import { getDoctorTitle } from '../../utils/formatters';
+import { IconCalendar, IconClock, IconUser, IconList } from '../../components/common/Icons';
 import './DoctorDashboardPage.css';
 
 function DoctorDashboardPage() {
@@ -83,7 +83,8 @@ function DoctorDashboardPage() {
   }).length;
 
   const pendingAppointments = appointments.filter(app => app.status === 'pending').length;
-  const activeAppointments = appointments.filter(app => app && app.status !== 'cancelled');
+  const activeAppointments = appointments.filter(app => app && app.status !== 'cancelled' && app.status !== 'completed');
+  const completedAppointments = appointments.filter(app => app.status === 'completed').length;
 
   const getGreeting = () => {
     if (!doctor) return 'Bentornato';
@@ -118,7 +119,11 @@ function DoctorDashboardPage() {
         </div>
         <div className="stat-card info">
           <span className="stat-value">{activeAppointments.length}</span>
-          <span className="stat-label">Totale attivi</span>
+          <span className="stat-label">In programma</span>
+        </div>
+        <div className="stat-card success">
+          <span className="stat-value">{completedAppointments}</span>
+          <span className="stat-label">Completati</span>
         </div>
       </div>
 
@@ -150,14 +155,16 @@ function DoctorDashboardPage() {
                         <div className="appointment-details">
                           <h3>{app.examName || 'Esame medico'}</h3>
                           <div className="appointment-meta">
-                            <span className="meta-item">🕒 {date.time}</span>
-                            <span className="meta-item">👤 {patientName}</span>
+                            <span className="meta-item"><IconClock size={14} /> {date.time}</span>
+                            <span className="meta-item"><IconUser size={14} /> {patientName}</span>
                           </div>
                         </div>
                       </div>
                       <div className="appointment-actions">
                         <span className={`status-badge status-${app.status}`}>
-                          {app.status === 'pending' ? 'In attesa' : 'Confermato'}
+                          {app.status === 'pending' ? 'In attesa' : 
+                           app.status === 'confirmed' ? 'Confermato' : 
+                           app.status === 'completed' ? 'Completato' : 'Annullato'}
                         </span>
                         <Link to={`/doctor/appointments/${app.id}`} className="btn-manage">
                           Gestisci
@@ -169,7 +176,7 @@ function DoctorDashboardPage() {
               </div>
             ) : (
               <div className="empty-state">
-                <span className="empty-state-icon">📅</span>
+                <span className="empty-state-icon"><IconCalendar size={48} /></span>
                 <p>Nessun appuntamento in programma.</p>
               </div>
             )}
@@ -183,14 +190,14 @@ function DoctorDashboardPage() {
             </div>
             <div className="quick-actions">
               <Link to="/doctor/appointments" className="action-card">
-                <div className="action-icon">📅</div>
+                <div className="action-icon"><IconCalendar size={20} /></div>
                 <div className="action-info">
                   <h3>Agenda Completa</h3>
                   <p>Gestisci tutto il calendario</p>
                 </div>
               </Link>
               <Link to="/exams" className="action-card">
-                <div className="action-icon">📋</div>
+                <div className="action-icon"><IconList size={20} /></div>
                 <div className="action-info">
                   <h3>Catalogo Esami</h3>
                   <p>Visualizza esami disponibili</p>
