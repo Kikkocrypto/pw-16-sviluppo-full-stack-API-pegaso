@@ -4,6 +4,7 @@ import { getPatientProfile } from '../../api/services/patient/patientService';
 import { getAppointments } from '../../api/services/appointments/appointmentService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
 import './PatientDashboardPage.css';
 
 function PatientDashboardPage() {
@@ -104,11 +105,6 @@ function PatientDashboardPage() {
               <div className="appointments-list">
                 {upcomingAppointments.map(app => {
                   const date = formatDate(app.appointmentDate);
-                  const getDoctorTitle = (gender) => {
-                    if (gender === 'F') return 'Dott.ssa';
-                    if (gender === 'M') return 'Dott.';
-                    return 'Dott.'; // Fallback
-                  };
                   const doctorName = app.doctorFirstName && app.doctorLastName 
                     ? `${getDoctorTitle(app.doctorGender)} ${app.doctorFirstName} ${app.doctorLastName}`
                     : 'Dottore';

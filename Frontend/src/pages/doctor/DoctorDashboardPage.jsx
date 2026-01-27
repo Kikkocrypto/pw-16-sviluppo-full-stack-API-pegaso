@@ -4,6 +4,7 @@ import { getDoctorProfile } from '../../api/services/doctor/doctorService';
 import { getAppointments } from '../../api/services/appointments/appointmentService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { getDoctorTitle } from '../../utils/formatters';
 import './DoctorDashboardPage.css';
 
 function DoctorDashboardPage() {
@@ -87,8 +88,7 @@ function DoctorDashboardPage() {
   const getGreeting = () => {
     if (!doctor) return 'Bentornato';
     const bentornato = doctor.gender === 'F' ? 'Bentornata' : 'Bentornato';
-    const title = doctor.gender === 'F' ? 'Dott.ssa' : 'Dott.';
-    return `${bentornato}, ${title}`;
+    return `${bentornato}, ${getDoctorTitle(doctor.gender)}`;
   };
 
   return (
