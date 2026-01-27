@@ -31,4 +31,7 @@ public class AppointmentCreateResponse {
 
     @Schema(description = "Status of the appointment")
     private String status;
+
+    @Schema(description = "Name of the exam")
+    private String examName;
 }

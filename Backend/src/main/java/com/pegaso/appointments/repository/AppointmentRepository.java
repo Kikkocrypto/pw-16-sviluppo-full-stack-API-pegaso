@@ -51,6 +51,17 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
                                                    @Param("startTime") OffsetDateTime startTime,
                                                    @Param("endTime") OffsetDateTime endTime);
 
+    // Verifica se esiste un appuntamento sovrapposto per un paziente
+    @Query(value = "SELECT COUNT(*) > 0 FROM appointments a " +
+           "WHERE a.patient_id = :patientId " +
+           "AND a.status != 'cancelled' " +
+           "AND a.scheduled_at < :endTime " +
+           "AND (a.scheduled_at + COALESCE(a.duration_minutes, 30) * INTERVAL '1 minute') > :startTime",
+           nativeQuery = true)
+    boolean existsOverlappingAppointmentForPatient(@Param("patientId") UUID patientId,
+                                                   @Param("startTime") OffsetDateTime startTime,
+                                                   @Param("endTime") OffsetDateTime endTime);
+
 // Recupero degli appuntamenti passati
     @Query(value = "SELECT * FROM appointments a " +
            "WHERE a.status != 'cancelled' " +

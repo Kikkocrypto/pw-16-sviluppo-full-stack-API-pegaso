@@ -96,14 +96,14 @@ public class AppointmentService {
                 throw new ForbiddenException("Accesso non autorizzato");
             }
             if (!appointment.getDoctor().getId().equals(doctorId)) {
-                throw new ForbiddenException("Unauthorized to view this appointment");
+                throw new ForbiddenException("Non sei autorizzato a visualizzare questo appuntamento");
             }
         } else if (patientId != null) {
             if (!patientRepository.existsById(patientId)) {
                 throw new ForbiddenException("Accesso non autorizzato");
             }
             if (!appointment.getPatient().getId().equals(patientId)) {
-                throw new ForbiddenException("Unauthorized to view this appointment");
+                throw new ForbiddenException("Non sei autorizzato a visualizzare questo appuntamento");
             }
         }
 
@@ -116,18 +116,18 @@ public class AppointmentService {
     @Transactional
     public AppointmentCreateResponse createAppointment(UUID patientId, AppointmentRequest request) {
         Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Paziente non trovato"));
 
         Exam exam = examRepository.findById(request.getExamId())
-                .orElseThrow(() -> new ResourceNotFoundException("Exam not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Esame non trovato"));
 
         if (!exam.getIsActive()) {
-            throw new BadRequestException("Exam is not active");
+            throw new BadRequestException("L'esame non è attivo");
         }
 
         List<DoctorExam> doctorExams = doctorExamRepository.findByExamIdWithDoctor(request.getExamId());
         if (doctorExams.isEmpty()) {
-            throw new ConflictException("No doctors are authorized for this exam");
+            throw new ConflictException("Nessun dottore è autorizzato a svolgere questo esame");
         }
 
         OffsetDateTime scheduledAt = request.getAppointmentDate()
@@ -135,23 +135,44 @@ public class AppointmentService {
                 .toOffsetDateTime();
 
         if (scheduledAt.isBefore(OffsetDateTime.now())) {
-            throw new BadRequestException("Appointment date must be in the future");
+            throw new BadRequestException("La data dell'appuntamento deve essere nel futuro");
         }
 
         Integer durationMinutes = exam.getDurationMinutes();
         OffsetDateTime endTime = scheduledAt.plusMinutes(durationMinutes);
 
+        // Verifica se il paziente ha già un appuntamento sovrapposto
+        if (appointmentRepository.existsOverlappingAppointmentForPatient(patientId, scheduledAt, endTime)) {
+            throw new ConflictException("Hai già un appuntamento sovrapposto");
+        }
+
         Doctor availableDoctor = null;
-        for (DoctorExam doctorExam : doctorExams) {
-            Doctor doctor = doctorExam.getDoctor();
-            if (!appointmentRepository.existsOverlappingAppointment(doctor.getId(), scheduledAt, endTime)) {
-                availableDoctor = doctor;
-                break;
+        if (request.getDoctorId() != null) {
+            Doctor requestedDoctor = doctorRepository.findById(request.getDoctorId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
+            
+            // Verifica se il dottore è abilitato per questo esame
+            if (!doctorExamRepository.existsByDoctorIdAndExamId(requestedDoctor.getId(), exam.getId())) {
+                throw new BadRequestException("Il dottore richiesto non è autorizzato a svolgere questo esame");
+            }
+
+            // Verifica disponibilità del dottore richiesto
+            if (appointmentRepository.existsOverlappingAppointment(requestedDoctor.getId(), scheduledAt, endTime)) {
+                throw new ConflictException("Il dottore richiesto non è disponibile a questo orario");
+            }
+            availableDoctor = requestedDoctor;
+        } else {
+            for (DoctorExam doctorExam : doctorExams) {
+                Doctor doctor = doctorExam.getDoctor();
+                if (!appointmentRepository.existsOverlappingAppointment(doctor.getId(), scheduledAt, endTime)) {
+                    availableDoctor = doctor;
+                    break;
+                }
             }
         }
 
         if (availableDoctor == null) {
-            throw new ConflictException("No doctors are available at the requested time slot for this exam");
+            throw new ConflictException("Nessun dottore è disponibile a questo orario per questo esame");
         }
 
         Appointment appointment = Appointment.builder()
@@ -184,6 +205,7 @@ public class AppointmentService {
                 .doctorId(appointment.getDoctor().getId())
                 .patientId(appointment.getPatient().getId())
                 .status(appointment.getStatus())
+                .examName(appointment.getExam().getName())
                 .build();
     }
 
@@ -205,6 +227,7 @@ public class AppointmentService {
                 .patientFirstName(a.getPatient().getFirstName())
                 .patientLastName(a.getPatient().getLastName())
                 .status(a.getStatus())
+                .examName(a.getExam().getName())
                 .build();
     }
 
@@ -223,20 +246,20 @@ public class AppointmentService {
             // Admin può modificare tutto (data, status, notes, contraindications)
         } else if (patientId != null) {
             if (!appointment.getPatient().getId().equals(patientId)) {
-                throw new ForbiddenException("Unauthorized to modify this appointment");
+                throw new ForbiddenException("Non sei autorizzato a modificare questo appuntamento");
             }
             if (request.getStatus() != null) {
-                throw new ConflictException("Patient cannot modify appointment status");
+                throw new ConflictException("Il paziente non può modificare lo stato dell'appuntamento");
             }
             if (request.getAppointmentDate() != null) {
-                throw new ConflictException("Patient cannot modify appointment date. Only admin can modify the appointment date.");
+                throw new ConflictException("Il paziente non può modificare la data dell'appuntamento. Solo l'admin può modificare la data dell'appuntamento.");
             }
         } else if (doctorId != null) {
             if (!appointment.getDoctor().getId().equals(doctorId)) {
-                throw new ForbiddenException("Unauthorized to modify this appointment");
+                throw new ForbiddenException("Non sei autorizzato a modificare questo appuntamento");
             }
             if (request.getAppointmentDate() != null || request.getNotes() != null || request.getContraindications() != null) {
-                throw new ConflictException("Doctor can only modify appointment status");
+                throw new ConflictException("Il dottore può solo modificare lo stato dell'appuntamento");
             }
         }
 
@@ -261,7 +284,7 @@ public class AppointmentService {
                     appointment.getId(), 
                     scheduledAt, 
                     endTime)) {
-                throw new ConflictException("Doctor is not available at the requested time slot");
+                throw new ConflictException("Il dottore non è disponibile a questo orario");
             }
 
             appointment.setScheduledAt(scheduledAt);
@@ -273,7 +296,7 @@ public class AppointmentService {
                 (!normalizedStatus.equals("pending") && 
                  !normalizedStatus.equals("confirmed") && 
                  !normalizedStatus.equals("cancelled"))) {
-                throw new BadRequestException("Invalid status. Allowed values: pending, confirmed, cancelled");
+                throw new BadRequestException("Stato non valido. I valori consentiti sono: pending, confirmed, cancelled");
             }
             appointment.setStatus(normalizedStatus);
         }
@@ -307,19 +330,19 @@ public class AppointmentService {
                 throw new ForbiddenException("Accesso non autorizzato");
             }
             if (!appointment.getDoctor().getId().equals(doctorId)) {
-                throw new ForbiddenException("Unauthorized to delete this appointment");
+                throw new ForbiddenException("Non sei autorizzato a cancellare questo appuntamento");
             }
         } else if (patientId != null) {
             if (!patientRepository.existsById(patientId)) {
                 throw new ForbiddenException("Accesso non autorizzato");
             }
             if (!appointment.getPatient().getId().equals(patientId)) {
-                throw new ForbiddenException("Unauthorized to delete this appointment");
+                throw new ForbiddenException("Non sei autorizzato a cancellare questo appuntamento");
             }
         }
 
         if ("cancelled".equals(appointment.getStatus())) {
-            throw new ConflictException("Appointment is already cancelled");
+            throw new ConflictException("L'appuntamento è già cancellato");
         }
 
         // Verifica che l'appuntamento possa essere annullato (almeno 2 giorni prima)
@@ -329,7 +352,7 @@ public class AppointmentService {
         OffsetDateTime cancellationDeadline = appointmentDate.minusDays(2);
         
         if (now.isAfter(cancellationDeadline) || now.isEqual(cancellationDeadline)) {
-            throw new ConflictException("Appointment cannot be cancelled. Cancellation must be requested at least 2 days before the appointment date.");
+            throw new ConflictException("L'appuntamento non può essere cancellato. La cancellazione deve essere richiesta almeno 2 giorni prima della data dell'appuntamento.");
         }
 
         appointment.setStatus("cancelled");
@@ -352,6 +375,7 @@ public class AppointmentService {
                 .status(appointment.getStatus())
                 .notes(appointment.getReason())
                 .contraindications(appointment.getContraindications())
+                .examName(appointment.getExam().getName())
                 .build();
     }
 }

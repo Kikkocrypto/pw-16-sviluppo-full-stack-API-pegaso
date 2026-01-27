@@ -52,9 +52,15 @@ function PatientDashboardPage() {
     let date;
     if (Array.isArray(dateValue)) {
       const [year, month, day, hour, minute] = dateValue;
-      date = new Date(year, month - 1, day, hour || 0, minute || 0);
+      // Il backend invia UTC, creiamo la data come UTC
+      date = new Date(Date.UTC(year, month - 1, day, hour || 0, minute || 0));
     } else {
-      date = new Date(dateValue);
+      // Se è una stringa ISO (es. "2026-02-15T10:00:00"), aggiungiamo 'Z' se manca 
+      // per forzare il parsing come UTC
+      const normalizedDate = typeof dateValue === 'string' && !dateValue.endsWith('Z') && !dateValue.includes('+')
+        ? `${dateValue}Z`
+        : dateValue;
+      date = new Date(normalizedDate);
     }
 
     if (isNaN(date.getTime())) {

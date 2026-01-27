@@ -23,8 +23,9 @@ export interface Appointment {
 export interface CreateAppointmentRequest {
   doctorId: string;
   examId: string;
-  scheduledAt: string;
-  reason?: string;
+  appointmentDate: string;
+  notes?: string;
+  contraindications?: string;
 }
 
 export interface AppointmentFilters {

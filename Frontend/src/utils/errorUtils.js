@@ -44,14 +44,7 @@ function isSensitiveError(error) {
  * @param {string} defaultMessage - Messaggio di default se non trovato
  * @returns {string} - Il messaggio di errore
  */
-export function getErrorMessage(error, defaultMessage = 'Si è verificato un errore') {
-  // Prevenzione account enumeration: per errori sensibili, usa messaggi generici
-  if (isSensitiveError(error)) {
-    const status = error.statusCode || error.status || error.response?.status;
-    if (status && GENERIC_ERROR_MESSAGES[status]) {
-      return GENERIC_ERROR_MESSAGES[status];
-    }
-  }
+export function getErrorMessage(error, defaultMessage = 'Si è verificato un errore', bypassSensitivity = false) {
   // Se è già una stringa, restituiscila
   if (typeof error === 'string') {
     return error || defaultMessage;
@@ -62,55 +55,61 @@ export function getErrorMessage(error, defaultMessage = 'Si è verificato un err
     return defaultMessage;
   }
 
-  // ApiClientError (ha message)
-  if (error.message && typeof error.message === 'string') {
-    return error.message;
-  }
-
-  // AxiosError - controlla error.response.data
-  if (error.response) {
-    const data = error.response.data;
+  // 1. Priorità assoluta ai dati strutturati della risposta
+  // Se è un ApiClientError, il messaggio è già stato estratto dal JSON nel client
+  if (error.name === 'ApiClientError' || error.statusCode) {
+    const status = error.statusCode || error.response?.status;
     
-    // Formato standardizzato del backend: { error: { message: ... } }
-    if (data?.error?.message) {
-      return data.error.message;
-    }
-    
-    // Messaggio diretto in data
-    if (data?.message) {
-      return data.message;
-    }
-    
-    // Se data è una stringa
-    if (typeof data === 'string') {
-      return data;
-    }
-  }
-
-  // Error standard
-  if (error.message) {
-    return error.message;
-  }
-
-  // Prova a estrarre da vari campi comuni
-  if (error.error?.message) {
-    return error.error.message;
-  }
-
-  if (error.details) {
-    return error.details;
-  }
-
-  // Se è un oggetto, prova a stringificarlo (per debug)
-  if (typeof error === 'object') {
-    try {
-      const stringified = JSON.stringify(error);
-      if (stringified !== '{}') {
-        return `Errore: ${stringified}`;
+    // Se non vogliamo bypassare la sensibilità (es. login), usiamo il messaggio generico
+    if (!bypassSensitivity && isSensitiveError(error)) {
+      if (status && GENERIC_ERROR_MESSAGES[status]) {
+        return GENERIC_ERROR_MESSAGES[status];
       }
-    } catch (e) {
-      // Ignora errori di stringificazione
     }
+    
+    // Se abbiamo un messaggio specifico (estratto dal backend), usiamolo
+    if (error.message && 
+        !error.message.toLowerCase().includes('status code') && 
+        error.message.toLowerCase() !== 'error 409' &&
+        error.message.toLowerCase() !== 'conflict') {
+      return error.message;
+    }
+  }
+
+  const responseData = error.response?.data || error.data;
+  if (responseData) {
+    // Formato standard: { message: ... }
+    if (responseData.message) {
+      const msg = responseData.message;
+      if (!bypassSensitivity && isSensitiveError(error)) {
+        const status = error.response?.status || error.status;
+        return GENERIC_ERROR_MESSAGES[status] || msg;
+      }
+      return msg;
+    }
+    
+    // Formato: { error: { message: ... } }
+    if (responseData.error?.message) {
+      const msg = responseData.error.message;
+      if (!bypassSensitivity && isSensitiveError(error)) {
+        const status = error.response?.status || error.status;
+        return GENERIC_ERROR_MESSAGES[status] || msg;
+      }
+      return msg;
+    }
+    
+    // Se data è una stringa diretta
+    if (typeof responseData === 'string' && responseData.length > 0 && !responseData.includes('<!DOCTYPE')) {
+      return responseData;
+    }
+  }
+
+  // 2. Fallback su error.message standard
+  if (error.message && typeof error.message === 'string') {
+    if (error.message.toLowerCase().includes('status code') || error.message.toLowerCase() === 'error 409') {
+      return defaultMessage;
+    }
+    return error.message;
   }
 
   return defaultMessage;
