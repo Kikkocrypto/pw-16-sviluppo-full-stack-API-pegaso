@@ -22,8 +22,8 @@ public class UpdateAppointmentRequest {
     @Schema(description = "Status of the appointment (pending, confirmed, cancelled)", example = "confirmed")
     private String status;
 
-    @Schema(description = "Optional notes for the appointment", example = "Patient requested morning appointment")
-    private String notes;
+    @Schema(description = "Reason for the visit", example = "Patient requested morning appointment")
+    private String reason;
 
     @Schema(description = "Optional contraindications for the appointment", example = "Patient has allergies to contrast agents")
     private String contraindications;

@@ -1,8 +1,10 @@
 import Toast from './Toast';
 import './Toast.css';
 
-
-// Container per i toast notifications
+/**
+ * Container per i toast notifications
+ * Gestisce la pila di notifiche in basso a destra
+ */
 function ToastContainer({ toasts, onRemove }) {
   if (!toasts || toasts.length === 0) {
     return null;

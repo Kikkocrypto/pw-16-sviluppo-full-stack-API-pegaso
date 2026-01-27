@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPatch } from '../../apiClient';
+import { api } from '../../apiClient';
 import { API_ROUTES, buildQueryString } from '../../routes';
 
 
@@ -24,7 +24,7 @@ export interface CreateAppointmentRequest {
   doctorId: string;
   examId: string;
   appointmentDate: string;
-  notes?: string;
+  reason?: string;
   contraindications?: string;
 }
 
@@ -36,31 +36,46 @@ export interface AppointmentFilters {
   offset?: number;
 }
 
+export interface UpdateAppointmentRequest {
+  appointmentDate?: string;
+  reason?: string;
+  contraindications?: string;
+  status?: string;
+}
+
 /**
  * Recupera la lista degli appuntamenti (filtra automaticamente in base al ruolo/header)
  */
 export async function getAppointments(filters: AppointmentFilters = {}): Promise<Appointment[]> {
   const queryString = buildQueryString(filters as any);
-  return apiGet<Appointment[]>(`${API_ROUTES.appointments.list}${queryString}`);
+  return api.get<Appointment[]>(`${API_ROUTES.appointments.list}${queryString}`);
 }
 
 /**
  * Recupera i dettagli di un singolo appuntamento
  */
 export async function getAppointmentDetail(id: string): Promise<Appointment> {
-  return apiGet<Appointment>(API_ROUTES.appointments.detail(id));
+  return api.get<Appointment>(API_ROUTES.appointments.detail(id));
 }
 
 /**
  * Crea un nuovo appuntamento (richiede header X-Demo-Patient-Id)
  */
 export async function createAppointment(data: CreateAppointmentRequest): Promise<Appointment> {
-  return apiPost<Appointment>(API_ROUTES.appointments.create, data);
+  return api.post<Appointment>(API_ROUTES.appointments.create, data);
 }
 
 /**
- * Annulla un appuntamento (richiede header X-Demo-Patient-Id)
+ * Aggiorna un appuntamento
  */
-export async function cancelAppointment(id: string): Promise<Appointment> {
-  return apiPatch<Appointment>(API_ROUTES.appointments.cancel(id));
+export async function updateAppointment(id: string, data: UpdateAppointmentRequest): Promise<Appointment> {
+  return api.patch<Appointment>(API_ROUTES.appointments.update(id), data);
+}
+
+/**
+ * Annulla un appuntamento (richiede header X-Demo-Patient-Id o X-Demo-Doctor-Id o X-Demo-Admin-Id)
+ * Il backend esegue un "soft delete" impostando lo stato a "cancelled"
+ */
+export async function cancelAppointment(id: string): Promise<void> {
+  return api.delete(API_ROUTES.appointments.delete(id));
 }

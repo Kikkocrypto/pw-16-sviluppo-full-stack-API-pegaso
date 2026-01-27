@@ -30,8 +30,8 @@ public class UpdateAppointmentResponse {
     @Schema(description = "Status of the appointment (pending, confirmed, cancelled)")
     private String status;
 
-    @Schema(description = "Notes for the appointment")
-    private String notes;
+    @Schema(description = "Reason for the visit")
+    private String reason;
 
     @Schema(description = "Contraindications for the appointment")
     private String contraindications;

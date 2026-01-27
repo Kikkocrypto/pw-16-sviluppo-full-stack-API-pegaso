@@ -45,6 +45,15 @@ public class AppointmentResponse {
     @Schema(description = "Status of the appointment (pending, confirmed, cancelled)")
     private String status;
 
+    @Schema(description = "Reason for the visit")
+    private String reason;
+
+    @Schema(description = "Contraindications for the visit")
+    private String contraindications;
+
+    @Schema(description = "Duration of the exam in minutes")
+    private Integer durationMinutes;
+
     @Schema(description = "Name of the exam")
     private String examName;
 }

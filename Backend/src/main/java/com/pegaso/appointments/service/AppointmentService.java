@@ -182,7 +182,7 @@ public class AppointmentService {
                 .scheduledAt(scheduledAt)
                 .durationMinutes(durationMinutes)
                 .status("pending")
-                .reason(request.getNotes())
+                .reason(request.getReason())
                 .contraindications(request.getContraindications())
                 .build();
 
@@ -205,6 +205,8 @@ public class AppointmentService {
                 .doctorId(appointment.getDoctor().getId())
                 .patientId(appointment.getPatient().getId())
                 .status(appointment.getStatus())
+                .reason(appointment.getReason())
+                .contraindications(appointment.getContraindications())
                 .examName(appointment.getExam().getName())
                 .build();
     }
@@ -227,6 +229,9 @@ public class AppointmentService {
                 .patientFirstName(a.getPatient().getFirstName())
                 .patientLastName(a.getPatient().getLastName())
                 .status(a.getStatus())
+                .reason(a.getReason())
+                .contraindications(a.getContraindications())
+                .durationMinutes(a.getDurationMinutes())
                 .examName(a.getExam().getName())
                 .build();
     }
@@ -243,7 +248,7 @@ public class AppointmentService {
             if (!adminRepository.existsById(adminId)) {
                 throw new ForbiddenException("Accesso non autorizzato");
             }
-            // Admin può modificare tutto (data, status, notes, contraindications)
+            // Admin può modificare tutto (data, status, reason, contraindications)
         } else if (patientId != null) {
             if (!appointment.getPatient().getId().equals(patientId)) {
                 throw new ForbiddenException("Non sei autorizzato a modificare questo appuntamento");
@@ -251,14 +256,21 @@ public class AppointmentService {
             if (request.getStatus() != null) {
                 throw new ConflictException("Il paziente non può modificare lo stato dell'appuntamento");
             }
+            // Il paziente può modificare la data solo se mancano almeno 2 giorni
             if (request.getAppointmentDate() != null) {
-                throw new ConflictException("Il paziente non può modificare la data dell'appuntamento. Solo l'admin può modificare la data dell'appuntamento.");
+                OffsetDateTime now = OffsetDateTime.now();
+                OffsetDateTime currentAppointmentDate = appointment.getScheduledAt();
+                OffsetDateTime reschedulingDeadline = currentAppointmentDate.minusDays(2);
+                
+                if (now.isAfter(reschedulingDeadline) || now.isEqual(reschedulingDeadline)) {
+                    throw new ConflictException("L'appuntamento non può essere spostato. La modifica deve essere richiesta almeno 2 giorni prima della data originale.");
+                }
             }
         } else if (doctorId != null) {
             if (!appointment.getDoctor().getId().equals(doctorId)) {
                 throw new ForbiddenException("Non sei autorizzato a modificare questo appuntamento");
             }
-            if (request.getAppointmentDate() != null || request.getNotes() != null || request.getContraindications() != null) {
+            if (request.getAppointmentDate() != null || request.getReason() != null || request.getContraindications() != null) {
                 throw new ConflictException("Il dottore può solo modificare lo stato dell'appuntamento");
             }
         }
@@ -278,13 +290,22 @@ public class AppointmentService {
                     ? appointment.getDurationMinutes() 
                     : 30;
             OffsetDateTime endTime = scheduledAt.plusMinutes(durationMinutes);
-            // Verifico che non sia sovrapposta ad un altro appuntamento
+            // Verifico che non sia sovrapposta ad un altro appuntamento per il dottore
             if (appointmentRepository.existsOverlappingAppointmentExcluding(
                     appointment.getDoctor().getId(), 
                     appointment.getId(), 
                     scheduledAt, 
                     endTime)) {
                 throw new ConflictException("Il dottore non è disponibile a questo orario");
+            }
+
+            // Verifico che non sia sovrapposta ad un altro appuntamento per il paziente
+            if (appointmentRepository.existsOverlappingAppointmentForPatientExcluding(
+                    appointment.getPatient().getId(),
+                    appointment.getId(),
+                    scheduledAt,
+                    endTime)) {
+                throw new ConflictException("Hai già un altro appuntamento in questa fascia oraria");
             }
 
             appointment.setScheduledAt(scheduledAt);
@@ -301,12 +322,12 @@ public class AppointmentService {
             appointment.setStatus(normalizedStatus);
         }
 
-        if (request.getNotes() != null) {
-            appointment.setReason(request.getNotes());
+        if (request.getReason() != null) {
+            appointment.setReason(request.getReason().trim().isEmpty() ? null : request.getReason().trim());
         }
 
         if (request.getContraindications() != null) {
-            appointment.setContraindications(request.getContraindications());
+            appointment.setContraindications(request.getContraindications().trim().isEmpty() ? null : request.getContraindications().trim());
         }
 
         Appointment updatedAppointment = appointmentRepository.save(appointment);
@@ -373,7 +394,7 @@ public class AppointmentService {
                 .appointmentDate(appointmentDate)
                 .patientId(appointment.getPatient().getId())
                 .status(appointment.getStatus())
-                .notes(appointment.getReason())
+                .reason(appointment.getReason())
                 .contraindications(appointment.getContraindications())
                 .examName(appointment.getExam().getName())
                 .build();

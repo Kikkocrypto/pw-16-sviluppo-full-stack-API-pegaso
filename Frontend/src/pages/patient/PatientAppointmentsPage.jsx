@@ -130,7 +130,7 @@ function PatientAppointmentsPage() {
                       <div className="meta-info">
                         <div className="meta-item">
                           <span className="icon">🕒</span>
-                          <span>{date.time} ({app.durationMinutes} min)</span>
+                          <span>{date.time}</span>
                         </div>
                         <div className="meta-item">
                           <span className="icon">👨‍⚕️</span>
@@ -148,7 +148,7 @@ function PatientAppointmentsPage() {
                           Annulla
                         </button>
                       )}
-                      <Link to={`/appointments/${app.id}`} className="btn-details">
+                      <Link to={`/patient/appointments/${app.id}`} className="btn-details">
                         Dettagli
                       </Link>
                     </div>

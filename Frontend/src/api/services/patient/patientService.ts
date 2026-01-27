@@ -6,7 +6,7 @@
  * - Creazione nuovo paziente
  */
 
-import { apiGet, apiPost, apiPatch, apiDelete } from '../../apiClient';
+import { api } from '../../apiClient';
 import { API_ROUTES } from '../../routes';
 
 /**
@@ -58,7 +58,7 @@ export interface CreatePatientData {
  */
 export async function getPatients(limit: number = 10): Promise<Patient[]> {
   // skipDemoHeaders: true per ottenere la lista senza header demo
-  const allPatients = await apiGet<Patient[]>(API_ROUTES.patients.list, {
+  const allPatients = await api.get<Patient[]>(API_ROUTES.patients.list, {
     skipDemoHeaders: true,
   } as any);
   
@@ -71,7 +71,7 @@ export async function getPatients(limit: number = 10): Promise<Patient[]> {
  * @returns Profilo del paziente
  */
 export async function getPatientProfile(): Promise<Patient> {
-  return apiGet<Patient>(API_ROUTES.patients.current);
+  return api.get<Patient>(API_ROUTES.patients.current);
 }
 
 /**
@@ -80,7 +80,7 @@ export async function getPatientProfile(): Promise<Patient> {
  * @returns Paziente creato con ID
  */
 export async function createPatient(data: CreatePatientData): Promise<Patient> {
-  return apiPost<Patient>(API_ROUTES.patients.create, data);
+  return api.post<Patient>(API_ROUTES.patients.create, data);
 }
 
 /**
@@ -89,12 +89,12 @@ export async function createPatient(data: CreatePatientData): Promise<Patient> {
  * @returns Profilo aggiornato
  */
 export async function updatePatientProfile(data: UpdatePatientData): Promise<Patient> {
-  return apiPatch<Patient>(API_ROUTES.patients.update, data);
+  return api.patch<Patient>(API_ROUTES.patients.update, data);
 }
 
 /**
  * Elimina il profilo del paziente corrente
  */
 export async function deletePatientProfile(): Promise<void> {
-  return apiDelete(API_ROUTES.patients.delete);
+  return api.delete(API_ROUTES.patients.delete);
 }
