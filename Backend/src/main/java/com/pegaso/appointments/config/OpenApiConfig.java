@@ -19,8 +19,8 @@ public class OpenApiConfig {
                         .description("API Backend for medical appointments booking system")
                         .version("1.0.0")
                         .contact(new Contact()
-                                .name("private healthcare")
-                                .email("support@privatehealthcare.com"))
+                                .name("Dottori & Dolori")
+                                .email("support@dottoridolori.com"))
                         .license(new License()
                                 .name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")));

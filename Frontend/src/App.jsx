@@ -3,6 +3,8 @@ import HomePage from './pages/shared/HomePage';
 import PatientAccessPage from './pages/patient/PatientAccessPage';
 import PatientDashboardPage from './pages/patient/PatientDashboardPage';
 import BookAppointmentPage from './pages/patient/BookAppointmentPage';
+import PatientProfilePage from './pages/patient/PatientProfilePage';
+import PatientAppointmentsPage from './pages/patient/PatientAppointmentsPage';
 import DoctorAccessPage from './pages/doctor/DoctorAccessPage';
 import DoctorDashboardPage from './pages/doctor/DoctorDashboardPage';
 import AppointmentManagePage from './pages/doctor/AppointmentManagePage';
@@ -32,6 +34,8 @@ function App() {
               <Route path="/patient" element={<PatientAccessPage />} />
               <Route path="/patient/dashboard" element={<PatientDashboardPage />} />
               <Route path="/patient/book" element={<BookAppointmentPage />} />
+              <Route path="/patient/profile" element={<PatientProfilePage />} />
+              <Route path="/patient/appointments" element={<PatientAppointmentsPage />} />
               
               <Route path="/doctor" element={<DoctorAccessPage />} />
               <Route path="/doctor/dashboard" element={<DoctorDashboardPage />} />

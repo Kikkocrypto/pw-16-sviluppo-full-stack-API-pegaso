@@ -1,0 +1,311 @@
+.patient-appointments-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.patient-appointments-page .back-button {
+  padding: 0.6rem 1.25rem;
+  background: white;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  color: #2c3e50;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  text-align: center;
+}
+
+.patient-appointments-page .back-button:hover {
+  background: #f8fafc;
+  color: #007bff;
+  border-color: #007bff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+  min-width: 200px;
+}
+
+.header-actions .submit-button {
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
+}
+
+.header-actions .submit-button:hover {
+  box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+  transform: translateY(-1px);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 2rem;
+}
+
+.header-content-main h1 {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+}
+
+.header-content-main p {
+  color: #7f8c8d;
+  margin: 0;
+}
+
+.appointments-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.appointment-card-full {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.appointment-card-full:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-card-full.cancelled {
+  opacity: 0.7;
+  background-color: #f8fafc;
+}
+
+.card-left {
+  margin-right: 2rem;
+}
+
+.date-badge {
+  background: #f0f7ff;
+  color: #007bff;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid #cce3ff;
+}
+
+.date-badge .day {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.date-badge .month {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.card-center {
+  flex: 1;
+}
+
+.exam-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.exam-info h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #2c3e50;
+}
+
+.status-tag {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pending { background: #fff3cd; color: #856404; }
+.status-confirmed { background: #d4edda; color: #155724; }
+.status-cancelled { background: #f8d7da; color: #721c24; }
+
+.meta-info {
+  display: flex;
+  gap: 2rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.card-right {
+  display: flex;
+  gap: 1rem;
+  margin-left: 2rem;
+}
+
+.btn-details {
+  padding: 0.6rem 1.25rem;
+  background: white;
+  border: 1px solid #cbd5e0;
+  color: #4a5568;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.btn-details:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.btn-cancel {
+  padding: 0.6rem 1.25rem;
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  color: #c53030;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background: #fed7d7;
+}
+
+.empty-state-full {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: white;
+  border-radius: 12px;
+  border: 2px dashed #e2e8f0;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+  .appointment-card-full {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+  
+  .card-left {
+    margin-right: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .date-badge {
+    width: 100%;
+    height: auto;
+    padding: 0.75rem;
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  .date-badge .day {
+    font-size: 1.25rem;
+  }
+
+  .date-badge .month {
+    font-size: 1rem;
+  }
+  
+  .card-center {
+    width: 100%;
+  }
+
+  .exam-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .exam-info h3 {
+    font-size: 1.1rem;
+  }
+  
+  .meta-info {
+    flex-direction: column;
+    gap: 0.75rem;
+    background: #f8fafc;
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .meta-item {
+    font-size: 0.85rem;
+  }
+  
+  .card-right {
+    margin-left: 0;
+    width: 100%;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f2f5;
+  }
+  
+  .card-right button, .card-right a {
+    flex: 1;
+    text-align: center;
+    padding: 0.75rem;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .patient-appointments-page {
+    padding: 1rem;
+  }
+
+  .header-content-main h1 {
+    font-size: 1.5rem;
+  }
+}
