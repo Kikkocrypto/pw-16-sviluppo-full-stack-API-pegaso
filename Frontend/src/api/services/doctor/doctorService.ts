@@ -42,11 +42,6 @@ export interface CreateDoctorData {
 
 /**
  * Recupera la lista dei dottori (per selettore demo)
- * 
- * Nota: questa chiamata viene fatta SENZA header demo per ottenere la lista completa.
- * Il backend restituisce la lista quando non viene passato l'header X-Demo-Doctor-Id.
- * Il limite viene applicato lato frontend dopo aver ricevuto tutti i risultati.
- * 
  * @param limit - Numero massimo di risultati da restituire (default: 10)
  * @returns Array di dottori limitato
  */

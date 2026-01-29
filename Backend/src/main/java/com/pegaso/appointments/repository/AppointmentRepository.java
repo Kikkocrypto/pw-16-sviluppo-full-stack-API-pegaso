@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
+// Repository per la gestione degli appuntamenti
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, UUID> {
 

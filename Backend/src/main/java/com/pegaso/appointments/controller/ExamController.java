@@ -49,6 +49,7 @@ public class ExamController {
                     description = "Internal server error"
             )
     })
+    // Recupero della lista di tutti gli esami + verifica che sia presente l'header ADMIN
     public ResponseEntity<List<ExamResponse>> getAllExams(
             @Parameter(description = "Filtra per stato attivo (opzionale)")
             @RequestParam(required = false) Boolean active) {

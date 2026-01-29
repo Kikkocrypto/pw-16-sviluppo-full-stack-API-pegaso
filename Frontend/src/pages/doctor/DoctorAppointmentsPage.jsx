@@ -7,7 +7,7 @@ import { IconCalendar, IconClock, IconUser, IconList, IconCheck, IconX, IconAler
 import { useToast } from '../../contexts/ToastContext';
 import { getErrorMessage } from '../../utils/errorUtils';
 import './DoctorAppointmentsPage.css';
-
+// Pagina di gestione degli appuntamenti per il dottore
 function DoctorAppointmentsPage() {
   const navigate = useNavigate();
   const { showError } = useToast();
@@ -20,6 +20,7 @@ function DoctorAppointmentsPage() {
     loadAppointments();
   }, []);
 
+  // Recupera la lista degli appuntamenti
   const loadAppointments = async () => {
     setLoading(true);
     setError(null);
@@ -34,6 +35,7 @@ function DoctorAppointmentsPage() {
     }
   };
 
+  // Formatta la data
   const formatDate = (dateValue) => {
     if (!dateValue) return { day: '?', month: '?', time: '?', full: 'Data non disponibile' };
     
@@ -60,6 +62,7 @@ function DoctorAppointmentsPage() {
     };
   };
 
+  // Filtra gli appuntamenti in base al filtro selezionato
   const filteredAppointments = appointments.filter(app => {
     if (filter === 'all') return true;
     return app.status === filter;

@@ -37,9 +37,7 @@ export class ApiClientError extends Error {
   }
 }
 
-/**
- * Crea e configura l'istanza Axios
- */
+// CONFIGURAZIONE DELL'ISTANZA AXIOS
 const createAxiosInstance = (): AxiosInstance => {
   const instance = axios.create({
     baseURL: API_BASE_URL,
@@ -53,7 +51,7 @@ const createAxiosInstance = (): AxiosInstance => {
   // Interceptor per aggiungere automaticamente gli header demo
   instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      // flag skipDemoHeaders per non dover aggiungere gli header demo (errore di sviluppo a backend)
+      // flag skipDemoHeaders  gestisce casi particolari in cui non si vuole aggiungere gli header demo
       if ((config as any).skipDemoHeaders) {
         return config;
       }
@@ -121,8 +119,6 @@ const handleApiError = (error: AxiosError<ApiError>): Promise<never> => {
 
   // Se il backend restituisce un formato di errore standardizzato
   if (data) {
-    // Il backend restituisce { status, error, message, ... }
-    // dove error è una stringa (es. "Conflict") e message è il dettaglio
     const backendMessage = data.message || (typeof data.error === 'string' ? data.error : data.error?.message);
     
     if (backendMessage) {
@@ -156,10 +152,7 @@ const handleApiError = (error: AxiosError<ApiError>): Promise<never> => {
 
 // Istanza Axios configurata
 const apiClient = createAxiosInstance();
-
-/**
- * Helper per le richieste GET
- */
+// Helper per le richieste GET
 export const apiGet = async <T = any>(
   endpoint: string,
   config?: AxiosRequestConfig
@@ -168,9 +161,7 @@ export const apiGet = async <T = any>(
   return response.data;
 };
 
-/**
- * Helper per le richieste POST
- */
+// Helper per le richieste POST
 export const apiPost = async <T = any>(
   endpoint: string,
   data?: any,
@@ -180,9 +171,7 @@ export const apiPost = async <T = any>(
   return response.data;
 };
 
-/**
- * Helper per le richieste PATCH
- */
+// Helper per le richieste PATCH
 export const apiPatch = async <T = any>(
   endpoint: string,
   data?: any,
@@ -192,9 +181,7 @@ export const apiPatch = async <T = any>(
   return response.data;
 };
 
-/**
- * Helper per le richieste DELETE
- */
+// Helper per le richieste DELETE
 export const apiDelete = async <T = any>(
   endpoint: string,
   config?: AxiosRequestConfig
@@ -203,9 +190,7 @@ export const apiDelete = async <T = any>(
   return response.data;
 };
 
-/**
- * Oggetto API con metodi helper (compatibilità con il vecchio codice)
- */
+// Oggetto API con metodi helper (compatibilità con il vecchio codice)
 export const api = {
   get: apiGet,
   post: apiPost,
@@ -213,12 +198,8 @@ export const api = {
   delete: apiDelete,
 };
 
-/**
- * Esporta anche l'istanza Axios per casi avanzati
- */
+// Esporta anche l'istanza Axios per casi avanzati
 export { apiClient };
 
-/**
- * Esporta il baseURL per riferimento
- */
+// Esporta il baseURL per riferimento
 export { API_BASE_URL };

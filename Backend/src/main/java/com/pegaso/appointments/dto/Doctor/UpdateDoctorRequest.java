@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// DTO per la richiesta di aggiornamento di un profilo dottore
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

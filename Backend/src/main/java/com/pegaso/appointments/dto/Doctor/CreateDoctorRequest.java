@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
+// DTO per la richiesta di creazione di un nuovo dottore
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

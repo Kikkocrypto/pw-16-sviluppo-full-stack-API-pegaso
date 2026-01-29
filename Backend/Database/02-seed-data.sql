@@ -45,8 +45,8 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO exams (id, name, description, duration_minutes, is_active, created_at, updated_at)
 VALUES (
     '770e8400-e29b-41d4-a716-446655440001',
-    'Colonscopia',
-    'Esame endoscopico del colon',
+    'Radiologia Digitale',
+    'Esame radiologico ad alta risoluzione',
     30,
     true,
     NOW(),

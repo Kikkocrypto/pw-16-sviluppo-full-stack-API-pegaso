@@ -8,6 +8,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { getErrorMessage } from '../../utils/errorUtils';
 import './AppointmentManagePage.css';
 
+// Pagina di gestione dell'appuntamento per il dottore
 function AppointmentManagePage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ function AppointmentManagePage() {
     loadAppointment();
   }, [id]);
 
+  // Recupera i dettagli dell'appuntamento
   const loadAppointment = async () => {
     setLoading(true);
     setError(null);
@@ -35,6 +37,7 @@ function AppointmentManagePage() {
     }
   };
 
+  // Aggiorna lo stato dell'appuntamento
   const handleStatusUpdate = async (newStatus) => {
     setSaving(true);
     try {
@@ -48,6 +51,7 @@ function AppointmentManagePage() {
     }
   };
 
+  // Formatta la data
   const formatDate = (dateValue) => {
     if (!dateValue) return 'Data non disponibile';
     const date = new Date(dateValue.endsWith('Z') ? dateValue : dateValue + 'Z');
@@ -61,10 +65,12 @@ function AppointmentManagePage() {
     });
   };
 
+  // Rendere il componente
   if (loading) return <LoadingSpinner message="Caricamento dettagli..." />;
   if (error) return <ErrorMessage message={error} onRetry={loadAppointment} />;
   if (!appointment) return <ErrorMessage message="Appuntamento non trovato." />;
 
+  // Verifica lo stato dell'appuntamento
   const isCancelled = appointment.status === 'cancelled';
   const isConfirmed = appointment.status === 'confirmed';
   const isPending = appointment.status === 'pending';

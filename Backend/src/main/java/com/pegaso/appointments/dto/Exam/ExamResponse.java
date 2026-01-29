@@ -20,7 +20,7 @@ public class ExamResponse {
     @Schema(description = "Unique identifier of the exam", example = "770e8400-e29b-41d4-a716-446655440001")
     private UUID id;
 
-    @Schema(description = "Exam name", example = "Colonscopia")
+    @Schema(description = "Exam name", example = "Radiologia Digitale")
     private String name;
 
     @Schema(description = "Exam description", example = "Esame endoscopico del colon")

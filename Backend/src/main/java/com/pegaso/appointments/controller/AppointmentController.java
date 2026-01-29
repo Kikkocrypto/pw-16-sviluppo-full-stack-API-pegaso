@@ -62,6 +62,7 @@ public class AppointmentController {
             @ApiResponse(responseCode = "403", description = "Forbidden - access not authorized"),
             @ApiResponse(responseCode = "500", description = "Internal server error - unexpected persistence error")
     })
+    // Recupero della lista di tutti gli appuntamenti + verifica che sia presente l'header ADMIN, DOCTOR o PATIENT
     public ResponseEntity<List<AppointmentResponse>> getAppointments(
             @Parameter(description = "Admin UUID; when present, returns all appointments")
             @RequestHeader(value = HEADER_ADMIN, required = false) String adminIdHeader,
@@ -142,6 +143,7 @@ public class AppointmentController {
             @ApiResponse(responseCode = "404", description = "Appointment not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error - unexpected persistence error")
     })
+    // Recupero di un singolo appuntamento in base all'ID + verifica che sia presente l'header ADMIN, DOCTOR o PATIENT
     public ResponseEntity<AppointmentResponse> getAppointmentById(
             @Parameter(description = "UUID of the appointment to retrieve", required = true, example = "990e8400-e29b-41d4-a716-446655440001")
             @PathVariable UUID appointmentId,

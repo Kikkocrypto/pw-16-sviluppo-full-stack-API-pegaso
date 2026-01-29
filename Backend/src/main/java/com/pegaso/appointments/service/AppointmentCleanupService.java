@@ -9,10 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 
-/**
- * Servizio per la pulizia automatica degli appuntamenti passati.
- * Esegue un cron job che elimina gli appuntamenti completati (passati) dal database.
- */
+// SERVIZIO ATTUALMENTE NON UTILIZZATO
 @Service
 @RequiredArgsConstructor
 @Slf4j

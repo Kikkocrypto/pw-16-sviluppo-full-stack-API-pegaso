@@ -7,7 +7,7 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 import { IconCalendar, IconClock, IconUser, IconList } from '../../components/common/Icons';
 import { getDoctorTitle } from '../../utils/formatters';
 import './DoctorDashboardPage.css';
-
+// Pagina di dashboard per il dottore
 function DoctorDashboardPage() {
   const [doctor, setDoctor] = useState(null);
   const [appointments, setAppointments] = useState([]);
@@ -18,6 +18,7 @@ function DoctorDashboardPage() {
     loadDashboardData();
   }, []);
 
+  // Recupera i dati della dashboard
   const loadDashboardData = async () => {
     setLoading(true);
     setError(null);
@@ -37,6 +38,7 @@ function DoctorDashboardPage() {
     }
   };
 
+  // Rendere il componente
   if (loading) {
     return <LoadingSpinner message="Caricamento dashboard dottore..." />;
   }

@@ -129,6 +129,7 @@ public class PatientController {
             @ApiResponse(responseCode = "409", description = "Conflict - email already exists"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    // Aggiornamento del profilo del paziente PATCH api/patients + verifica che sia presente l'header PATIENT
     public ResponseEntity<PatientResponse> updatePatientProfile(
             @Parameter(description = "UUID of the patient. Required for PATCH /api/patients.", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @RequestHeader(value = "X-Demo-Patient-Id", required = true) String patientIdHeader,
@@ -158,6 +159,7 @@ public class PatientController {
             @ApiResponse(responseCode = "404", description = "Patient not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    // Eliminazione del profilo del paziente DELETE api/patients + verifica che sia presente l'header PATIENT
     public ResponseEntity<Void> deletePatientProfile(
             @Parameter(description = "UUID del paziente da eliminare. Obbligatorio.", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @RequestHeader(value = "X-Demo-Patient-Id", required = true) String patientIdHeader) {

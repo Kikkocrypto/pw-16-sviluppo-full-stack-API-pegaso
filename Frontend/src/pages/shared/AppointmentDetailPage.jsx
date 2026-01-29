@@ -11,6 +11,7 @@ import { getErrorMessage } from '../../utils/errorUtils';
 import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
 import './AppointmentDetailPage.css';
 
+// Pagina di dettaglio di un appuntamento per il paziente o il dottore
 function AppointmentDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ function AppointmentDetailPage() {
     loadAppointment();
   }, [id]);
 
+  // Recupera i dettagli dell'appuntamento
   const loadAppointment = async () => {
     setLoading(true);
     setError(null);

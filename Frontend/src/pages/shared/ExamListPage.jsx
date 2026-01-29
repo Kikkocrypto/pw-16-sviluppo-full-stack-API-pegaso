@@ -6,13 +6,14 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 import EmptyState from '../../components/common/EmptyState';
 import { IconClock, IconUser, IconList } from '../../components/common/Icons';
 import './ExamListPage.css';
-
+// Pagina di lista degli esami per il paziente o il dottore
 function ExamListPage() {
   const [exams, setExams] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Recupera la lista degli esami
   useEffect(() => {
     const fetchData = async () => {
       try {
