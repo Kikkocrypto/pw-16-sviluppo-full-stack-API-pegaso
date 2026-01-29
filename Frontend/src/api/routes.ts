@@ -1,9 +1,4 @@
-/**
- * Definizione delle route API del backend
- * 
- * Tutte le route sono relative al baseURL configurato in apiClient
- * (es. se baseURL = 'http://localhost:8080/api', allora '/patients' diventa 'http://localhost:8080/api/patients')
- */
+// DEFINIZIONE DELLE ROUTE API DEL BACKEND, tutte partono dalla baseURL configurata in apiClient
 
 export const API_ROUTES = {
   // Health check
@@ -55,9 +50,7 @@ export const API_ROUTES = {
   },
 } as const;
 
-/**
- * Helper per costruire query string per le chiamate API
- */
+// Helper per costruire query string per le chiamate API
 export function buildQueryString(params: Record<string, string | number | boolean | null | undefined>): string {
   const searchParams = new URLSearchParams();
   
@@ -71,42 +64,3 @@ export function buildQueryString(params: Record<string, string | number | boolea
   return queryString ? `?${queryString}` : '';
 }
 
-/**
- * Esempi di utilizzo:
- * 
- * // Health check
- * api.get(API_ROUTES.health)
- * 
- * // Lista pazienti
- * api.get(API_ROUTES.patients.list)
- * api.get(API_ROUTES.patients.list + buildQueryString({ limit: 20 }))
- * 
- * // Dettaglio paziente
- * api.get(API_ROUTES.patients.detail('550e8400-e29b-41d4-a716-446655440000'))
- * 
- * // Profilo paziente corrente (con header X-Demo-Patient-Id)
- * api.get(API_ROUTES.patients.current)
- * 
- * // Creazione paziente
- * api.post(API_ROUTES.patients.create, { firstName: 'Mario', lastName: 'Rossi' })
- * 
- * // Lista prenotazioni paziente
- * api.get(API_ROUTES.patients.appointments('550e8400-e29b-41d4-a716-446655440000'))
- * 
- * // Lista prenotazioni con filtri
- * api.get(API_ROUTES.appointments.list + buildQueryString({ 
- *   status: 'pending', 
- *   from: '2026-02-01T00:00:00Z',
- *   limit: 20 
- * }))
- * 
- * // Creazione prenotazione (con header X-Demo-Patient-Id)
- * api.post(API_ROUTES.appointments.create, {
- *   doctorId: '...',
- *   examId: '...',
- *   scheduledAt: '2026-02-15T10:00:00Z'
- * })
- * 
- * // Annullamento prenotazione (con header X-Demo-Patient-Id)
- * api.patch(API_ROUTES.appointments.cancel('880e8400-e29b-41d4-a716-446655440003'))
- */

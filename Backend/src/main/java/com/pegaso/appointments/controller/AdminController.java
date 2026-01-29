@@ -356,6 +356,7 @@ public class AdminController {
                     description = "Internal server error"
             )
     })
+    // Recupero della lista di tutti i dottori + verifica che sia presente l'header ADMIN
     public ResponseEntity<List<DoctorProfileResponse>> getAllDoctors(
             @Parameter(description = "UUID of the admin. Required.", required = true, example = "880e8400-e29b-41d4-a716-446655440001")
             @RequestHeader(value = HEADER_ADMIN, required = false) String adminIdHeader) {

@@ -5,6 +5,7 @@ import { LoadingSpinner, ErrorMessage } from '../../components/common';
 import { IconClock, IconCheck, IconX } from '../../components/common/Icons';
 import './ExamDetailPage.css';
 
+// Pagina di dettaglio di un esame per il paziente o il dottore
 function ExamDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ function ExamDetailPage() {
     fetchExamDetail();
   }, [id]);
 
+  // Recupera i dettagli dell'esame
   const fetchExamDetail = async () => {
     try {
       setLoading(true);
@@ -30,6 +32,7 @@ function ExamDetailPage() {
     }
   };
 
+  // Rendere il componente
   if (loading) return <LoadingSpinner message="Caricamento dettagli esame..." />;
   if (error) return <ErrorMessage message={error} onRetry={fetchExamDetail} />;
   if (!exam) return <ErrorMessage message="Esame non trovato." />;

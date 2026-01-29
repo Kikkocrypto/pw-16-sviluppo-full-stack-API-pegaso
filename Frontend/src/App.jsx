@@ -21,7 +21,7 @@ import AdminExamsPage from './pages/admin/AdminExamsPage';
 import Header from './components/shared/Header';
 import { ToastProvider } from './contexts/ToastContext';
 import './App.css';
-
+// Pagina principale dell'applicazione
 function App() {
   return (
     <ToastProvider>

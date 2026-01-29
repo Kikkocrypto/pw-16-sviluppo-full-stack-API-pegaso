@@ -13,6 +13,7 @@ import { validateField } from '../../utils/validation';
 import './AdminPage.css';
 import './AdminExamsPage.css';
 
+// Pagina di gestione degli esami per l'admin
 function AdminExamsPage() {
   const [exams, setExams] = useState([]);
   const [allDoctors, setAllDoctors] = useState([]);
@@ -38,6 +39,7 @@ function AdminExamsPage() {
     fetchInitialData();
   }, []);
 
+  // Recupera la lista degli esami e dei dottori
   const fetchInitialData = async () => {
     try {
       setLoading(true);
@@ -56,6 +58,7 @@ function AdminExamsPage() {
     }
   };
 
+  // Recupera la lista degli esami
   const fetchExams = async () => {
     try {
       const data = await getExams();
@@ -65,6 +68,7 @@ function AdminExamsPage() {
     }
   };
 
+  // Apri il dialog di creazione/modifica di un esame
   const handleOpenModal = (exam = null) => {
     const initialData = exam ? {
       name: exam.name,
@@ -91,11 +95,13 @@ function AdminExamsPage() {
     setIsModalOpen(true);
   };
 
+  // Verifica se il form è cambiato
   const isFormChanged = () => {
     if (!initialFormData) return false;
     return JSON.stringify(formData) !== JSON.stringify(initialFormData);
   };
 
+  // Verifica se il form è valido
   const isFormValid = () => {
     return (
       formData.name.trim() !== '' &&
@@ -106,6 +112,7 @@ function AdminExamsPage() {
     );
   };
 
+  // Chiude il dialog di creazione/modifica di un esame
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCurrentExam(null);
@@ -113,11 +120,13 @@ function AdminExamsPage() {
     setTouchedFields({});
   };
 
+  // Apri il dialog di gestione dei dottori per un esame
   const handleOpenDoctorModal = (exam) => {
     setCurrentExam(exam);
     setIsDoctorModalOpen(true);
   };
 
+  // Chiude il dialog di gestione dei dottori per un esame
   const handleCloseDoctorModal = () => {
     setIsDoctorModalOpen(false);
     setCurrentExam(null);

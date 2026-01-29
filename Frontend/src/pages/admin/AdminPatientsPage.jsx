@@ -10,7 +10,7 @@ import { IconX, IconList, IconTrash } from '../../components/common/Icons';
 import { useToast } from '../../contexts/ToastContext';
 import { getDoctorTitle, formatDateTime } from '../../utils/formatters';
 import './AdminPatientsPage.css';
-
+// Pagina di gestione dei pazienti per l'admin
 function AdminPatientsPage() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +32,7 @@ function AdminPatientsPage() {
     fetchPatients();
   }, []);
 
+  // Recupera la lista dei pazienti
   const fetchPatients = async () => {
     try {
       setLoading(true);
@@ -46,6 +47,7 @@ function AdminPatientsPage() {
     }
   };
 
+  // Apri il dialog di dettagli per un paziente
   const handleViewDetails = async (patient) => {
     setSelectedPatient(patient);
     setLoadingAppointments(true);
@@ -60,10 +62,12 @@ function AdminPatientsPage() {
     }
   };
 
+  // Apri il dialog di eliminazione per un paziente
   const handleDeleteClick = (patient) => {
     setPatientToDelete(patient);
   };
 
+  // Elimina un paziente
   const confirmDelete = async () => {
     if (!patientToDelete) return;
     
@@ -81,7 +85,8 @@ function AdminPatientsPage() {
       setIsDeleting(false);
     }
   };
-
+  
+  // Filtra i pazienti in base al termine di ricerca e al nome o email
   const filteredPatients = patients.filter(patient => {
     const fullName = `${patient.firstName} ${patient.lastName}`.toLowerCase();
     const email = (patient.email || '').toLowerCase();

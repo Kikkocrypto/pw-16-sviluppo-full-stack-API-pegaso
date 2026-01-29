@@ -19,7 +19,7 @@ public class CreateExamRequest {
 
     @NotBlank(message = "Name is required")
     @Size(max = 150, message = "Name must not exceed 150 characters")
-    @Schema(description = "Exam name (unique)", example = "Colonscopia", required = true, maxLength = 150)
+    @Schema(description = "Exam name (unique)", example = "Radiologia Digitale", required = true, maxLength = 150)
     private String name;
 
     @Schema(description = "Exam description", example = "Esame endoscopico del colon")

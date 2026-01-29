@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { IconUser, IconDoctor, IconCalendar, IconSettings } from '../../components/common/Icons';
 import './AdminPage.css';
 
+// Pagina di gestione del sistema per l'admin
 function AdminPage() {
   return (
     <div className="admin-page">

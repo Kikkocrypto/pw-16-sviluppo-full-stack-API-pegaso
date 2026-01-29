@@ -7,7 +7,7 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 import { IconCalendar, IconClock, IconDoctor, IconPlus, IconUser, IconList } from '../../components/common/Icons';
 import { getDoctorTitle } from '../../utils/formatters';
 import './PatientDashboardPage.css';
-
+// Pagina di dashboard per il paziente
 function PatientDashboardPage() {
   const [patient, setPatient] = useState(null);
   const [appointments, setAppointments] = useState([]);

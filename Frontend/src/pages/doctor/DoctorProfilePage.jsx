@@ -9,7 +9,7 @@ import { validateField as validateFieldUtil, validateDoctorForm } from '../../ut
 import { normalizePhoneNumber, ensurePhonePrefix } from '../../utils/phoneUtils';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import './DoctorProfilePage.css';
-
+// Pagina di gestione del profilo per il dottore
 function DoctorProfilePage() {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
@@ -32,6 +32,7 @@ function DoctorProfilePage() {
     loadProfile();
   }, []);
 
+  // Recupera il profilo del dottore
   const loadProfile = async () => {
     setLoading(true);
     try {
@@ -52,6 +53,7 @@ function DoctorProfilePage() {
     }
   };
 
+  // Valida il campo
   const validateField = (name, value) => {
     const errors = { ...formErrors };
     const error = validateFieldUtil(name, value, { required: name === 'firstName' || name === 'lastName' });
@@ -65,6 +67,7 @@ function DoctorProfilePage() {
     setFormErrors(errors);
   };
 
+  // Gestione del cambio dei campi
   const handleChange = (e) => {
     const { name, value } = e.target;
     let processedValue = value;
@@ -77,11 +80,13 @@ function DoctorProfilePage() {
     validateField(name, processedValue);
   };
 
+  // Verifica se il form è cambiato
   const isFormChanged = () => {
     if (!initialData) return false;
     return JSON.stringify(formData) !== JSON.stringify(initialData);
   };
 
+  // Verifica se il form è valido
   const isFormValid = () => {
     return (
       formData.firstName.trim() !== '' &&
@@ -91,6 +96,7 @@ function DoctorProfilePage() {
     );
   };
 
+  // Gestione del salvataggio del form
   const handleSubmit = async (e) => {
     e.preventDefault();
     

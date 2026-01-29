@@ -27,7 +27,8 @@ function AdminDoctorsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const { showToast } = useToast();
-
+  
+  // Recupera la lista dei dottori
   useEffect(() => {
     fetchDoctors();
   }, []);
@@ -46,6 +47,7 @@ function AdminDoctorsPage() {
     }
   };
 
+  // Apri il dialog di dettagli per un dottore
   const handleViewDetails = async (doctor) => {
     setSelectedDoctor(doctor);
     setLoadingAppointments(true);
@@ -64,9 +66,10 @@ function AdminDoctorsPage() {
     setDoctorToDelete(doctor);
   };
 
+  // Elimina un dottore
   const confirmDelete = async () => {
     if (!doctorToDelete) return;
-    
+    // Imposta lo stato di eliminazione
     setIsDeleting(true);
     try {
       await deleteDoctorAdmin(doctorToDelete.id);
@@ -82,6 +85,7 @@ function AdminDoctorsPage() {
     }
   };
 
+  // Filtra i dottori in base al termine di ricerca e alla specializzazione
   const filteredDoctors = doctors.filter(doctor => {
     const fullName = `${doctor.firstName} ${doctor.lastName}`.toLowerCase();
     const specialization = (doctor.specialization || '').toLowerCase();
@@ -89,6 +93,7 @@ function AdminDoctorsPage() {
     return fullName.includes(search) || specialization.includes(search);
   });
 
+  // Rendere il componente
   if (loading) return <LoadingSpinner label="Caricamento dottori..." />;
   if (error) return <ErrorMessage message={error} onRetry={fetchDoctors} />;
 

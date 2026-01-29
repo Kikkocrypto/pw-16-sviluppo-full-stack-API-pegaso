@@ -5,6 +5,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { useToast } from '../../contexts/ToastContext';
 import { getErrorMessage } from '../../utils/errorUtils';
+import { getDoctorTitle } from '../../utils/formatters';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { IconCalendar, IconClock, IconDoctor, IconList, IconTrash, IconPlus } from '../../components/common/Icons';
 import './PatientAppointmentsPage.css';

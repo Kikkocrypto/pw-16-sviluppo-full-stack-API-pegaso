@@ -21,16 +21,16 @@ ON CONFLICT (id) DO NOTHING;
 -- ========== ESAMI aggiuntivi ==========
 INSERT INTO exams (id, name, description, duration_minutes, is_active, created_at, updated_at)
 VALUES
-    ('770e8400-e29b-41d4-a716-446655440002', 'Esame del sangue', 'Emocromo e parametri biochimici', 15, true, NOW(), NOW()),
-    ('770e8400-e29b-41d4-a716-446655440003', 'Risonanza magnetica', 'RM senza e con mezzo di contrasto', 45, true, NOW(), NOW()),
-    ('770e8400-e29b-41d4-a716-446655440004', 'Ecografia addominale', 'Ecografia addome completo', 25, true, NOW(), NOW())
+    ('770e8400-e29b-41d4-a716-446655440002', 'Ecografia', 'Ecografia diagnostica per immagini', 20, true, NOW(), NOW()),
+    ('770e8400-e29b-41d4-a716-446655440003', 'Radiografia Dentale', 'Panoramica dentale digitale', 15, true, NOW(), NOW()),
+    ('770e8400-e29b-41d4-a716-446655440004', 'Mammografia', 'Esame diagnostico mammario', 30, true, NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- ========== ASSOCIAZIONI MEDICO–ESAME (doctor_exams) ==========
--- Francesco Bianchi: Colonscopia (già medico seed)
--- Dexter: Esame sangue, Risonanza
--- Deborah: Ecografia, Colonscopia
--- Masuka: Esame sangue, Medicina legale → usiamo Esame sangue + Colonscopia
+-- Francesco Bianchi: Radiologia Digitale (già medico seed)
+-- Dexter: Ecografia, Radiografia Dentale
+-- Deborah: Mammografia, Radiologia Digitale
+-- Masuka: Ecografia, Radiologia Digitale
 INSERT INTO doctor_exams (doctor_id, exam_id, created_at)
 VALUES
     ('660e8400-e29b-41d4-a716-446655440001', '770e8400-e29b-41d4-a716-446655440001', NOW()),
@@ -43,20 +43,20 @@ VALUES
 ON CONFLICT (doctor_id, exam_id) DO NOTHING;
 
 -- ========== PRENOTAZIONI ==========
--- Mario Rossi (550e...000) → Francesco Bianchi, Colonscopia
--- Rita → Dexter, Esame sangue
--- Harrison → Deborah, Ecografia
--- Lila → Masuka, Esame sangue
--- Arthur → Dexter, Risonanza
--- Mario → Dexter, Esame sangue
--- Rita → Deborah, Colonscopia
+-- Mario Rossi (550e...000) → Francesco Bianchi, Radiologia Digitale
+-- Rita → Dexter, Ecografia
+-- Harrison → Deborah, Mammografia
+-- Lila → Masuka, Ecografia
+-- Arthur → Dexter, Radiografia Dentale
+-- Mario → Dexter, Ecografia
+-- Rita → Deborah, Radiologia Digitale
 INSERT INTO appointments (id, patient_id, doctor_id, exam_id, scheduled_at, duration_minutes, status, reason, created_at, updated_at)
 VALUES
-    ('aa0e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440000', '660e8400-e29b-41d4-a716-446655440001', '770e8400-e29b-41d4-a716-446655440001', '2025-02-03 09:00:00+00', 30, 'confirmed', 'Controllo programmato', NOW(), NOW()),
-    ('aa0e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440001', '660e8400-e29b-41d4-a716-446655440002', '770e8400-e29b-41d4-a716-446655440002', '2025-02-04 10:30:00+00', 15, 'confirmed', 'Emocromo di routine', NOW(), NOW()),
-    ('aa0e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440002', '660e8400-e29b-41d4-a716-446655440003', '770e8400-e29b-41d4-a716-446655440004', '2025-02-05 14:00:00+00', 25, 'pending', 'Controllo crescita', NOW(), NOW()),
-    ('aa0e8400-e29b-41d4-a716-446655440004', '550e8400-e29b-41d4-a716-446655440003', '660e8400-e29b-41d4-a716-446655440004', '770e8400-e29b-41d4-a716-446655440002', '2025-02-06 11:00:00+00', 15, 'pending', 'Check-up', NOW(), NOW()),
-    ('aa0e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440004', '660e8400-e29b-41d4-a716-446655440002', '770e8400-e29b-41d4-a716-446655440003', '2025-02-07 08:30:00+00', 45, 'cancelled', 'RM colonna', NOW(), NOW()),
-    ('aa0e8400-e29b-41d4-a716-446655440006', '550e8400-e29b-41d4-a716-446655440000', '660e8400-e29b-41d4-a716-446655440002', '770e8400-e29b-41d4-a716-446655440002', '2025-02-10 09:30:00+00', 15, 'confirmed', 'Esame sangue', NOW(), NOW()),
-    ('aa0e8400-e29b-41d4-a716-446655440007', '550e8400-e29b-41d4-a716-446655440001', '660e8400-e29b-41d4-a716-446655440003', '770e8400-e29b-41d4-a716-446655440001', '2025-02-12 15:00:00+00', 30, 'pending', 'Colonscopia', NOW(), NOW())
+    ('aa0e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440000', '660e8400-e29b-41d4-a716-446655440001', '770e8400-e29b-41d4-a716-446655440001', '2026-02-03 09:00:00+00', 30, 'confirmed', 'Controllo periodico', NOW(), NOW()),
+    ('aa0e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440001', '660e8400-e29b-41d4-a716-446655440002', '770e8400-e29b-41d4-a716-446655440002', '2026-02-04 10:30:00+00', 20, 'confirmed', 'Ecografia muscolo-tendinea', NOW(), NOW()),
+    ('aa0e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440002', '660e8400-e29b-41d4-a716-446655440003', '770e8400-e29b-41d4-a716-446655440004', '2026-02-05 14:00:00+00', 30, 'pending', 'Screening preventivo', NOW(), NOW()),
+    ('aa0e8400-e29b-41d4-a716-446655440004', '550e8400-e29b-41d4-a716-446655440003', '660e8400-e29b-41d4-a716-446655440004', '770e8400-e29b-41d4-a716-446655440002', '2026-02-06 11:00:00+00', 20, 'pending', 'Controllo ecografico', NOW(), NOW()),
+    ('aa0e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440004', '660e8400-e29b-41d4-a716-446655440002', '770e8400-e29b-41d4-a716-446655440003', '2026-02-07 08:30:00+00', 15, 'cancelled', 'Panoramica dentale', NOW(), NOW()),
+    ('aa0e8400-e29b-41d4-a716-446655440006', '550e8400-e29b-41d4-a716-446655440000', '660e8400-e29b-41d4-a716-446655440002', '770e8400-e29b-41d4-a716-446655440002', '2026-02-10 09:30:00+00', 20, 'confirmed', 'Controllo ecografico', NOW(), NOW()),
+    ('aa0e8400-e29b-41d4-a716-446655440007', '550e8400-e29b-41d4-a716-446655440001', '660e8400-e29b-41d4-a716-446655440003', '770e8400-e29b-41d4-a716-446655440001', '2026-02-12 15:00:00+00', 30, 'pending', 'Radiologia toracica', NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;

@@ -174,7 +174,7 @@ public class AppointmentService {
         if (availableDoctor == null) {
             throw new ConflictException("Nessun dottore è disponibile a questo orario per questo esame");
         }
-
+        // Creazione dell'appuntamento
         Appointment appointment = Appointment.builder()
                 .patient(patient)
                 .doctor(availableDoctor)
@@ -186,6 +186,7 @@ public class AppointmentService {
                 .contraindications(request.getContraindications())
                 .build();
 
+        // Salvataggio dell'appuntamento
         Appointment savedAppointment = appointmentRepository.save(appointment);
 
         return mapToCreateResponse(savedAppointment);

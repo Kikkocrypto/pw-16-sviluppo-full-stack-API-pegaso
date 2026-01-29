@@ -9,7 +9,7 @@ import { validateField as validateFieldUtil, validatePatientForm } from '../../u
 import { normalizePhoneNumber, ensurePhonePrefix } from '../../utils/phoneUtils';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import './PatientProfilePage.css';
-
+// Pagina di gestione del profilo per il paziente
 function PatientProfilePage() {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
@@ -33,6 +33,7 @@ function PatientProfilePage() {
     loadProfile();
   }, []);
 
+  // Recupera il profilo del paziente
   const loadProfile = async () => {
     setLoading(true);
     try {
@@ -54,6 +55,7 @@ function PatientProfilePage() {
     }
   };
 
+  // Valida il campo
   const validateField = (name, value) => {
     const errors = { ...formErrors };
     const error = validateFieldUtil(name, value, { required: name === 'firstName' || name === 'lastName' });

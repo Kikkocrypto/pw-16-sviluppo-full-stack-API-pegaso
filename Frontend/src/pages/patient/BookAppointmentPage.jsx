@@ -11,6 +11,7 @@ import { getErrorMessage } from '../../utils/errorUtils';
 import { getDoctorTitle } from '../../utils/formatters';
 import './BookAppointmentPage.css';
 
+// Pagina di prenotazione di un appuntamento per il paziente
 function BookAppointmentPage() {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();

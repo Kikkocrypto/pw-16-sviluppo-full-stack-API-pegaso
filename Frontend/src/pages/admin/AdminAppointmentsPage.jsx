@@ -7,6 +7,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { Link } from 'react-router-dom';
 import './AdminAppointmentsPage.css';
 
+// Pagina di gestione delle prenotazioni per l'admin
 function AdminAppointmentsPage() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +24,7 @@ function AdminAppointmentsPage() {
     fetchAppointments();
   }, []);
 
+  // Recupera la lista delle prenotazioni
   const fetchAppointments = async () => {
     try {
       setLoading(true);
@@ -37,10 +39,12 @@ function AdminAppointmentsPage() {
     }
   };
 
+  // Apri il dialog di conferma per annullare una prenotazione
   const handleCancelClick = (appointment) => {
     setAppointmentToCancel(appointment);
   };
 
+  // Annulla una prenotazione
   const confirmCancel = async () => {
     if (!appointmentToCancel) return;
     
@@ -58,6 +62,7 @@ function AdminAppointmentsPage() {
     }
   };
 
+  // Filtra le prenotazioni in base al termine di ricerca e al filtro di stato
   const filteredAppointments = appointments.filter(app => {
     const patientName = `${app.patientFirstName} ${app.patientLastName}`.toLowerCase();
     const doctorName = `${app.doctorFirstName} ${app.doctorLastName}`.toLowerCase();
@@ -70,12 +75,14 @@ function AdminAppointmentsPage() {
     return matchesSearch && matchesStatus;
   });
 
+  // Formatta la data
   const formatDate = (dateValue) => {
     if (!dateValue) return '-';
     const date = new Date(dateValue.endsWith('Z') ? dateValue : dateValue + 'Z');
     return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
+  // Formatta l'ora
   const formatTime = (dateValue) => {
     if (!dateValue) return '-';
     const date = new Date(dateValue.endsWith('Z') ? dateValue : dateValue + 'Z');
@@ -84,7 +91,8 @@ function AdminAppointmentsPage() {
 
   if (loading) return <LoadingSpinner label="Caricamento prenotazioni..." />;
   if (error) return <ErrorMessage message={error} onRetry={fetchAppointments} />;
-
+  
+  // Rendere il componente
   return (
     <div className="admin-appointments-container">
       <AdminQuickNav />
