@@ -1,4 +1,4 @@
-# pw-16-sviluppo-full-stack-API-pegaso
+# pw-16-damiano-francesco-web-app
 
 ### Come avviare l'applicazione
 
@@ -11,3 +11,6 @@
 4. Saranno inoltre eseguiti script .sql, presenti nella cartella /Backend/Database, che inseriscono dati di test nel database e creano schemi, relazioni, vincoli, indici.
 
 5. Et voilà, Dottori & dolori è servita. (Niente di più semplice)
+
+
+ELABORATO/PROJECT WORK DI DAMIANO FRANCESCO, Matricola 0312300145
